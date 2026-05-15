@@ -35,7 +35,7 @@ class HomeCalendar extends StatelessWidget {
           },
           
           // Thiết lập hiển thị mặc định là dạng Tuần (Week) cho gọn gàng
-          calendarFormat: CalendarFormat.week, 
+          calendarFormat: CalendarFormat.month, 
           // Cho phép các tùy chọn chuyển đổi định dạng (Tuần, 2 tuần, Tháng)
           availableCalendarFormats: const {
             CalendarFormat.month: 'Month',

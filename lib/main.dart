@@ -5,7 +5,11 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'features/task/data/repositories/mock_task_repository_impl.dart';
-
+import 'features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'features/task/domain/usecase/add__task.dart';
+import 'features/task/domain/usecase/delete_task.dart';
+import 'features/task/domain/usecase/get_task.dart';
+import 'features/task/domain/usecase/update_task.dart';
 /// Điểm bắt đầu của toàn bộ ứng dụng (Entry point).
 void main() async {
   // Đảm bảo Flutter Engine đã được khởi tạo xong trước khi chạy các setup bất đồng bộ (async).
@@ -15,13 +19,18 @@ void main() async {
   // Yêu cầu bắt buộc để package `table_calendar` có thể format ngày tháng đúng chuẩn.
   await initializeDateFormatting(); 
 
+  // Khởi tạo Repository dùng chung cho các tính năng
+  final taskRepository = MockTaskRepositoryImpl();
+
   // Chạy ứng dụng
-  runApp(const StudyFlowApp());
+  runApp(StudyFlowApp(taskRepository: taskRepository));
 }
 
 /// Lớp gốc chứa toàn bộ cấu hình chung của ứng dụng
 class StudyFlowApp extends StatelessWidget {
-  const StudyFlowApp({super.key});
+  final MockTaskRepositoryImpl taskRepository;
+
+  const StudyFlowApp({super.key, required this.taskRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +42,16 @@ class StudyFlowApp extends StatelessWidget {
         // Cú pháp ChangeNotifierProvider sẽ tự động lắng nghe và dọn dẹp bộ nhớ (dispose) khi không dùng nữa.
         ChangeNotifierProvider(
           create: (_) => HomeViewModel(
-            taskRepository: MockTaskRepositoryImpl(), // Dependency Injection (có thể thay = Isar sau này)
+            taskRepository: taskRepository, // Dependency Injection (có thể thay = Isar sau này)
+          ),
+        ),
+        // Khởi tạo TaskViewmodel và tiêm các UseCase vào nó
+        ChangeNotifierProvider(
+          create: (_) => TaskViewmodel(
+            addTaskUseCase: AddTask(taskRepository),
+            deleteTaskUseCase: DeleteTask(taskRepository),
+            getTaskUseCase: GetTask(taskRepository),
+            updateTaskUseCase: UpdateTask(taskRepository),
           ),
         ),
       ],
