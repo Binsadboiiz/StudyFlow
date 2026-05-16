@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'features/home/presentation/screens/home_screen.dart';
+import 'features/home/presentation/screens/main_screen.dart';
 import 'features/home/presentation/viewmodels/home_viewmodel.dart';
-import 'features/task/data/repositories/mock_task_repository_impl.dart';
+import 'features/task/data/datasource/task_local_datasource.dart';
+import 'features/task/data/models/task_model.dart';
+import 'features/task/data/repositories/task_repository_impl.dart';
+import 'features/task/domain/repositories/task_repository.dart';
 import 'features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'features/task/domain/usecase/add__task.dart';
 import 'features/task/domain/usecase/delete_task.dart';
@@ -19,8 +25,16 @@ void main() async {
   // Yêu cầu bắt buộc để package `table_calendar` có thể format ngày tháng đúng chuẩn.
   await initializeDateFormatting(); 
 
+  // Khởi tạo Isar
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [TaskModelSchema],
+    directory: dir.path,
+  );
+
   // Khởi tạo Repository dùng chung cho các tính năng
-  final taskRepository = MockTaskRepositoryImpl();
+  final taskLocalDatasource = TaskLocalDatasource(isar);
+  final taskRepository = TaskRepositoryImpl(taskLocalDatasource);
 
   // Chạy ứng dụng
   runApp(StudyFlowApp(taskRepository: taskRepository));
@@ -28,7 +42,7 @@ void main() async {
 
 /// Lớp gốc chứa toàn bộ cấu hình chung của ứng dụng
 class StudyFlowApp extends StatelessWidget {
-  final MockTaskRepositoryImpl taskRepository;
+  final TaskRepository taskRepository;
 
   const StudyFlowApp({super.key, required this.taskRepository});
 
@@ -66,7 +80,7 @@ class StudyFlowApp extends StatelessWidget {
           useMaterial3: true,
         ),
         // Màn hình đầu tiên hiện lên khi mở app
-        home: const HomeScreen(),
+        home: const MainScreen(),
       ),
     );
   }

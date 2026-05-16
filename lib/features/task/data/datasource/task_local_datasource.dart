@@ -1,29 +1,35 @@
+import 'package:isar/isar.dart';
 import 'package:studyflow/features/task/data/models/task_model.dart';
 
 class TaskLocalDatasource {
-  final List<TaskModel> _tasks = [];
+  final Isar isar;
+
+  TaskLocalDatasource(this.isar);
 
   Future<List<TaskModel>> getTasksForDate(DateTime date) async {
-    return _tasks.where((task) {
-      return task.date.year == date.year &&
-        task.date.month == date.month &&
-        task.date.day == date.day;
-    }).toList();
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+
+    return await isar.taskModels.filter()
+      .dateBetween(startOfDay, endOfDay)
+      .findAll();
   }
 
   Future<void> addTask(TaskModel task) async {
-    _tasks.add(task);
+    await isar.writeTxn(() async {
+      await isar.taskModels.put(task);
+    });
   }
 
   Future<void> updateTask(TaskModel updatedTask) async {
-    final index = _tasks.indexWhere((t) => t.id == updatedTask.id);
-
-    if(index != -1) {
-      _tasks[index] = updatedTask;
-    }
+    await isar.writeTxn(() async {
+      await isar.taskModels.put(updatedTask);
+    });
   }
 
   Future<void> deleteTask(int id) async {
-    _tasks.removeWhere((task) => task.id == id);
+    await isar.writeTxn(() async {
+      await isar.taskModels.delete(id);
+    });
   }
 }

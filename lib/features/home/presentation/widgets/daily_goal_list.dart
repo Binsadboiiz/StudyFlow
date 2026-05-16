@@ -25,7 +25,12 @@ class DailyGoalList extends StatelessWidget {
 
         // 3. Trạng thái Có dữ liệu: Hiển thị danh sách task dưới dạng ListView (mỗi task là 1 hàng ngang)
         return ListView.separated(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 16.0,
+            bottom: 100.0, // Thêm khoảng trống dưới cùng để không bị che bởi BottomAppBar
+          ),
           itemCount: viewModel.dailyTasks.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12.0), // Khoảng cách giữa các hàng
           itemBuilder: (context, index) {

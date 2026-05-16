@@ -74,6 +74,10 @@ class _TaskScreenState extends State<TaskScreen> {
           // Khu vực danh sách các Task hiển thị bên dưới
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 100, // Thêm khoảng trống dưới cùng để không bị che bởi BottomAppBar
+              ),
               itemCount: vm.tasks.length,
               itemBuilder: (context, index) {
                 final task = vm.tasks[index];

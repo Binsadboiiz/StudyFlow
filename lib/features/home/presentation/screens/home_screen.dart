@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
@@ -12,35 +13,103 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar hiển thị thanh tiêu đề ở trên cùng
+      extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar
+      // AppBar hiện đại với hiệu ứng kính mờ (Glassmorphism)
       appBar: AppBar(
-        title: const Text('StudyFlow', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      
-      // Nội dung chính của màn hình: Được xếp dọc bằng Column
-      body: const Column(
-        children: [
-          // 1. Phần Widget hiển thị lịch (chiếm khoảng trống vừa đủ ở trên)
-          HomeCalendar(),
-          SizedBox(height: 8), // Khoảng cách nhỏ giữa lịch và danh sách
-          
-          // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày.
-          // Expanded bắt buộc DailyGoalList phải chiếm TOÀN BỘ khoảng trống còn lại bên dưới lịch
-          Expanded(child: DailyGoalList()),
+        backgroundColor: Colors.white.withOpacity(0.2),
+        elevation: 0,
+        toolbarHeight: 80,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+        title: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
+              child: const CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.blueAccent,
+                backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Have a good day,',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  'StudyFlow 👋',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
+                onPressed: () {},
+              ),
+            ),
+          )
         ],
       ),
       
-      // Nút hình tròn nổi ở góc dưới bên phải (Dùng để thêm Task mới)
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Mở màn hình quản lý Task
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const TaskScreen()),
-          );
-        },
-        child: const Icon(Icons.add), // Icon dấu cộng
+      // Nội dung chính của màn hình: Được xếp dọc bằng Column
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/backgrounds/background_app.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: const SafeArea(
+          bottom: false, // Không cần thiết lập SafeArea cho bottom vì có extendBody rồi
+          child: Column(
+            children: [
+              SizedBox(height: 70), // Khoảng trống đẩy Lịch xuống dưới AppBar
+              // 1. Phần Widget hiển thị lịch (chiếm khoảng trống vừa đủ ở trên)
+              HomeCalendar(),
+              SizedBox(height: 8), // Khoảng cách nhỏ giữa lịch và danh sách
+              
+              // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày.
+              // Expanded bắt buộc DailyGoalList phải chiếm TOÀN BỘ khoảng trống còn lại bên dưới lịch
+              Expanded(child: DailyGoalList()),
+            ],
+          ),
+        ),
       ),
     );
   }
