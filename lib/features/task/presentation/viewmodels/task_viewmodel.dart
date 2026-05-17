@@ -24,8 +24,19 @@ class TaskViewmodel extends ChangeNotifier {
   // Danh sách các công việc hiện tại (State của View)
   List<Task> tasks = [];
 
+  // Ngày đang được chọn trên TaskScreen (mặc định = hôm nay)
+  DateTime _selectedDate = DateTime.now();
+  DateTime get selectedDate => _selectedDate;
+
+  /// Chọn ngày mới và tải lại danh sách task cho ngày đó
+  Future<void> selectDate(DateTime date) async {
+    _selectedDate = date;
+    await loadTask(date);
+  }
+
   /// Tải danh sách công việc theo ngày
   Future<void> loadTask(DateTime date) async {
+    _selectedDate = date;
     tasks = await getTaskUseCase(date);
     notifyListeners(); // Thông báo cho UI (các Widget đang listen) biết dữ liệu đã thay đổi để vẽ lại
   }

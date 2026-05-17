@@ -5,6 +5,8 @@ class Task {
   final String title; // Tiêu đề ngắn gọn của mục tiêu
   final String description; // Mô tả chi tiết thêm nếu cần
   final DateTime date; // Ngày thực hiện mục tiêu này
+  final DateTime? startTime; // Thời gian bắt đầu cụ thể (giờ:phút) - nullable vì không bắt buộc
+  final DateTime? endTime; // Thời gian kết thúc cụ thể (giờ:phút) - nullable vì không bắt buộc
   final bool isCompleted; // Trạng thái hoàn thành (true là đã xong, false là chưa xong)
 
   // Constructor yêu cầu cung cấp các thông tin cơ bản, mặc định chưa hoàn thành (isCompleted = false)
@@ -13,6 +15,8 @@ class Task {
     required this.title,
     required this.description,
     required this.date,
+    this.startTime,
+    this.endTime,
     this.isCompleted = false,
   });
 
@@ -24,6 +28,8 @@ class Task {
     String? title,
     String? description,
     DateTime? date,
+    DateTime? startTime,
+    DateTime? endTime,
     bool? isCompleted,
   }) {
     return Task(
@@ -31,7 +37,12 @@ class Task {
       title: title ?? this.title,
       description: description ?? this.description,
       date: date ?? this.date,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
       isCompleted: isCompleted ?? this.isCompleted,
     );
   }
+
+  /// Kiểm tra task có thời gian cụ thể hay không (dùng cho Schedule)
+  bool get hasTimeSlot => startTime != null;
 }

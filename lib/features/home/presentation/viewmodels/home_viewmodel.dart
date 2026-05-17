@@ -51,6 +51,11 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  /// Public method để các ViewModel khác có thể trigger reload (đồng bộ dữ liệu)
+  Future<void> refreshTasks() async {
+    await _loadTasksForSelectedDate();
+  }
+
   /// Hàm đổi trạng thái hoàn thành (Check/Uncheck) của một task khi người dùng ấn vào task đó
   Future<void> toggleTaskCompletion(Task task) async {
     // Tạo bản sao của task hiện tại nhưng đảo ngược trạng thái isCompleted (true thành false, false thành true)

@@ -10,6 +10,8 @@ class TaskModel {
   late String title;
   late String description;
   late DateTime date;
+  DateTime? startTime; // Thời gian bắt đầu (nullable)
+  DateTime? endTime; // Thời gian kết thúc (nullable)
   late bool isCompleted;
 
   TaskModel();
@@ -20,6 +22,8 @@ class TaskModel {
       ..title = task.title
       ..description = task.description
       ..date = task.date
+      ..startTime = task.startTime
+      ..endTime = task.endTime
       ..isCompleted = task.isCompleted;
   }
 
@@ -29,6 +33,8 @@ class TaskModel {
       title: title,
       description: description,
       date: date,
+      startTime: startTime,
+      endTime: endTime,
       isCompleted: isCompleted,
     );
   }

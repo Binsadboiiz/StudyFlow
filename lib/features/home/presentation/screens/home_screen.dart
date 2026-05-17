@@ -87,7 +87,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       
-      // Nội dung chính của màn hình: Được xếp dọc bằng Column
+      // Nội dung chính: Toàn bộ màn hình scroll được (Calendar + Task list)
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -95,18 +95,27 @@ class HomeScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        child: const SafeArea(
+        child: SafeArea(
           bottom: false, // Không cần thiết lập SafeArea cho bottom vì có extendBody rồi
-          child: Column(
-            children: [
-              SizedBox(height: 70), // Khoảng trống đẩy Lịch xuống dưới AppBar
-              // 1. Phần Widget hiển thị lịch (chiếm khoảng trống vừa đủ ở trên)
-              HomeCalendar(),
-              SizedBox(height: 8), // Khoảng cách nhỏ giữa lịch và danh sách
-              
-              // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày.
-              // Expanded bắt buộc DailyGoalList phải chiếm TOÀN BỘ khoảng trống còn lại bên dưới lịch
-              Expanded(child: DailyGoalList()),
+          child: CustomScrollView(
+            slivers: [
+              // Khoảng trống đẩy nội dung xuống dưới AppBar
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 70),
+              ),
+              // 1. Phần Widget hiển thị lịch
+              const SliverToBoxAdapter(
+                child: HomeCalendar(),
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 8),
+              ),
+              // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày
+              // Dùng SliverFillRemaining với hasScrollBody: false để DailyGoalList
+              // chiếm phần còn lại và scroll cùng Calendar
+              const SliverToBoxAdapter(
+                child: DailyGoalList(),
+              ),
             ],
           ),
         ),

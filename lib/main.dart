@@ -16,6 +16,8 @@ import 'features/task/domain/usecase/add__task.dart';
 import 'features/task/domain/usecase/delete_task.dart';
 import 'features/task/domain/usecase/get_task.dart';
 import 'features/task/domain/usecase/update_task.dart';
+import 'features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
+
 /// Điểm bắt đầu của toàn bộ ứng dụng (Entry point).
 void main() async {
   // Đảm bảo Flutter Engine đã được khởi tạo xong trước khi chạy các setup bất đồng bộ (async).
@@ -62,6 +64,15 @@ class StudyFlowApp extends StatelessWidget {
         // Khởi tạo TaskViewmodel và tiêm các UseCase vào nó
         ChangeNotifierProvider(
           create: (_) => TaskViewmodel(
+            addTaskUseCase: AddTask(taskRepository),
+            deleteTaskUseCase: DeleteTask(taskRepository),
+            getTaskUseCase: GetTask(taskRepository),
+            updateTaskUseCase: UpdateTask(taskRepository),
+          ),
+        ),
+        // Khởi tạo ScheduleViewmodel và tiêm các UseCase vào nó
+        ChangeNotifierProvider(
+          create: (_) => ScheduleViewmodel(
             addTaskUseCase: AddTask(taskRepository),
             deleteTaskUseCase: DeleteTask(taskRepository),
             getTaskUseCase: GetTask(taskRepository),
