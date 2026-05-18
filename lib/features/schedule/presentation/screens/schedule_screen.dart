@@ -19,14 +19,6 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<ScheduleViewmodel>().loadWeekTasks();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final vm = context.watch<ScheduleViewmodel>();
 
@@ -57,7 +49,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2E7D32).withOpacity(0.1),
+                        color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -98,11 +90,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       tasks: vm.selectedDayTasks,
                       selectedDay: vm.selectedDay,
                       onHourTapped: (hour) => _showAddDialog(context, vm, initialHour: hour),
-                      onTaskToggle: (task) {
-                        vm.toggleScheduleTask(task);
-                        // Đồng bộ sang Task và Home
-                        context.read<TaskViewmodel>().loadTask(context.read<TaskViewmodel>().selectedDate);
-                        context.read<HomeViewModel>().refreshTasks();
+                      onTaskToggle: (task) async {
+                        await vm.toggleScheduleTask(task);
+                        if (!context.mounted) return;
+                        final taskVm = context.read<TaskViewmodel>();
+                        final homeVm = context.read<HomeViewModel>();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) return;
+                          taskVm.loadTask(taskVm.selectedDate);
+                          homeVm.refreshTasks();
+                        });
                       },
                       onTaskDelete: (task) => _confirmDelete(context, vm, task),
                     ),
@@ -126,7 +123,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -174,7 +171,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Expanded(
       child: Row(
         children: [
-          Icon(icon, size: 18, color: const Color(0xFF2E7D32).withOpacity(0.7)),
+          Icon(icon, size: 18, color: const Color(0xFF2E7D32).withValues(alpha: 0.7)),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

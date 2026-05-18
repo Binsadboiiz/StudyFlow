@@ -85,13 +85,13 @@ class TimelineView extends StatelessWidget {
                     color: isCurrentHour
                         ? const Color(0xFF2E7D32)
                         : hourTasks.isNotEmpty
-                            ? const Color(0xFF2E7D32).withOpacity(0.5)
+                            ? const Color(0xFF2E7D32).withValues(alpha: 0.5)
                             : Colors.grey.shade300,
                     shape: BoxShape.circle,
                     boxShadow: isCurrentHour
                         ? [
                             BoxShadow(
-                              color: const Color(0xFF2E7D32).withOpacity(0.3),
+                              color: const Color(0xFF2E7D32).withValues(alpha: 0.3),
                               blurRadius: 6,
                             ),
                           ]
@@ -103,7 +103,7 @@ class TimelineView extends StatelessWidget {
                   child: Container(
                     width: 2,
                     color: isCurrentHour
-                        ? const Color(0xFF2E7D32).withOpacity(0.3)
+                        ? const Color(0xFF2E7D32).withValues(alpha: 0.3)
                         : Colors.grey.shade200,
                   ),
                 ),
@@ -140,7 +140,7 @@ class TimelineView extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: isCurrentHour
-                ? const Color(0xFF2E7D32).withOpacity(0.15)
+                ? const Color(0xFF2E7D32).withValues(alpha: 0.15)
                 : Colors.grey.shade100,
           ),
         ),
@@ -162,7 +162,7 @@ class TimelineView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2E7D32).withOpacity(0.7),
+                    color: const Color(0xFF2E7D32).withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -178,12 +178,12 @@ class TimelineView extends StatelessWidget {
       decoration: BoxDecoration(
         color: task.isCompleted
             ? Colors.grey.shade100
-            : const Color(0xFF2E7D32).withOpacity(0.08),
+            : const Color(0xFF2E7D32).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: task.isCompleted
               ? Colors.grey.shade200
-              : const Color(0xFF2E7D32).withOpacity(0.2),
+              : const Color(0xFF2E7D32).withValues(alpha: 0.2),
         ),
       ),
       child: Material(
@@ -235,7 +235,7 @@ class TimelineView extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           color: task.isCompleted
                               ? Colors.grey.shade400
-                              : const Color(0xFF2E7D32).withOpacity(0.8),
+                              : const Color(0xFF2E7D32).withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -254,7 +254,7 @@ class TimelineView extends StatelessWidget {
                     border: Border.all(
                       color: task.isCompleted
                           ? Colors.grey.shade400
-                          : const Color(0xFF2E7D32).withOpacity(0.5),
+                          : const Color(0xFF2E7D32).withValues(alpha: 0.5),
                       width: 2,
                     ),
                   ),

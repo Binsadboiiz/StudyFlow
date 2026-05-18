@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import '../../../../features/task/domain/entities/task.dart';
 import '../../../../features/task/domain/repositories/task_repository.dart';
 
 /// ViewModel chịu trách nhiệm xử lý logic và lưu trữ state (trạng thái) cho màn hình Home.
 /// Extends ChangeNotifier để có thể thông báo cho UI (View) biết khi nào cần build lại.
-class HomeViewModel extends ChangeNotifier {
+class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   final TaskRepository _taskRepository;
 
   // Constructor nhận vào một TaskRepository (Dependency Injection).
   // Ngay khi khởi tạo, gọi hàm load dữ liệu của ngày hiện tại ngay lập tức.
   HomeViewModel({required TaskRepository taskRepository})
       : _taskRepository = taskRepository {
-    _loadTasksForSelectedDate();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTasksForSelectedDate();
+    });
   }
 
   // --- CÁC BIẾN STATE NỘI BỘ (Private) ---
@@ -37,7 +40,7 @@ class HomeViewModel extends ChangeNotifier {
   /// Gọi Repository để lấy dữ liệu (tasks) tương ứng với ngày đang chọn (_selectedDate)
   Future<void> _loadTasksForSelectedDate() async {
     _isLoading = true; // Bật cờ loading
-    notifyListeners(); // Báo cho UI hiển thị vòng tròn loading
+    notifyListenersSafely();
 
     try {
       // Gọi repository lấy dữ liệu (chỗ này sau này có thể là gọi Isar db hoặc API)
@@ -47,7 +50,7 @@ class HomeViewModel extends ChangeNotifier {
       // Có thể xử lý hiển thị popup báo lỗi ở đây
     } finally {
       _isLoading = false; // Tắt cờ loading
-      notifyListeners(); // Báo cho UI biết đã tải xong để ẩn loading và vẽ ra danh sách tasks
+      notifyListenersSafely();
     }
   }
 

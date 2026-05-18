@@ -17,9 +17,10 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
-    // Dùng Future.microtask để đảm bảo context đã sẵn sàng trước khi gọi ViewModel.
-    Future.microtask(() {
-      context.read<TaskViewmodel>().loadTask(DateTime.now());
+    final vm = context.read<TaskViewmodel>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      vm.loadTask(DateTime.now());
     });
   }
 
@@ -103,10 +104,10 @@ class _TaskScreenState extends State<TaskScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF2E7D32).withOpacity(0.1),
+          color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: const Color(0xFF2E7D32).withOpacity(0.3),
+            color: const Color(0xFF2E7D32).withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -163,14 +164,14 @@ class _TaskScreenState extends State<TaskScreen> {
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF2E7D32).withOpacity(0.3),
+                          color: const Color(0xFF2E7D32).withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         )
                       ]
                     : [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         )
@@ -185,7 +186,7 @@ class _TaskScreenState extends State<TaskScreen> {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: isSelected
-                          ? Colors.white.withOpacity(0.8)
+                          ? Colors.white.withValues(alpha: 0.8)
                           : Colors.grey.shade500,
                     ),
                   ),
@@ -220,7 +221,7 @@ class _TaskScreenState extends State<TaskScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -357,7 +358,7 @@ class _TaskScreenState extends State<TaskScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -423,7 +424,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                 size: 14,
                                 color: task.isCompleted
                                     ? Colors.grey.shade300
-                                    : const Color(0xFF2E7D32).withOpacity(0.7),
+                                    : const Color(0xFF2E7D32).withValues(alpha: 0.7),
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -461,7 +462,7 @@ class _TaskScreenState extends State<TaskScreen> {
                       decoration: BoxDecoration(
                         color: task.isCompleted
                             ? Colors.grey.shade100
-                            : const Color(0xFF2E7D32).withOpacity(0.08),
+                            : const Color(0xFF2E7D32).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(

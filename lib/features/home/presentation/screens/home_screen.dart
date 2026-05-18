@@ -1,8 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
-import '../../../../features/task/presentation/screens/task_screen.dart';
 
 /// Màn hình chính của ứng dụng (View trong MVVM).
 /// Nhiệm vụ duy nhất của nó là ghép nối các Widget nhỏ hơn lại với nhau
@@ -12,11 +13,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthViewmodel>().currentUser;
+    final displayName = user?.username ?? 'Guest';
+
     return Scaffold(
       extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar
       // AppBar hiện đại với hiệu ứng kính mờ (Glassmorphism)
       appBar: AppBar(
-        backgroundColor: Colors.white.withOpacity(0.2),
+        backgroundColor: Colors.white.withValues(alpha: 0.2),
         elevation: 0,
         toolbarHeight: 80,
         flexibleSpace: ClipRRect(
@@ -33,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   )
@@ -41,16 +45,16 @@ class HomeScreen extends StatelessWidget {
               ),
               child: const CircleAvatar(
                 radius: 22,
-                backgroundColor: Colors.blueAccent,
-                backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+                // backgroundColor: Colors.blueAccent,
+                backgroundImage: AssetImage('assets/images/8b4635fd93dc6e874f686435da83a210.jpg'),
               ),
             ),
             const SizedBox(width: 12),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'Have a good day,',
                   style: TextStyle(
                     fontSize: 13,
@@ -59,8 +63,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'StudyFlow 👋',
-                  style: TextStyle(
+                  '$displayName 👋',
+                  style: const TextStyle(
                     fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -75,7 +79,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: IconButton(

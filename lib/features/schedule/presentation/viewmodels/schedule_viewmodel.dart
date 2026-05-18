@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/domain/usecase/add__task.dart';
 import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
@@ -7,7 +8,7 @@ import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 
 /// ViewModel quản lý trạng thái của màn hình Schedule (Lịch trình tuần).
 /// Load tasks cho 7 ngày trong tuần và hỗ trợ điều hướng qua lại giữa các tuần.
-class ScheduleViewmodel extends ChangeNotifier {
+class ScheduleViewmodel extends ChangeNotifier with SafeChangeNotifier {
   final AddTask addTaskUseCase;
   final DeleteTask deleteTaskUseCase;
   final GetTask getTaskUseCase;
@@ -19,7 +20,11 @@ class ScheduleViewmodel extends ChangeNotifier {
     required this.getTaskUseCase,
     required this.updateTaskUseCase,
   }) {
-    _initWeek();
+    _currentWeekStart = _getMonday(DateTime.now());
+    _selectedDay = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadWeekTasks();
+    });
   }
 
   // --- STATE ---
@@ -49,17 +54,10 @@ class ScheduleViewmodel extends ChangeNotifier {
   /// Lấy tasks của ngày đang chọn
   List<Task> get selectedDayTasks => getTasksForDay(_selectedDay);
 
-  /// Khởi tạo tuần hiện tại
-  void _initWeek() {
-    _currentWeekStart = _getMonday(DateTime.now());
-    _selectedDay = DateTime.now();
-    loadWeekTasks();
-  }
-
   /// Chọn một ngày trên tab bar
   Future<void> selectDay(DateTime day) async {
     _selectedDay = day;
-    notifyListeners();
+    notifyListenersSafely();
   }
 
   /// Điều hướng tuần (offset: -1 = tuần trước, 1 = tuần sau)
@@ -76,7 +74,7 @@ class ScheduleViewmodel extends ChangeNotifier {
   /// Load tasks cho cả 7 ngày trong tuần
   Future<void> loadWeekTasks() async {
     _isLoading = true;
-    notifyListeners();
+    notifyListenersSafely();
 
     try {
       _weeklyTasks = {};
@@ -88,7 +86,7 @@ class ScheduleViewmodel extends ChangeNotifier {
       _weeklyTasks = {};
     } finally {
       _isLoading = false;
-      notifyListeners();
+      notifyListenersSafely();
     }
   }
 

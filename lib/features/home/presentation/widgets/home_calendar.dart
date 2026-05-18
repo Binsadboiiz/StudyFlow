@@ -53,7 +53,7 @@ class HomeCalendar extends StatelessWidget {
           calendarStyle: CalendarStyle(
             // Giao diện cho ngày "Hôm nay" (today) - màu xanh mờ
             todayDecoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.5),
+              color: Colors.blue.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             // Giao diện cho ngày "Đang được chọn" (selected) - màu xanh đậm

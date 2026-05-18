@@ -47,7 +47,7 @@ class DayTabBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2E7D32).withOpacity(0.08),
+                    color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -86,7 +86,7 @@ class DayTabBar extends StatelessWidget {
                       color: isSelected
                           ? const Color(0xFF2E7D32)
                           : isToday
-                              ? const Color(0xFF2E7D32).withOpacity(0.08)
+                              ? const Color(0xFF2E7D32).withValues(alpha: 0.08)
                               : Colors.white,
                       borderRadius: BorderRadius.circular(14),
                       border: isToday && !isSelected
@@ -95,7 +95,7 @@ class DayTabBar extends StatelessWidget {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: const Color(0xFF2E7D32).withOpacity(0.25),
+                                color: const Color(0xFF2E7D32).withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               ),
@@ -111,7 +111,7 @@ class DayTabBar extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: isSelected
-                                ? Colors.white.withOpacity(0.8)
+                                ? Colors.white.withValues(alpha: 0.8)
                                 : Colors.grey.shade500,
                             letterSpacing: 0.5,
                           ),
@@ -151,7 +151,7 @@ class DayTabBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

@@ -8,6 +8,7 @@ import 'package:studyflow/features/schedule/presentation/screens/schedule_screen
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -23,7 +24,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     const HomeScreen(),
     const TaskScreen(),
     const ScheduleScreen(),
-    const Center(child: Text('Settings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+    const SettingsScreen(),
   ];
 
   // Labels cho BottomAppBar items
@@ -96,11 +97,14 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
+        if (_currentIndex == index) return;
         setState(() {
           _currentIndex = index;
         });
-        // Đồng bộ dữ liệu: reload ViewModel của tab khi chuyển sang
-        _reloadTabData(index);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _reloadTabData(index);
+        });
       },
       child: SizedBox(
         height: double.infinity,
@@ -447,11 +451,12 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                           );
                           
                           await vm.addTask(task);
-                          // Đồng bộ: reload Schedule và Home sau khi thêm task
-                          if (context.mounted) {
-                            context.read<ScheduleViewmodel>().loadWeekTasks();
-                            context.read<HomeViewModel>().refreshTasks();
-                            Navigator.pop(context); // Đóng modal sau khi thêm xong
+                          if (!context.mounted) return;
+                          context.read<ScheduleViewmodel>().loadWeekTasks();
+                          context.read<HomeViewModel>().refreshTasks();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!context.mounted) return;
+                            Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Added new task!'),
@@ -459,7 +464,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                                 backgroundColor: Color(0xFF2E7D32),
                               ),
                             );
-                          }
+                          });
                         },
                         child: const Text('Add now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),

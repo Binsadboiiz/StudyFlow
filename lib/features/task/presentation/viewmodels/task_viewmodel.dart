@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/domain/usecase/add__task.dart';
 import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
@@ -7,7 +8,7 @@ import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 
 /// ViewModel chịu trách nhiệm quản lý trạng thái của màn hình Task (TaskScreen)
 /// Cung cấp dữ liệu (tasks) và các phương thức xử lý logic (thêm, sửa, xóa) cho View.
-class TaskViewmodel extends ChangeNotifier {
+class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   // Các UseCase chứa logic nghiệp vụ tương ứng
   final AddTask addTaskUseCase;
   final DeleteTask deleteTaskUseCase;
@@ -38,7 +39,7 @@ class TaskViewmodel extends ChangeNotifier {
   Future<void> loadTask(DateTime date) async {
     _selectedDate = date;
     tasks = await getTaskUseCase(date);
-    notifyListeners(); // Thông báo cho UI (các Widget đang listen) biết dữ liệu đã thay đổi để vẽ lại
+    notifyListenersSafely();
   }
 
   /// Thêm một công việc mới và tải lại danh sách
