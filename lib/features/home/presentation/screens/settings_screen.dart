@@ -66,8 +66,15 @@ class SettingsScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    context.read<AuthViewmodel>().Logout();
+                  onPressed: () async {
+                    await context.read<AuthViewmodel>().Logout();
+
+                  Navigator.pushAndRemoveUntil(
+                    context, 
+                    MaterialPageRoute(builder: (_) => const LoginScreen(),
+                    ), 
+                    (route) => false,
+                    );
                   },
                   icon: const Icon(Icons.logout, color: Colors.redAccent),
                   label: const Text(

@@ -4,9 +4,12 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:studyflow/features/auth/data/datasource/auth_local_datasource.dart';
+import 'package:studyflow/features/auth/data/models/session_model.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
 import 'package:studyflow/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:studyflow/features/auth/domain/usecase/check_auth_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/login_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/register_usecase.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
@@ -29,7 +32,7 @@ class DependencyInjection {
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open(
-      [TaskModelSchema, UserModelSchema],
+      [TaskModelSchema, UserModelSchema, SessionModelSchema],
       directory: dir.path,
     );
 
@@ -67,6 +70,8 @@ class DependencyInjection {
         create: (_) => AuthViewmodel(
           registerUsecase: RegisterUsecase(authRepository), 
           loginUsecase: LoginUsecase(authRepository),
+          checkAuthUsecase: CheckAuthUsecase(authRepository),
+          logoutUsecase: LogoutUsecase(authRepository),
         ),
       ),
     ];

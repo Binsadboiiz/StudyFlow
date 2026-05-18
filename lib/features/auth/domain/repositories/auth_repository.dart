@@ -8,4 +8,10 @@ abstract class AuthRepository {
 
   Future<bool> isUsernameExists(String username);
   Future<bool> isEmailExists(String email);
+  Future<void> saveSession(int userId);
+
+  Future<bool> isLoggedIn();
+  Future<UserEntity?> getCurrentUser();
+
+  Future<void> Logout();
 }

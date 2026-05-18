@@ -38,6 +38,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final isPasswordCorrect = BCrypt.checkpw(password, user.password);
     if (!isPasswordCorrect) return null;
 
+    await localDatasource.saveSession(user.id);
+
     return UserEntity(
       id: user.id, 
       username: user.username, 
@@ -56,5 +58,36 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<bool> isEmailExists(String email) async {
     final user = await localDatasource.getUserByEmail(email);
     return user != null;
+  }
+
+  @override
+  Future<void> saveSession(int userId) async {
+    await localDatasource.saveSession(userId);
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    return await localDatasource.isLoggedIn();
+  }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    final session = await localDatasource.getSession();
+    if (session == null || !session.isLoggedIn) return null;
+
+    final user = await localDatasource.getUserById(session.userId);
+    if (user == null) return null;
+
+    return UserEntity(
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      password: user.password,
+    );
+  }
+
+  @override
+  Future<void> Logout() async {
+    await localDatasource.Logout();
   }
 }

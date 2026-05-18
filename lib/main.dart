@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:studyflow/core/di/injection.dart';
-import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
+import 'package:studyflow/features/auth/presentation/widgets/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class StudyFlowApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const MainScreen(),
+        home: const AuthGate(),
         debugShowCheckedModeBanner: false,
       ),
     );
