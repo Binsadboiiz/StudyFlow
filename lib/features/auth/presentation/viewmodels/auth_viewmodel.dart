@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:studyflow/core/services/notification/app_notification.dart';
+import 'package:studyflow/core/services/notification/notification_service.dart';
+import 'package:studyflow/core/services/notification/notification_type.dart';
 import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import 'package:studyflow/features/auth/domain/entities/user_entity.dart';
 import 'package:studyflow/features/auth/domain/usecase/check_auth_usecase.dart';
@@ -33,9 +36,15 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
         email: email,
         password: password));
 
+      NotificationService.instance.show(
+        AppNotification(message: "Register Successfully!", type: NotificationType.success)
+      );
+
       return null;
     } catch (e) {
-      return e.toString().replaceFirst("Exception: ", "");
+      NotificationService.instance.show(
+        AppNotification(message: "Register failed!", type: NotificationType.error)
+      );
     } finally {
       isLoading = false;
       notifyListenersSafely();
@@ -53,13 +62,21 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
       );
 
       if (user == null) {
-        return "Invalid credentials";
+        NotificationService.instance.show(
+          AppNotification(message: "Invalid credentials", type: NotificationType.error)
+        );
       }
       isAuthenticated = true;
 
       currentUser = user;
+      NotificationService.instance.show(
+        AppNotification(message: "Login Successfully", type: NotificationType.success)
+      );
       return null;
     } catch (e) {
+      NotificationService.instance.show(
+        AppNotification(message: "Login failed", type: NotificationType.error)
+      );
       return e.toString().replaceFirst("Exception: ", "");
     } finally {
       isLoading = false;
@@ -84,6 +101,9 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     await logoutUsecase();
     isAuthenticated = false;
     currentUser = null;
+    NotificationService.instance.show(
+      AppNotification(message: 'Logout success', type: NotificationType.success)
+    );
     notifyListenersSafely();
   }
 }
