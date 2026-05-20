@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:studyflow/features/auth/data/models/session_model.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
+import 'package:studyflow/features/task/data/models/task_model.dart';
 
 class AuthLocalDatasource {
   final Isar isar;

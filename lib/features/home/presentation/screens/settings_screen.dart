@@ -220,7 +220,7 @@ class SettingsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.username,
+                  user.fullName,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

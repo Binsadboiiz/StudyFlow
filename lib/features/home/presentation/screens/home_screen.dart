@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthViewmodel>().currentUser;
-    final displayName = user?.username ?? 'Guest';
+    final displayName = user?.fullName ?? 'Guest';
 
     return Scaffold(
       extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar

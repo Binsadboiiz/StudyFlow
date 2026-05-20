@@ -62,4 +62,10 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
     await updateTaskUseCase(updateTask);
     await loadTask(task.date);
   }
+
+  /// Cập nhật một công việc và tải lại danh sách
+  Future<void> updateTask(Task task) async {
+    await updateTaskUseCase(task);
+    await loadTask(task.date);
+  }
 }

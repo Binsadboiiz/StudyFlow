@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 
 /// Màn hình quản lý các công việc (Task) - Giao diện hiện đại.
 /// Đây là View trong kiến trúc MVVM, chỉ làm nhiệm vụ hiển thị và nhận tương tác từ người dùng.
@@ -369,31 +370,39 @@ class _TaskScreenState extends State<TaskScreen> {
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTap: () => vm.toggleTask(task),
+            onTap: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => TaskFormModal(task: task),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   // Checkbox tùy chỉnh
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: task.isCompleted
-                          ? const Color(0xFF2E7D32)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
+                  GestureDetector(
+                    onTap: () => vm.toggleTask(task),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
                         color: task.isCompleted
                             ? const Color(0xFF2E7D32)
-                            : Colors.grey.shade300,
-                        width: 2,
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: task.isCompleted
+                              ? const Color(0xFF2E7D32)
+                              : Colors.grey.shade300,
+                          width: 2,
+                        ),
                       ),
+                      child: task.isCompleted
+                          ? const Icon(Icons.check, size: 16, color: Colors.white)
+                          : null,
                     ),
-                    child: task.isCompleted
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
                   ),
                   const SizedBox(width: 14),
                   // Nội dung task

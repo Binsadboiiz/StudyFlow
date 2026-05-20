@@ -12,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _fullNameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -21,12 +22,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isConfirmPasswordVisible = false;
 
   void _handleRegister() async {
+    final fullName = _fullNameController.text.trim();
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (fullName.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -50,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     final authViewModel = context.read<AuthViewmodel>();
-    final error = await authViewModel.Register(username, email, password);
+    final error = await authViewModel.Register(fullName, username, email, password);
 
     if (!mounted) return;
 
@@ -184,6 +186,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: Column(
                         children: [
+                          _buildTextField(
+                            controller: _fullNameController,
+                            icon: Icons.badge_outlined,
+                            hintText: 'Full Name',
+                          ),
+                          const SizedBox(height: 16),
                           _buildTextField(
                             controller: _usernameController,
                             icon: Icons.person_outline,

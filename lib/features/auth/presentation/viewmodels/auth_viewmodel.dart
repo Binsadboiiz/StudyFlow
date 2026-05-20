@@ -26,12 +26,13 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   bool isAuthenticated = false;
   UserEntity? currentUser;
 
-  Future<String?> Register(String username, String email, String password) async {
+  Future<String?> Register(String fullName, String username, String email, String password) async {
     try {
       isLoading = true;
       notifyListenersSafely();
 
       await registerUsecase(UserEntity(
+        fullName: fullName,
         username: username, 
         email: email,
         password: password));
@@ -45,6 +46,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
       NotificationService.instance.show(
         AppNotification(message: "Register failed!", type: NotificationType.error)
       );
+      return e.toString().replaceFirst("Exception: ", "");
     } finally {
       isLoading = false;
       notifyListenersSafely();
@@ -65,6 +67,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
         NotificationService.instance.show(
           AppNotification(message: "Invalid credentials", type: NotificationType.error)
         );
+        return "Invalid credentials";
       }
       isAuthenticated = true;
 

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:studyflow/features/auth/data/datasource/auth_local_datasource.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
 import 'package:studyflow/features/auth/domain/entities/user_entity.dart';
@@ -21,10 +22,24 @@ class AuthRepositoryImpl implements AuthRepository {
       user.password, 
       BCrypt.gensalt());
 
+    // Generate a random ID and ensure it doesn't collide
+    int randomId;
+    bool exists = true;
+    final random = Random();
+    do {
+      randomId = random.nextInt(900000) + 100000;
+      final existingUser = await localDatasource.getUserById(randomId);
+      if (existingUser == null) {
+        exists = false;
+      }
+    } while (exists);
+
     final userModel = UserModel()
+      ..id = randomId
       ..username = user.username
       ..email = user.email
-      ..password = hashedPassword;
+      ..password = hashedPassword
+      ..fullName = user.fullName;
 
     await localDatasource.Register(userModel);
   }
@@ -44,7 +59,8 @@ class AuthRepositoryImpl implements AuthRepository {
       id: user.id, 
       username: user.username, 
       email: user.email,
-      password: user.password
+      password: user.password,
+      fullName: user.fullName,
     );
   }
 
@@ -83,6 +99,7 @@ class AuthRepositoryImpl implements AuthRepository {
       username: user.username,
       email: user.email,
       password: user.password,
+      fullName: user.fullName,
     );
   }
 

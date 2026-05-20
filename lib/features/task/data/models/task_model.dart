@@ -13,6 +13,7 @@ class TaskModel {
   DateTime? startTime; // Thời gian bắt đầu (nullable)
   DateTime? endTime; // Thời gian kết thúc (nullable)
   late bool isCompleted;
+  int userId = 0;
 
   TaskModel();
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/home_viewmodel.dart';
+import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 
 /// Widget hiển thị danh sách các mục tiêu (Tasks) dưới dạng List (từng hàng/row) bên dưới lịch.
 /// Sử dụng Column thay vì ListView để có thể scroll cùng với Calendar trong CustomScrollView.
@@ -46,10 +47,12 @@ class DailyGoalList extends StatelessWidget {
               return Padding(
                 padding: EdgeInsets.only(bottom: index < viewModel.dailyTasks.length - 1 ? 12.0 : 0),
                 child: GestureDetector(
-                  onTap: () {
-                    // Gọi viewmodel để đổi trạng thái hoàn thành (check/uncheck)
-                    viewModel.toggleTaskCompletion(task);
-                  },
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => TaskFormModal(task: task),
+                  ),
                   child: Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(
@@ -62,12 +65,17 @@ class DailyGoalList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center, // Căn giữa theo chiều dọc
                         children: [
                           // Icon checkmark bên trái
-                          Icon(
-                            task.isCompleted
-                                ? Icons.check_circle
-                                : Icons.circle_outlined,
-                            color: task.isCompleted ? Colors.green : Colors.grey,
-                            size: 28,
+                          GestureDetector(
+                            onTap: () {
+                              viewModel.toggleTaskCompletion(task);
+                            },
+                            child: Icon(
+                              task.isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.circle_outlined,
+                              color: task.isCompleted ? Colors.green : Colors.grey,
+                              size: 28,
+                            ),
                           ),
                           const SizedBox(width: 16.0),
                           
