@@ -4,6 +4,9 @@ import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'dart:ui';
 
+/// `RegisterScreen` là giao diện đăng ký tài khoản mới của ứng dụng.
+/// Tương tự như màn hình Login, màn hình này sử dụng giao diện Glassmorphism độc lập 
+/// để duy trì tính thẩm mỹ nhất quán ở bước đăng nhập/đăng ký.
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 

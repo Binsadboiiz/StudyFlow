@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/screens/task_screen.dart';
@@ -8,7 +9,11 @@ import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_vie
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
+import 'package:studyflow/core/theme/app_colors.dart';
 
+/// `MainScreen` là màn hình gốc chứa thanh điều hướng dưới (Bottom Navigation Bar)
+/// và quản lý việc chuyển đổi giữa các màn hình chính của ứng dụng: Home, Task, Schedule, Settings.
+/// Màn hình này cũng chứa nút FloatingActionButton (FAB) để thêm nhanh công việc.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -36,6 +41,9 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       extendBody: true, // Cho phép nội dung tràn xuống dưới BottomAppBar
       body: IndexedStack(
@@ -49,7 +57,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           backgroundColor: Colors.transparent,
           builder: (context) => const TaskFormModal(),
         ),
-        backgroundColor: const Color(0xFF2E7D32), 
+        backgroundColor: AppColors.accent,
         shape: const CircleBorder(),
         elevation: 4,
         child: const Icon(Icons.add, color: Colors.white, size: 30),
@@ -58,9 +66,9 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 10.0, // Khoảng cách lõm xuống
-        color: Colors.white,
+        color: theme.bottomAppBarTheme.color,
         elevation: 10,
-        shadowColor: Colors.black45,
+        shadowColor: isDark ? Colors.black87 : Colors.black45,
         child: SizedBox(
           height: 65,
           child: Row(
@@ -98,6 +106,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   // Hàm tạo từng nút trong BottomAppBar kèm animation + subtitle
   Widget _buildNavItem({required _NavItem navItem, required int index}) {
     final isSelected = _currentIndex == index;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final unselectedColor = isDark ? Colors.grey.shade600 : Colors.grey.shade400;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -123,7 +135,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               transform: Matrix4.identity()..scale(isSelected ? 1.15 : 1.0),
               child: Icon(
                 navItem.icon,
-                color: isSelected ? const Color(0xFF2E7D32) : Colors.grey.shade400,
+                color: isSelected ? AppColors.accent : unselectedColor,
                 size: 24,
               ),
             ),
@@ -134,7 +146,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? const Color(0xFF2E7D32) : Colors.grey.shade400,
+                color: isSelected ? AppColors.accent : unselectedColor,
               ),
               child: Text(navItem.label),
             ),

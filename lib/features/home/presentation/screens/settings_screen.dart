@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/theme/app_colors.dart';
+import 'package:studyflow/core/theme/app_theme.dart';
+import 'package:studyflow/core/theme/theme_provider.dart';
 import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/screens/register_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
+/// `SettingsScreen` là màn hình cài đặt của ứng dụng.
+/// Cho phép người dùng xem thông tin tài khoản, đăng xuất, chuyển đổi giao diện Light/Dark Mode
+/// và quản lý một số cài đặt khác của hệ thống.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -11,15 +17,21 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewmodel>();
     final user = authViewModel.currentUser;
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            color: theme.colorScheme.onSurface,
+          ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: ext.cardBackground,
         elevation: 0,
         centerTitle: true,
       ),
@@ -33,35 +45,33 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (user == null) _buildGuestSection(context) else _buildProfileSection(context, user),
+            if (user == null) _buildGuestSection(context, theme) else _buildProfileSection(context, user, theme, ext, isDark),
             const SizedBox(height: 40),
-            const Text(
+            Text(
               'General Settings',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
             _buildSettingItem(
+              context: context,
               icon: Icons.notifications_none_outlined,
               title: 'Notifications',
               onTap: () {},
             ),
+            _buildThemeSettingItem(context),
             _buildSettingItem(
-              icon: Icons.color_lens_outlined,
-              title: 'Theme',
-              subtitle: 'Light',
-              onTap: () {},
-            ),
-            _buildSettingItem(
+              context: context,
               icon: Icons.language_outlined,
               title: 'Language',
               subtitle: 'English',
               onTap: () {},
             ),
             _buildSettingItem(
+              context: context,
               icon: Icons.info_outline_rounded,
               title: 'About',
               onTap: () {},
@@ -102,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGuestSection(BuildContext context) {
+  Widget _buildGuestSection(BuildContext context, ThemeData theme) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -186,16 +196,16 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileSection(BuildContext context, dynamic user) {
+  Widget _buildProfileSection(BuildContext context, dynamic user, ThemeData theme, AppThemeExtension ext, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ext.cardBackground,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -206,7 +216,7 @@ class SettingsScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF2E7D32), width: 2),
+              border: Border.all(color: AppColors.accent, width: 2),
             ),
             child: const CircleAvatar(
               radius: 36,
@@ -221,25 +231,25 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   user.fullName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   user.email,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Colors.black54,
+                    color: ext.subtext,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
+                    color: AppColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
@@ -247,7 +257,7 @@ class SettingsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E7D32),
+                      color: AppColors.accent,
                     ),
                   ),
                 ),
@@ -259,20 +269,33 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem({
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required VoidCallback onTap,
-  }) {
+  /// Theme setting item with current mode display and bottom sheet picker
+  Widget _buildThemeSettingItem(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    String currentThemeLabel;
+    switch (themeProvider.themeMode) {
+      case ThemeMode.light:
+        currentThemeLabel = 'Light';
+        break;
+      case ThemeMode.dark:
+        currentThemeLabel = 'Dark';
+        break;
+      default:
+        currentThemeLabel = 'System';
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ext.cardBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -283,22 +306,246 @@ class SettingsScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: isDark ? AppColors.surfaceDark : Colors.grey.shade100,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: Colors.black87, size: 24),
+          child: Icon(
+            isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            color: theme.colorScheme.onSurface,
+            size: 24,
+          ),
+        ),
+        title: Text(
+          'Theme',
+          style: TextStyle(
+            fontWeight: FontWeight.w600, 
+            fontSize: 16,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        subtitle: Text(
+          currentThemeLabel,
+          style: TextStyle(fontSize: 13, color: ext.subtext),
+        ),
+        trailing: Icon(Icons.chevron_right, color: ext.subtext),
+        onTap: () => _showThemePicker(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  /// Bottom sheet to pick theme mode
+  void _showThemePicker(BuildContext context) {
+    final themeProvider = context.read<ThemeProvider>();
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: ext.cardBackground,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Choose Theme',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildThemeOption(
+                context: context,
+                icon: Icons.light_mode_rounded,
+                title: 'Light',
+                subtitle: 'Bright and clean',
+                mode: ThemeMode.light,
+                currentMode: themeProvider.themeMode,
+                onTap: () {
+                  themeProvider.setTheme(ThemeMode.light);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 8),
+              _buildThemeOption(
+                context: context,
+                icon: Icons.dark_mode_rounded,
+                title: 'Dark',
+                subtitle: 'Easy on the eyes',
+                mode: ThemeMode.dark,
+                currentMode: themeProvider.themeMode,
+                onTap: () {
+                  themeProvider.setTheme(ThemeMode.dark);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 8),
+              _buildThemeOption(
+                context: context,
+                icon: Icons.settings_suggest_rounded,
+                title: 'System',
+                subtitle: 'Follow device settings',
+                mode: ThemeMode.system,
+                currentMode: themeProvider.themeMode,
+                onTap: () {
+                  themeProvider.setTheme(ThemeMode.system);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildThemeOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required ThemeMode mode,
+    required ThemeMode currentMode,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = mode == currentMode;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final ext = theme.extension<AppThemeExtension>()!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.accent.withValues(alpha: 0.1)
+              : isDark ? AppColors.surfaceDark : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.accent.withValues(alpha: 0.15)
+                    : isDark ? AppColors.cardDark : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? AppColors.accent : ext.subtext,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? AppColors.accent : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ext.subtext,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: AppColors.accent, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: ext.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : Colors.grey.shade100,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: theme.colorScheme.onSurface, size: 24),
         ),
         title: Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.w600, 
+            fontSize: 16,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         subtitle: subtitle != null
             ? Text(
                 subtitle,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: ext.subtext),
               )
             : null,
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+        trailing: Icon(Icons.chevron_right, color: ext.subtext),
         onTap: onTap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

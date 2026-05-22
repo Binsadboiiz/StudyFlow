@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/theme/app_colors.dart';
+import 'package:studyflow/core/theme/app_theme.dart';
 import '../viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 
@@ -10,6 +12,10 @@ class DailyGoalList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
     // Consumer lắng nghe dữ liệu từ HomeViewModel
     return Consumer<HomeViewModel>(
       builder: (context, viewModel, child) {
@@ -23,23 +29,20 @@ class DailyGoalList extends StatelessWidget {
 
         // 2. Trạng thái Không có dữ liệu
         if (viewModel.dailyTasks.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
+          return Padding(
+            padding: const EdgeInsets.all(32),
             child: Center(
-              child: Text('No goals for this day. Take a rest!'),
+              child: Text(
+                'No goals for this day. Take a rest!',
+                style: TextStyle(color: ext.subtext),
+              ),
             ),
           );
         }
 
-        // 3. Trạng thái Có dữ liệu: Hiển thị danh sách task dưới dạng Column (mỗi task là 1 hàng ngang)
-        // Dùng Column thay vì ListView để nằm trong CustomScrollView mà không bị conflict scroll
+        // 3. Trạng thái Có dữ liệu
         return Padding(
-          padding: const EdgeInsets.only(
-            left: 16.0,
-            right: 16.0,
-            top: 16.0,
-            bottom: 100.0, // Thêm khoảng trống dưới cùng để không bị che bởi BottomAppBar
-          ),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 100.0),
           child: Column(
             children: List.generate(viewModel.dailyTasks.length, (index) {
               final task = viewModel.dailyTasks[index];
@@ -55,31 +58,24 @@ class DailyGoalList extends StatelessWidget {
                   ),
                   child: Card(
                     elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    color: task.isCompleted ? Colors.green.shade100 : Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                    color: task.isCompleted
+                        ? (isDark ? AppColors.accent.withValues(alpha: 0.15) : Colors.green.shade100)
+                        : ext.cardBackground,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center, // Căn giữa theo chiều dọc
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Icon checkmark bên trái
                           GestureDetector(
-                            onTap: () {
-                              viewModel.toggleTaskCompletion(task);
-                            },
+                            onTap: () => viewModel.toggleTaskCompletion(task),
                             child: Icon(
-                              task.isCompleted
-                                  ? Icons.check_circle
-                                  : Icons.circle_outlined,
-                              color: task.isCompleted ? Colors.green : Colors.grey,
+                              task.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                              color: task.isCompleted ? AppColors.accent : ext.subtext,
                               size: 28,
                             ),
                           ),
                           const SizedBox(width: 16.0),
-                          
-                          // Nội dung chính (Tiêu đề và mô tả) chiếm phần còn lại
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,20 +85,15 @@ class DailyGoalList extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    decoration: task.isCompleted
-                                        ? TextDecoration.lineThrough
-                                        : null,
+                                    color: theme.colorScheme.onSurface,
+                                    decoration: task.isCompleted ? TextDecoration.lineThrough : null,
                                   ),
                                 ),
-                                // Chỉ hiển thị mô tả nếu nó không rỗng
                                 if (task.description.isNotEmpty) ...[
                                   const SizedBox(height: 4),
                                   Text(
                                     task.description,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey.shade700,
-                                    ),
+                                    style: TextStyle(fontSize: 13, color: ext.subtext),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),

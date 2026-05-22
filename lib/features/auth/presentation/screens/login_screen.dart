@@ -5,6 +5,9 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
 import 'dart:ui';
 
+/// `LoginScreen` là giao diện đăng nhập của ứng dụng.
+/// Màn hình này được thiết kế độc lập, không sử dụng `AppTheme` chung để giữ nguyên 
+/// hiệu ứng Glassmorphism và màu nền Gradient đặc trưng bất kể người dùng đang dùng Light hay Dark mode.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

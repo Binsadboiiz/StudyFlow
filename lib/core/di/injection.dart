@@ -23,26 +23,39 @@ import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
 import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
+import 'package:studyflow/core/theme/theme_provider.dart';
 
+/// Lớp `DependencyInjection` chịu trách nhiệm khởi tạo và cung cấp toàn bộ 
+/// các dependencies (database, repositories, viewmodels) cho ứng dụng theo mô hình Singleton.
 class DependencyInjection {
+  // Isar database instance dùng chung cho toàn bộ app
   static late final Isar isar;
+  // Các Repository dùng để giao tiếp với local database
   static late final TaskRepositoryImpl taskRepository;
   static late final AuthRepositoryImpl authRepository;
 
+  /// Hàm khởi tạo, cần được gọi ở `main.dart` trước khi chạy `runApp`.
   static Future<void> init() async {
+    // Lấy đường dẫn thư mục tài liệu của ứng dụng trên thiết bị
     final dir = await getApplicationDocumentsDirectory();
+    
+    // Mở database Isar và đăng ký các Schema (cấu trúc bảng)
     isar = await Isar.open(
       [TaskModelSchema, UserModelSchema, SessionModelSchema],
       directory: dir.path,
     );
 
+    // Khởi tạo các Datasources (lớp tương tác trực tiếp với Isar)
     final taskLocalDatasource = TaskLocalDatasource(isar);
+    // Khởi tạo Repositories, tiêm Datasource vào
     taskRepository = TaskRepositoryImpl(taskLocalDatasource);
 
     final authLocalDatasource = AuthLocalDatasource(isar);
     authRepository = AuthRepositoryImpl(authLocalDatasource);
   }
 
+  /// Trả về danh sách tất cả các `Provider` (ViewModels) để đăng ký vào `MultiProvider` ở `main.dart`.
+  /// Các ViewModel được cấp phát các UseCases tương ứng.
   static List<SingleChildWidget> getProviders() {
     return [
       ChangeNotifierProvider(
@@ -73,6 +86,9 @@ class DependencyInjection {
           checkAuthUsecase: CheckAuthUsecase(authRepository),
           logoutUsecase: LogoutUsecase(authRepository),
         ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
       ),
     ];
   }

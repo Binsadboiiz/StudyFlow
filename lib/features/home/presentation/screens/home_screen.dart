@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
@@ -15,12 +16,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<AuthViewmodel>().currentUser;
     final displayName = user?.fullName ?? 'Guest';
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar
       // AppBar hiện đại với hiệu ứng kính mờ (Glassmorphism)
       appBar: AppBar(
-        backgroundColor: Colors.white.withValues(alpha: 0.2),
+        backgroundColor: isDark 
+            ? Colors.black.withValues(alpha: 0.3)
+            : Colors.white.withValues(alpha: 0.2),
         elevation: 0,
         toolbarHeight: 80,
         flexibleSpace: ClipRRect(
@@ -34,7 +39,10 @@ class HomeScreen extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(
+                  color: isDark ? Colors.grey.shade700 : Colors.white, 
+                  width: 2,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),
@@ -45,7 +53,6 @@ class HomeScreen extends StatelessWidget {
               ),
               child: const CircleAvatar(
                 radius: 22,
-                // backgroundColor: Colors.blueAccent,
                 backgroundImage: AssetImage('assets/images/8b4635fd93dc6e874f686435da83a210.jpg'),
               ),
             ),
@@ -54,19 +61,19 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Have a good day,',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '$displayName 👋',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
-                    color: Colors.black,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -79,11 +86,16 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.6),
+                color: isDark 
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
+                icon: Icon(
+                  Icons.notifications_none_rounded, 
+                  color: theme.colorScheme.onSurface,
+                ),
                 onPressed: () {},
               ),
             ),
@@ -93,8 +105,9 @@ class HomeScreen extends StatelessWidget {
       
       // Nội dung chính: Toàn bộ màn hình scroll được (Calendar + Task list)
       body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.backgroundDark : null,
+          image: isDark ? null : const DecorationImage(
             image: AssetImage('assets/backgrounds/background_app.jpg'),
             fit: BoxFit.cover,
           ),

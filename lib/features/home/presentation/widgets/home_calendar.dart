@@ -9,54 +9,54 @@ class HomeCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Consumer lắng nghe sự thay đổi từ HomeViewModel. 
-    // Mỗi khi viewmodel gọi notifyListeners(), đoạn builder này sẽ chạy lại để cập nhật UI.
+    final theme = Theme.of(context);
+
     return Consumer<HomeViewModel>(
       builder: (context, viewModel, child) {
         return TableCalendar(
-          // Giới hạn ngày hiển thị nhỏ nhất và lớn nhất của lịch
           firstDay: DateTime.utc(2020, 10, 16),
           lastDay: DateTime.utc(2030, 3, 14),
-          // Ngày đang được focus để lịch hiển thị đúng tuần/tháng hiện tại
           focusedDay: viewModel.focusedDate,
-          
-          // Logic để xác định xem một ngày bất kỳ trên lịch có phải là ngày "đang được chọn" hay không
-          selectedDayPredicate: (day) {
-            return isSameDay(viewModel.selectedDate, day);
-          },
-          
-          // Sự kiện xảy ra khi người dùng ấn vào một ngày trên lịch
+          selectedDayPredicate: (day) => isSameDay(viewModel.selectedDate, day),
           onDaySelected: (selectedDay, focusedDay) {
-            // Chỉ cập nhật nếu người dùng chọn một ngày mới (khác ngày đang chọn hiện tại)
             if (!isSameDay(viewModel.selectedDate, selectedDay)) {
-              // Gọi hàm trong ViewModel để xử lý đổi ngày và load data
               viewModel.onDaySelected(selectedDay, focusedDay);
             }
           },
-          
-          // Thiết lập hiển thị mặc định là dạng Tuần (Week) cho gọn gàng
-          calendarFormat: CalendarFormat.month, 
-          // Cho phép các tùy chọn chuyển đổi định dạng (Tuần, 2 tuần, Tháng)
+          calendarFormat: CalendarFormat.month,
           availableCalendarFormats: const {
             CalendarFormat.month: 'Month',
             CalendarFormat.twoWeeks: '2 Weeks',
             CalendarFormat.week: 'Week',
           },
-          
-          // Tùy chỉnh phần Header (tháng, nút chuyển định dạng)
-          headerStyle: const HeaderStyle(
+          headerStyle: HeaderStyle(
             formatButtonVisible: true,
             titleCentered: true,
+            titleTextStyle: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            leftChevronIcon: Icon(Icons.chevron_left, color: theme.colorScheme.onSurface),
+            rightChevronIcon: Icon(Icons.chevron_right, color: theme.colorScheme.onSurface),
+            formatButtonTextStyle: TextStyle(color: theme.colorScheme.onSurface, fontSize: 13),
+            formatButtonDecoration: BoxDecoration(
+              border: Border.all(color: theme.dividerColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          
-          // Tùy chỉnh giao diện màu sắc cho lịch
+          daysOfWeekStyle: DaysOfWeekStyle(
+            weekdayStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+            weekendStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5), fontWeight: FontWeight.w600),
+          ),
           calendarStyle: CalendarStyle(
-            // Giao diện cho ngày "Hôm nay" (today) - màu xanh mờ
+            defaultTextStyle: TextStyle(color: theme.colorScheme.onSurface),
+            weekendTextStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+            outsideTextStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
             todayDecoration: BoxDecoration(
               color: Colors.blue.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
-            // Giao diện cho ngày "Đang được chọn" (selected) - màu xanh đậm
             selectedDecoration: const BoxDecoration(
               color: Colors.blue,
               shape: BoxShape.circle,
