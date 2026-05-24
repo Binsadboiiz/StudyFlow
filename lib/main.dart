@@ -6,6 +6,8 @@ import 'package:studyflow/core/services/widgets/auth_gate.dart';
 import 'package:studyflow/core/services/widgets/global_snackbar.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // Đảm bảo Flutter framework đã được khởi tạo trước khi gọi các native code hoặc async.
@@ -16,9 +18,18 @@ void main() async {
   
   // Khởi tạo toàn bộ các dependency (database, repositories, v.v...) trước khi chạy UI.
   await DependencyInjection.init();
+  print("STEP 1");
+
+  // Khởi tạo firebase
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
+  print("STEP 2");
 
   // Bắt đầu render ứng dụng.
   runApp(const StudyFlowApp());
+
+  print("STEP 3");
 }
 
 /// Widget gốc của ứng dụng.

@@ -6,7 +6,7 @@ class RegisterUsecase {
   
   RegisterUsecase(this.repository);
 
-  Future<void> call(UserEntity user) async {
-    return await repository.Register(user);
+  Future<void> call(UserEntity user, String password) async {
+    return await repository.Register(user, password);
   }
 }

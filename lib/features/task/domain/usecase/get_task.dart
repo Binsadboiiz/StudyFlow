@@ -6,7 +6,7 @@ class GetTask {
 
   GetTask(this.repository);
 
-  Future<List<Task>> call(DateTime date) async {
-    return repository.getTasksForDate(date);
+  Stream<List<Task>> call() {
+    return repository.getTasksStream();
   }
 }

@@ -198,7 +198,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     final updatedTask = widget.task!.copyWith(title: _titleController.text.trim(), description: _descriptionController.text.trim(), date: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day), startTime: startDateTime, endTime: endDateTime);
                     await vm.updateTask(updatedTask);
                   } else {
-                    final newTask = Task(id: DateTime.now().millisecondsSinceEpoch, title: _titleController.text.trim(), description: _descriptionController.text.trim(), date: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day), startTime: startDateTime, endTime: endDateTime);
+                    final newTask = Task(id: '', title: _titleController.text.trim(), description: _descriptionController.text.trim(), date: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day), startTime: startDateTime, endTime: endDateTime);
                     await vm.addTask(newTask);
                   }
                   scheduleVm.loadWeekTasks();

@@ -6,7 +6,7 @@ class CheckAuthUsecase {
 
   CheckAuthUsecase(this.repository);
 
-  Future<UserEntity?> call() async {
-    return await repository.getCurrentUser();
+  Stream<UserEntity?> call() {
+    return repository.authStateChanges;
   }
 }

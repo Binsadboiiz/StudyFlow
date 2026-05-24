@@ -6,7 +6,7 @@ class LoginUsecase {
 
   LoginUsecase(this.repository);
 
-  Future<UserEntity?> call(String identifier, String password) async {
-    return await repository.Login(identifier, password);
+  Future<UserEntity?> call(String email, String password) async {
+    return await repository.Login(email, password);
   }
 }

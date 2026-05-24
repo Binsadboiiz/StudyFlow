@@ -1,7 +1,7 @@
 /// Lớp đại diện cho một mục tiêu/công việc hằng ngày (Entity trong Clean Architecture).
 /// Đây là lớp dữ liệu cốt lõi, không phụ thuộc vào bất kỳ framework hoặc UI nào.
 class Task {
-  final int id; // ID duy nhất của task (sử dụng kiểu int để dễ dàng tương thích với Isar Database sau này)
+  final String id; // ID duy nhất của task (String cho Firebase)
   final String title; // Tiêu đề ngắn gọn của mục tiêu
   final String description; // Mô tả chi tiết thêm nếu cần
   final DateTime date; // Ngày thực hiện mục tiêu này
@@ -24,7 +24,7 @@ class Task {
   /// Rất hữu ích khi chúng ta muốn thay đổi trạng thái (ví dụ: cập nhật isCompleted thành true)
   /// mà không làm thay đổi object gốc (Đảm bảo tính bất biến - Immutable state).
   Task copyWith({
-    int? id,
+    String? id,
     String? title,
     String? description,
     DateTime? date,

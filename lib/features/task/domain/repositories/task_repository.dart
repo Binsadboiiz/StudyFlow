@@ -4,8 +4,8 @@ import '../entities/task.dart';
 /// Domain Layer chỉ định nghĩa interface này, không quan tâm nó lấy dữ liệu từ đâu (API hay Database local).
 /// Giúp tách biệt logic ứng dụng khỏi công nghệ cơ sở dữ liệu.
 abstract class TaskRepository {
-  /// Lấy danh sách các task dựa theo một ngày cụ thể (Dùng để hiển thị lên lịch)
-  Future<List<Task>> getTasksForDate(DateTime date);
+  /// Lấy tất cả task của người dùng dưới dạng Stream (Real-time updates)
+  Stream<List<Task>> getTasksStream();
   
   /// Thêm một task mới vào hệ thống
   Future<void> addTask(Task task);
@@ -14,5 +14,5 @@ abstract class TaskRepository {
   Future<void> updateTask(Task task);
   
   /// Xóa một task dựa vào ID
-  Future<void> deleteTask(int id);
+  Future<void> deleteTask(String id);
 }

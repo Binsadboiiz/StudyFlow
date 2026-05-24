@@ -143,7 +143,7 @@ class _AddScheduleTaskDialogState extends State<AddScheduleTaskDialog> {
     final startDateTime = DateTime(day.year, day.month, day.day, _startTime.hour, _startTime.minute);
     DateTime? endDateTime;
     if (_endTime != null) endDateTime = DateTime(day.year, day.month, day.day, _endTime!.hour, _endTime!.minute);
-    final task = Task(id: DateTime.now().millisecondsSinceEpoch, title: _titleController.text.trim(), description: '', date: DateTime(day.year, day.month, day.day), startTime: startDateTime, endTime: endDateTime);
+    final task = Task(id: '', title: _titleController.text.trim(), description: '', date: DateTime(day.year, day.month, day.day), startTime: startDateTime, endTime: endDateTime);
     Navigator.pop(context, task);
   }
 }
