@@ -12,7 +12,12 @@
           "package_name": "com.example.studyflow"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA61GYPY8_eZkj3Tm01D_MFYAwsFqwnWrU"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "252578618828-3g7j6pk4u8s5tedqkghapu0r97gl644o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.studyflow"
+              }
+            }
+          ]
         }
       }
     }

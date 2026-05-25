@@ -11,5 +11,7 @@ abstract class AuthRepository {
   Stream<UserEntity?> get authStateChanges;
   Future<UserEntity?> getCurrentUser();
 
+  Future<void> updateUserStreak(int streak, DateTime lastStreakDate, List<String> streakHistory);
+
   Future<void> Logout();
 }

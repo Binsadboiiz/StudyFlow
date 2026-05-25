@@ -54,6 +54,10 @@ class AuthRemoteDatasource {
     await firestore.collection('users').doc(user.id).set(user.toMap());
   }
 
+  Future<void> updateUserFields(String uid, Map<String, dynamic> fields) async {
+    await firestore.collection('users').doc(uid).update(fields);
+  }
+
   Future<UserModel?> getUserFromFirestore(String uid) async {
     final doc = await firestore.collection('users').doc(uid).get();
     if (doc.exists && doc.data() != null) {

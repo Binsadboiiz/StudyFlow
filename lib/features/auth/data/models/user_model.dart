@@ -10,6 +10,7 @@ class UserModel {
   final double xp;
   final int streak;
   final DateTime? lastStreakDate;
+  final List<String> streakHistory;
 
   final int dailyTargetMinutes;
 
@@ -28,6 +29,7 @@ class UserModel {
     this.xp = 0.0,
     this.streak = 0,
     this.lastStreakDate,
+    this.streakHistory = const [],
     this.dailyTargetMinutes = 120,
     this.isEmailVerified = false,
     required this.createdAt,
@@ -47,6 +49,9 @@ class UserModel {
       lastStreakDate: map['lastStreakDate'] != null
           ? DateTime.parse(map['lastStreakDate'])
           : null,
+      streakHistory: map['streakHistory'] != null 
+          ? List<String>.from(map['streakHistory']) 
+          : [],
       dailyTargetMinutes: map['dailyTargetMinutes'] ?? 120,
       isEmailVerified: map['isEmailVerified'] ?? false,
       createdAt: DateTime.parse(map['createdAt']),
@@ -64,6 +69,7 @@ class UserModel {
       'xp': xp,
       'streak': streak,
       'lastStreakDate': lastStreakDate?.toIso8601String(),
+      'streakHistory': streakHistory,
       'dailyTargetMinutes': dailyTargetMinutes,
       'isEmailVerified': isEmailVerified,
       'createdAt': createdAt.toIso8601String(),

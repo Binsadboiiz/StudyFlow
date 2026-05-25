@@ -17,6 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
       streak: _effectiveStreak(userModel),
       dailyTargetMinutes: userModel.dailyTargetMinutes,
       lastStreakDate: userModel.lastStreakDate,
+      streakHistory: userModel.streakHistory,
     );
   }
 
@@ -96,6 +97,18 @@ class AuthRepositoryImpl implements AuthRepository {
     if (userModel == null) return null;
 
     return _toEntity(userModel);
+  }
+
+  @override
+  Future<void> updateUserStreak(int streak, DateTime lastStreakDate, List<String> streakHistory) async {
+    final uid = remoteDatasource.currentUserId;
+    if (uid == null) return;
+    
+    await remoteDatasource.updateUserFields(uid, {
+      'streak': streak,
+      'lastStreakDate': lastStreakDate.toIso8601String(),
+      'streakHistory': streakHistory,
+    });
   }
 
   @override

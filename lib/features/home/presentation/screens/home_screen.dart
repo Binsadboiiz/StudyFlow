@@ -5,6 +5,7 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
+import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 
 /// Màn hình chính của ứng dụng (View trong MVVM).
 /// Nhiệm vụ duy nhất của nó là ghép nối các Widget nhỏ hơn lại với nhau
@@ -85,33 +86,41 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.white.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.local_fire_department_rounded,
-                  color: AppColors.accent,
-                  size: 20,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$streak',
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StreakScreen()),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.local_fire_department_rounded,
+                    color: AppColors.accent,
+                    size: 20,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    '$streak',
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(

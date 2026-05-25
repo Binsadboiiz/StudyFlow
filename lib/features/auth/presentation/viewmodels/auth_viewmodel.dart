@@ -9,12 +9,14 @@ import 'package:studyflow/features/auth/domain/usecase/check_auth_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/login_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/register_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/update_streak_usecase.dart';
 
 class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   final RegisterUsecase registerUsecase;
   final LoginUsecase loginUsecase;
   final CheckAuthUsecase checkAuthUsecase;
   final LogoutUsecase logoutUsecase;
+  final UpdateStreakUsecase updateStreakUsecase;
   StreamSubscription? _authSubscription;
 
   AuthViewmodel({
@@ -22,6 +24,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     required this.loginUsecase,
     required this.checkAuthUsecase,
     required this.logoutUsecase,
+    required this.updateStreakUsecase,
   }) {
     _authSubscription = checkAuthUsecase().listen((user) {
       if (user != null) {
@@ -112,5 +115,37 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     NotificationService.instance.show(
       AppNotification(message: 'Logout success', type: NotificationType.success)
     );
+  }
+
+  Future<void> updateStreak(DateTime completedDate) async {
+    if (currentUser == null) return;
+    
+    final dateStr = "${completedDate.year}-${completedDate.month.toString().padLeft(2, '0')}-${completedDate.day.toString().padLeft(2, '0')}";
+    
+    if (currentUser!.streakHistory.contains(dateStr)) {
+      return; 
+    }
+    
+    int newStreak = currentUser!.streak;
+    
+    if (currentUser!.lastStreakDate != null) {
+      final lastDate = currentUser!.lastStreakDate!;
+      
+      final dateOnlyCompleted = DateTime(completedDate.year, completedDate.month, completedDate.day);
+      final dateOnlyLast = DateTime(lastDate.year, lastDate.month, lastDate.day);
+      final daysDiff = dateOnlyCompleted.difference(dateOnlyLast).inDays;
+      
+      if (daysDiff == 1) {
+        newStreak += 1;
+      } else if (daysDiff > 1) {
+        newStreak = 1; 
+      }
+    } else {
+      newStreak = 1;
+    }
+    
+    final newHistory = List<String>.from(currentUser!.streakHistory)..add(dateStr);
+    
+    await updateStreakUsecase(newStreak, completedDate, newHistory);
   }
 }

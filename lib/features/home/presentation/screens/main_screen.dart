@@ -4,6 +4,7 @@ import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/screens/task_screen.dart';
 import 'package:studyflow/features/schedule/presentation/screens/schedule_screen.dart';
+import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
@@ -20,21 +21,16 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
-
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const TaskScreen(),
-    const ScheduleScreen(),
-    const SettingsScreen(),
-  ];
 
   // Labels cho BottomAppBar items
   static const List<_NavItem> _navItems = [
     _NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
     _NavItem(icon: Icons.article_outlined, label: 'Tasks'),
     _NavItem(icon: Icons.calendar_view_week_rounded, label: 'Schedule'),
+    _NavItem(icon: Icons.local_fire_department_outlined, label: 'Streak'),
     _NavItem(icon: Icons.settings_outlined, label: 'Settings'),
   ];
 
@@ -42,12 +38,20 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    const screens = [
+      HomeScreen(),
+      TaskScreen(),
+      ScheduleScreen(),
+      StreakScreen(),
+      SettingsScreen(),
+    ];
+    final currentIndex = _currentIndex.clamp(0, screens.length - 1) as int;
 
     return Scaffold(
       extendBody: true, // Cho phép nội dung tràn xuống dưới BottomAppBar
       body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+        index: currentIndex,
+        children: screens,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showModalBottomSheet(
@@ -92,6 +96,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                   children: [
                     _buildNavItem(navItem: _navItems[2], index: 2),
                     _buildNavItem(navItem: _navItems[3], index: 3),
+                    _buildNavItem(navItem: _navItems[4], index: 4),
                   ],
                 ),
               ),
@@ -109,47 +114,52 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     final isDark = theme.brightness == Brightness.dark;
     final unselectedColor = isDark ? Colors.grey.shade600 : Colors.grey.shade400;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (_currentIndex == index) return;
-        setState(() {
-          _currentIndex = index;
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          _reloadTabData(index);
-        });
-      },
-      child: SizedBox(
-        height: double.infinity,
-        width: 60,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon với hiệu ứng phóng to khi được chọn
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutBack,
-              transform: Matrix4.identity()..scale(isSelected ? 1.15 : 1.0),
-              child: Icon(
-                navItem.icon,
-                color: isSelected ? AppColors.accent : unselectedColor,
-                size: 24,
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (_currentIndex == index) return;
+          setState(() {
+            _currentIndex = index;
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _reloadTabData(index);
+          });
+        },
+        child: SizedBox(
+          height: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon với hiệu ứng phóng to khi được chọn
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                transform: Matrix4.identity()..scale(isSelected ? 1.15 : 1.0),
+                child: Icon(
+                  navItem.icon,
+                  color: isSelected ? AppColors.accent : unselectedColor,
+                  size: 24,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            // Subtitle text
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? AppColors.accent : unselectedColor,
+              const SizedBox(height: 4),
+              // Subtitle text
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? AppColors.accent : unselectedColor,
+                ),
+                child: Text(
+                  navItem.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              child: Text(navItem.label),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -171,7 +181,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         break;
     }
   }
-
 }
 
 /// Model cho navigation item

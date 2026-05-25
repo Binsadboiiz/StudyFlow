@@ -4,6 +4,7 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import '../viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
+import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
 /// Widget hiển thị danh sách các mục tiêu (Tasks) dưới dạng List (từng hàng/row) bên dưới lịch.
 /// Sử dụng Column thay vì ListView để có thể scroll cùng với Calendar trong CustomScrollView.
@@ -68,7 +69,12 @@ class DailyGoalList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           GestureDetector(
-                            onTap: () => viewModel.toggleTaskCompletion(task),
+                            onTap: () {
+                              if (!task.isCompleted) {
+                                context.read<AuthViewmodel>().updateStreak(DateTime.now());
+                              }
+                              viewModel.toggleTaskCompletion(task);
+                            },
                             child: Icon(
                               task.isCompleted ? Icons.check_circle : Icons.circle_outlined,
                               color: task.isCompleted ? AppColors.accent : ext.subtext,

@@ -5,6 +5,7 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 
 /// `TaskScreen` là màn hình quản lý công việc hàng ngày.
@@ -241,7 +242,12 @@ class _TaskScreenState extends State<TaskScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(children: [
                 GestureDetector(
-                  onTap: () => vm.toggleTask(task),
+                  onTap: () {
+                    if (!task.isCompleted) {
+                      context.read<AuthViewmodel>().updateStreak(DateTime.now());
+                    }
+                    vm.toggleTask(task);
+                  },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     width: 26, height: 26,
