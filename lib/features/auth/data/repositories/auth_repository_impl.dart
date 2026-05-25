@@ -8,12 +8,45 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl(this.remoteDatasource);
 
+  UserEntity _toEntity(UserModel userModel) {
+    return UserEntity(
+      id: userModel.id,
+      username: userModel.username,
+      email: userModel.email,
+      fullName: userModel.fullName,
+      streak: _effectiveStreak(userModel),
+      dailyTargetMinutes: userModel.dailyTargetMinutes,
+      lastStreakDate: userModel.lastStreakDate,
+    );
+  }
+
+  int _effectiveStreak(UserModel userModel) {
+    final lastStreakDate = userModel.lastStreakDate;
+    if (lastStreakDate == null) return 0;
+
+    final today = _dateOnly(DateTime.now());
+    final lastDay = _dateOnly(lastStreakDate);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (lastDay == today || lastDay == yesterday) {
+      return userModel.streak;
+    }
+
+    return 0;
+  }
+
+  DateTime _dateOnly(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
+
   @override
   Future<void> Register(UserEntity user, String password) async {
     final usernameExists = await isUsernameExists(user.username);
-    if(usernameExists) throw Exception("Username already exists");
+    if (usernameExists) throw Exception("Username already exists");
 
-    final uid = await remoteDatasource.registerWithEmailAndPassword(user.email, password);
+    final uid = await remoteDatasource.registerWithEmailAndPassword(
+      user.email,
+      password,
+    );
 
     final userModel = UserModel(
       id: uid,
@@ -29,18 +62,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> Login(String email, String password) async {
-    final uid = await remoteDatasource.loginWithEmailAndPassword(email, password);
+    final uid = await remoteDatasource.loginWithEmailAndPassword(
+      email,
+      password,
+    );
     if (uid == null) return null;
 
     final userModel = await remoteDatasource.getUserFromFirestore(uid);
     if (userModel == null) return null;
 
-    return UserEntity(
-      id: userModel.id, 
-      username: userModel.username, 
-      email: userModel.email,
-      fullName: userModel.fullName,
-    );
+    return _toEntity(userModel);
   }
 
   @override
@@ -50,16 +81,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<UserEntity?> get authStateChanges {
-    return remoteDatasource.authStateChanges.asyncMap((uid) async {
-      if (uid == null) return null;
-      final userModel = await remoteDatasource.getUserFromFirestore(uid);
+    return remoteDatasource.userChanges.map((userModel) {
       if (userModel == null) return null;
-      return UserEntity(
-        id: userModel.id, 
-        username: userModel.username, 
-        email: userModel.email,
-        fullName: userModel.fullName,
-      );
+      return _toEntity(userModel);
     });
   }
 
@@ -71,12 +95,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final userModel = await remoteDatasource.getUserFromFirestore(uid);
     if (userModel == null) return null;
 
-    return UserEntity(
-      id: userModel.id,
-      username: userModel.username,
-      email: userModel.email,
-      fullName: userModel.fullName,
-    );
+    return _toEntity(userModel);
   }
 
   @override

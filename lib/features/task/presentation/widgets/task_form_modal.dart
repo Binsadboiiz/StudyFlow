@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/services/notification/app_notification.dart';
+import 'package:studyflow/core/services/notification/notification_service.dart';
+import 'package:studyflow/core/services/notification/notification_type.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
@@ -27,10 +30,16 @@ class _TaskFormModalState extends State<TaskFormModal> {
     super.initState();
     final task = widget.task;
     _titleController = TextEditingController(text: task?.title ?? '');
-    _descriptionController = TextEditingController(text: task?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: task?.description ?? '',
+    );
     _selectedDate = task?.date ?? DateTime.now();
-    if (task?.startTime != null) _startTime = TimeOfDay.fromDateTime(task!.startTime!);
-    if (task?.endTime != null) _endTime = TimeOfDay.fromDateTime(task!.endTime!);
+    if (task?.startTime != null) {
+      _startTime = TimeOfDay.fromDateTime(task!.startTime!);
+    }
+    if (task?.endTime != null) {
+      _endTime = TimeOfDay.fromDateTime(task!.endTime!);
+    }
   }
 
   @override
@@ -40,7 +49,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
     super.dispose();
   }
 
-  bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 
   Future<void> _deleteTask(BuildContext context) async {
     final vm = context.read<TaskViewmodel>();
@@ -52,11 +62,34 @@ class _TaskFormModalState extends State<TaskFormModal> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete Task', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Delete Task',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: const Text('Are you sure you want to delete this task?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(color: Theme.of(context).extension<AppThemeExtension>()!.subtext, fontWeight: FontWeight.w600))),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).extension<AppThemeExtension>()!.subtext,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -65,7 +98,13 @@ class _TaskFormModalState extends State<TaskFormModal> {
       scheduleVm.loadWeekTasks();
       homeVm.refreshTasks();
       navigator.pop();
-      scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Task deleted successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.redAccent));
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Task deleted successfully!'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+        ),
+      );
     }
   }
 
@@ -83,19 +122,45 @@ class _TaskFormModalState extends State<TaskFormModal> {
           color: ext.cardBackground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 24),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 24,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(width: 48),
-                Text(isEditMode ? 'Edit task' : 'Add new task', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+                Text(
+                  isEditMode ? 'Edit task' : 'Add new task',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
                 isEditMode
-                    ? IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 24), onPressed: () => _deleteTask(context))
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.redAccent,
+                          size: 24,
+                        ),
+                        onPressed: () => _deleteTask(context),
+                      )
                     : const SizedBox(width: 48),
               ],
             ),
@@ -108,9 +173,21 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 hintText: 'What do you want to do...?',
                 filled: true,
                 fillColor: ext.inputFill,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.accent,
+                    width: 1.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -123,9 +200,21 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 hintText: 'Add details / description...',
                 filled: true,
                 fillColor: ext.inputFill,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.accent,
+                    width: 1.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -134,7 +223,12 @@ class _TaskFormModalState extends State<TaskFormModal> {
               onTap: () async {
                 final picked = await showDatePicker(
                   context: context,
-                  initialDate: _selectedDate.isBefore(DateTime(today.year, today.month, today.day)) ? DateTime(today.year, today.month, today.day) : _selectedDate,
+                  initialDate:
+                      _selectedDate.isBefore(
+                        DateTime(today.year, today.month, today.day),
+                      )
+                      ? DateTime(today.year, today.month, today.day)
+                      : _selectedDate,
                   firstDate: DateTime(today.year, today.month, today.day),
                   lastDate: DateTime(today.year + 1, today.month, today.day),
                 );
@@ -142,35 +236,68 @@ class _TaskFormModalState extends State<TaskFormModal> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: ext.inputFill,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: theme.dividerColor),
                 ),
-                child: Row(children: [
-                  const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.accent),
-                  const SizedBox(width: 12),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Date', style: TextStyle(fontSize: 11, color: ext.subtext, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text(
-                      _isSameDay(_selectedDate, today) ? 'Today, ${DateFormat('dd MMM yyyy').format(_selectedDate)}' : DateFormat('EEEE, dd MMM yyyy').format(_selectedDate),
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.calendar_today_rounded,
+                      size: 18,
+                      color: AppColors.accent,
                     ),
-                  ]),
-                  const Spacer(),
-                  Icon(Icons.chevron_right, color: ext.subtext, size: 20),
-                ]),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Date',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: ext.subtext,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _isSameDay(_selectedDate, today)
+                              ? 'Today, ${DateFormat('dd MMM yyyy').format(_selectedDate)}'
+                              : DateFormat(
+                                  'EEEE, dd MMM yyyy',
+                                ).format(_selectedDate),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Icon(Icons.chevron_right, color: ext.subtext, size: 20),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 12),
             // Time pickers
-            Row(children: [
-              Expanded(child: _buildTimePicker(context, 'Start', _startTime, true)),
-              const SizedBox(width: 10),
-              Expanded(child: _buildTimePicker(context, 'End', _endTime, false)),
-            ]),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTimePicker(context, 'Start', _startTime, true),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTimePicker(context, 'End', _endTime, false),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             // Submit button
             SizedBox(
@@ -181,7 +308,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 onPressed: () async {
                   if (_titleController.text.trim().isEmpty) return;
@@ -189,24 +318,80 @@ class _TaskFormModalState extends State<TaskFormModal> {
                   final scheduleVm = context.read<ScheduleViewmodel>();
                   final homeVm = context.read<HomeViewModel>();
                   final navigator = Navigator.of(context);
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   DateTime? startDateTime;
                   DateTime? endDateTime;
-                  if (_startTime != null) startDateTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _startTime!.hour, _startTime!.minute);
-                  if (_endTime != null) endDateTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _endTime!.hour, _endTime!.minute);
+                  if (_startTime != null) {
+                    startDateTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      _startTime!.hour,
+                      _startTime!.minute,
+                    );
+                  }
+                  if (_endTime != null) {
+                    endDateTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      _endTime!.hour,
+                      _endTime!.minute,
+                    );
+                  }
                   if (isEditMode) {
-                    final updatedTask = widget.task!.copyWith(title: _titleController.text.trim(), description: _descriptionController.text.trim(), date: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day), startTime: startDateTime, endTime: endDateTime);
+                    final updatedTask = widget.task!.copyWith(
+                      title: _titleController.text.trim(),
+                      description: _descriptionController.text.trim(),
+                      date: DateTime(
+                        _selectedDate.year,
+                        _selectedDate.month,
+                        _selectedDate.day,
+                      ),
+                      startTime: startDateTime,
+                      endTime: endDateTime,
+                    );
                     await vm.updateTask(updatedTask);
                   } else {
-                    final newTask = Task(id: '', title: _titleController.text.trim(), description: _descriptionController.text.trim(), date: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day), startTime: startDateTime, endTime: endDateTime);
+                    final newTask = Task(
+                      id: '',
+                      title: _titleController.text.trim(),
+                      description: _descriptionController.text.trim(),
+                      date: DateTime(
+                        _selectedDate.year,
+                        _selectedDate.month,
+                        _selectedDate.day,
+                      ),
+                      startTime: startDateTime,
+                      endTime: endDateTime,
+                    );
                     await vm.addTask(newTask);
                   }
                   scheduleVm.loadWeekTasks();
                   homeVm.refreshTasks();
                   navigator.pop();
-                  scaffoldMessenger.showSnackBar(SnackBar(content: Text(isEditMode ? 'Task updated!' : 'Added new task!'), behavior: SnackBarBehavior.floating, backgroundColor: AppColors.accent));
+                  if (isEditMode) {
+                    NotificationService.instance.show(
+                      AppNotification(
+                        message: 'Task updated!',
+                        type: NotificationType.success,
+                      ),
+                    );
+                  } else {
+                    NotificationService.instance.show(
+                      AppNotification(
+                        message: 'Added new task!',
+                        type: NotificationType.success,
+                      ),
+                    );
+                  }
                 },
-                child: Text(isEditMode ? 'Save changes' : 'Add now', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  isEditMode ? 'Save changes' : 'Add now',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -216,29 +401,73 @@ class _TaskFormModalState extends State<TaskFormModal> {
     );
   }
 
-  Widget _buildTimePicker(BuildContext context, String label, TimeOfDay? time, bool isStart) {
+  Widget _buildTimePicker(
+    BuildContext context,
+    String label,
+    TimeOfDay? time,
+    bool isStart,
+  ) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
     return GestureDetector(
       onTap: () async {
-        final picked = await showTimePicker(context: context, initialTime: time ?? TimeOfDay.now());
-        if (picked != null) setState(() { if (isStart) { _startTime = picked; } else { _endTime = picked; } });
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: time ?? TimeOfDay.now(),
+        );
+        if (picked != null) {
+          setState(() {
+            if (isStart) {
+              _startTime = picked;
+            } else {
+              _endTime = picked;
+            }
+          });
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(color: ext.inputFill, borderRadius: BorderRadius.circular(14), border: Border.all(color: theme.dividerColor)),
-        child: Row(children: [
-          const Icon(Icons.schedule_rounded, size: 18, color: AppColors.accent),
-          const SizedBox(width: 8),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: TextStyle(fontSize: 10, color: ext.subtext, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 2),
-            Text(
-              time != null ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}' : 'Optional',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: time != null ? theme.colorScheme.onSurface : ext.subtext),
+        decoration: BoxDecoration(
+          color: ext.inputFill,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.schedule_rounded,
+              size: 18,
+              color: AppColors.accent,
             ),
-          ]),
-        ]),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: ext.subtext,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  time != null
+                      ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
+                      : 'Optional',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: time != null
+                        ? theme.colorScheme.onSurface
+                        : ext.subtext,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ class UserModel {
   final int level;
   final double xp;
   final int streak;
+  final DateTime? lastStreakDate;
 
   final int dailyTargetMinutes;
 
@@ -26,6 +27,7 @@ class UserModel {
     this.level = 1,
     this.xp = 0.0,
     this.streak = 0,
+    this.lastStreakDate,
     this.dailyTargetMinutes = 120,
     this.isEmailVerified = false,
     required this.createdAt,
@@ -34,19 +36,22 @@ class UserModel {
 
   factory UserModel.fromMap(Map<String, dynamic> map, String documentId) {
     return UserModel(
-      id: documentId, 
-      username: map['username'] ?? '', 
+      id: documentId,
+      username: map['username'] ?? '',
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',
       photoUrl: map['photoUrl'],
       level: map['level'] ?? 1,
-      xp: map['xp'] ?? 0.0,
+      xp: (map['xp'] ?? 0.0).toDouble(),
       streak: map['streak'] ?? 0,
+      lastStreakDate: map['lastStreakDate'] != null
+          ? DateTime.parse(map['lastStreakDate'])
+          : null,
       dailyTargetMinutes: map['dailyTargetMinutes'] ?? 120,
       isEmailVerified: map['isEmailVerified'] ?? false,
-      createdAt: DateTime.parse(map['createdAt']), 
+      createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
-      );
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -58,6 +63,7 @@ class UserModel {
       'level': level,
       'xp': xp,
       'streak': streak,
+      'lastStreakDate': lastStreakDate?.toIso8601String(),
       'dailyTargetMinutes': dailyTargetMinutes,
       'isEmailVerified': isEmailVerified,
       'createdAt': createdAt.toIso8601String(),

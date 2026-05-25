@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:studyflow/core/services/notification/notification_type.dart';
 
 class AppNotification {

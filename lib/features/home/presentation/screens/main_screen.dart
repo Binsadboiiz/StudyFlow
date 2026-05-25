@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/screens/task_screen.dart';

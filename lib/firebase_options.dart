@@ -17,17 +17,29 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,49 +52,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBUK9cOXfWF4__1jGhgmyuc3TkduZy_tTU',
-    appId: '1:252578618828:web:fc4153117be6df8b53d169',
-    messagingSenderId: '252578618828',
-    projectId: 'studyflow-ngnphcng',
-    authDomain: 'studyflow-ngnphcng.firebaseapp.com',
-    storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
-    measurementId: 'G-PHXWHPKD1B',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA61GYPY8_eZkj3Tm01D_MFYAwsFqwnWrU',
     appId: '1:252578618828:android:58995d5f2ad864bb53d169',
     messagingSenderId: '252578618828',
     projectId: 'studyflow-ngnphcng',
     storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDXvIHtbGvgdoXKqw5L6A8k74TbR3b7IqI',
-    appId: '1:252578618828:ios:e86c1b3415cfe36b53d169',
-    messagingSenderId: '252578618828',
-    projectId: 'studyflow-ngnphcng',
-    storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
-    iosBundleId: 'com.example.studyflow',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDXvIHtbGvgdoXKqw5L6A8k74TbR3b7IqI',
-    appId: '1:252578618828:ios:e86c1b3415cfe36b53d169',
-    messagingSenderId: '252578618828',
-    projectId: 'studyflow-ngnphcng',
-    storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
-    iosBundleId: 'com.example.studyflow',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBUK9cOXfWF4__1jGhgmyuc3TkduZy_tTU',
-    appId: '1:252578618828:web:794bbfddfd466f1153d169',
-    messagingSenderId: '252578618828',
-    projectId: 'studyflow-ngnphcng',
-    authDomain: 'studyflow-ngnphcng.firebaseapp.com',
-    storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
-    measurementId: 'G-R04SZSZHZH',
   );
 }

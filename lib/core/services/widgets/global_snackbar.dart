@@ -10,10 +10,7 @@ import 'package:studyflow/core/services/notification/notification_type.dart';
 class GlobalSnackbar extends StatefulWidget {
   final Widget child;
 
-  const GlobalSnackbar({
-    super.key,
-    required this.child,
-  });
+  const GlobalSnackbar({super.key, required this.child});
 
   @override
   State<GlobalSnackbar> createState() => _GlobalSnackbarState();
@@ -30,7 +27,7 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
     // Lấy luồng dữ liệu (stream) chứa các thông báo từ NotificationService (Singleton)
     _stream = NotificationService.instance.notificationStream;
 
-    // Đăng ký lắng nghe: Mỗi khi có thông báo mới được push vào stream, 
+    // Đăng ký lắng nghe: Mỗi khi có thông báo mới được push vào stream,
     // hàm _showNotification sẽ được gọi
     _subscription = _stream.listen((notification) {
       _showNotification(notification);
@@ -48,7 +45,7 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
   void _showNotification(AppNotification notification) {
     Color backgroundColor;
 
-    switch(notification.type) {
+    switch (notification.type) {
       case NotificationType.success:
         backgroundColor = Colors.green;
         break;
@@ -66,19 +63,19 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
         break;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(
-        notification.message
-        ),
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    NotificationService.instance.scaffoldMessengerKey.currentState
+        ?.showSnackBar(
+          SnackBar(
+            content: Text(notification.message),
+            backgroundColor: backgroundColor,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     return widget.child;
-  }  
+  }
 }

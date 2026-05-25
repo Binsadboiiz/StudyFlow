@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<AuthViewmodel>().currentUser;
     final displayName = user?.fullName ?? 'Guest';
+    final streak = user?.streak ?? 0;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -23,7 +24,7 @@ class HomeScreen extends StatelessWidget {
       extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar
       // AppBar hiện đại với hiệu ứng kính mờ (Glassmorphism)
       appBar: AppBar(
-        backgroundColor: isDark 
+        backgroundColor: isDark
             ? Colors.black.withValues(alpha: 0.3)
             : Colors.white.withValues(alpha: 0.2),
         elevation: 0,
@@ -40,7 +41,7 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark ? Colors.grey.shade700 : Colors.white, 
+                  color: isDark ? Colors.grey.shade700 : Colors.white,
                   width: 2,
                 ),
                 boxShadow: [
@@ -48,12 +49,14 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: const CircleAvatar(
                 radius: 22,
-                backgroundImage: AssetImage('assets/images/8b4635fd93dc6e874f686435da83a210.jpg'),
+                backgroundImage: AssetImage(
+                  'assets/images/8b4635fd93dc6e874f686435da83a210.jpg',
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -82,57 +85,81 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.local_fire_department_rounded,
+                  color: AppColors.accent,
+                  size: 20,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$streak',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark 
+                color: isDark
                     ? Colors.white.withValues(alpha: 0.1)
                     : Colors.white.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: Icon(
-                  Icons.notifications_none_rounded, 
+                  Icons.notifications_none_rounded,
                   color: theme.colorScheme.onSurface,
                 ),
                 onPressed: () {},
               ),
             ),
-          )
+          ),
         ],
       ),
-      
+
       // Nội dung chính: Toàn bộ màn hình scroll được (Calendar + Task list)
       body: Container(
         decoration: BoxDecoration(
           color: isDark ? AppColors.backgroundDark : null,
-          image: isDark ? null : const DecorationImage(
-            image: AssetImage('assets/backgrounds/background_app.jpg'),
-            fit: BoxFit.cover,
-          ),
+          image: isDark
+              ? null
+              : const DecorationImage(
+                  image: AssetImage('assets/backgrounds/background_app.jpg'),
+                  fit: BoxFit.cover,
+                ),
         ),
         child: SafeArea(
-          bottom: false, // Không cần thiết lập SafeArea cho bottom vì có extendBody rồi
+          bottom:
+              false, // Không cần thiết lập SafeArea cho bottom vì có extendBody rồi
           child: CustomScrollView(
             slivers: [
               // Khoảng trống đẩy nội dung xuống dưới AppBar
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 70),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 70)),
               // 1. Phần Widget hiển thị lịch
-              const SliverToBoxAdapter(
-                child: HomeCalendar(),
-              ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 8),
-              ),
+              const SliverToBoxAdapter(child: HomeCalendar()),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
               // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày
               // Dùng SliverFillRemaining với hasScrollBody: false để DailyGoalList
               // chiếm phần còn lại và scroll cùng Calendar
-              const SliverToBoxAdapter(
-                child: DailyGoalList(),
-              ),
+              const SliverToBoxAdapter(child: DailyGoalList()),
             ],
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:studyflow/core/di/injection.dart';
+import 'package:studyflow/core/services/notification/notification_service.dart';
 import 'package:studyflow/core/services/widgets/auth_gate.dart';
 import 'package:studyflow/core/services/widgets/global_snackbar.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
@@ -12,18 +13,16 @@ import 'firebase_options.dart';
 void main() async {
   // Đảm bảo Flutter framework đã được khởi tạo trước khi gọi các native code hoặc async.
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Khởi tạo locale data cho intl package (để format ngày tháng theo ngôn ngữ máy).
-  await initializeDateFormatting(); 
-  
-  // Khởi tạo toàn bộ các dependency (database, repositories, v.v...) trước khi chạy UI.
-  await DependencyInjection.init();
-  print("STEP 1");
+  await initializeDateFormatting();
 
   // Khởi tạo firebase
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("STEP 1");
+
+  // Khởi tạo toàn bộ các dependency (database, repositories, v.v...) trước khi chạy UI.
+  await DependencyInjection.init();
   print("STEP 2");
 
   // Bắt đầu render ứng dụng.
@@ -53,6 +52,8 @@ class StudyFlowApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             // Chế độ theme hiện tại đang được chọn (lấy từ ThemeProvider)
             themeMode: themeProvider.themeMode,
+            scaffoldMessengerKey:
+                NotificationService.instance.scaffoldMessengerKey,
             // builder này bao bọc toàn bộ app bằng GlobalSnackbar để có thể hiển thị thông báo ở bất kỳ đâu
             builder: (context, child) {
               return GlobalSnackbar(child: child!);
