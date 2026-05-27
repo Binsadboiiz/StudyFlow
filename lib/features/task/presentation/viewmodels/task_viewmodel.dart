@@ -28,6 +28,11 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   /// Internal list holding all tasks fetched from the data source.
   List<Task> _allTasks = [];
 
+  /// Flag indicating whether the initial task fetch is in progress.
+  bool _isLoading = true;
+  /// Getter for loading status.
+  bool get isLoading => _isLoading;
+
   /// Constructor initializes the ViewModel with required use cases
   /// and starts listening to the task stream.
   TaskViewmodel({
@@ -38,6 +43,7 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   }) {
     _taskSubscription = getTaskUseCase().listen((taskData) {
       _allTasks = taskData;
+      _isLoading = false;
       _updateTasks();
       notifyListenersSafely();
     });

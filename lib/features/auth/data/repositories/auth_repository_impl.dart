@@ -52,7 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
       DateTime(date.year, date.month, date.day);
 
   @override
-  Future<void> Register(UserEntity user, String password) async {
+  Future<void> register(UserEntity user, String password) async {
     // Check if the username is already taken.
     final usernameExists = await isUsernameExists(user.username);
     if (usernameExists) throw Exception("Username already exists");
@@ -78,7 +78,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserEntity?> Login(String email, String password) async {
+  Future<UserEntity?> login(String email, String password) async {
     // Authenticate the user and get their UID.
     final uid = await remoteDatasource.loginWithEmailAndPassword(
       email,
@@ -134,7 +134,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> Logout() async {
+  Future<void> logout() async {
     // Log out the current user via the remote datasource.
     await remoteDatasource.logout();
   }

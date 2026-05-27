@@ -11,6 +11,6 @@ class RegisterUsecase {
 
   /// Executes the registration operation for a [user] with the provided [password].
   Future<void> call(UserEntity user, String password) async {
-    return await repository.Register(user, password);
+    return await repository.register(user, password);
   }
 }

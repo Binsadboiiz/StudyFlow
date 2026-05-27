@@ -5,6 +5,7 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import '../viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
 
 /// A widget that displays the list of daily goals (Tasks) as a List (row by row) below the calendar.
 /// It uses a [Column] instead of a [ListView] so that it can be scrolled together with the Calendar in a [CustomScrollView].
@@ -22,9 +23,11 @@ class DailyGoalList extends StatelessWidget {
       builder: (context, viewModel, child) {
         // 1. Loading state
         if (viewModel.isLoading) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
+          return Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+            child: Column(
+              children: List.generate(3, (index) => const TaskSkeleton()),
+            ),
           );
         }
 

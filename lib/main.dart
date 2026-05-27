@@ -19,16 +19,12 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print("STEP 1");
 
   // Initialize all dependencies (database, repositories, etc.) before running the UI.
   await DependencyInjection.init();
-  print("STEP 2");
 
   // Start rendering the application.
   runApp(const StudyFlowApp());
-
-  print("STEP 3");
 }
 
 /// The root widget of the application.

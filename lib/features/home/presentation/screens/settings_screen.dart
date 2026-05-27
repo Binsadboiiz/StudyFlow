@@ -82,13 +82,12 @@ class SettingsScreen extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () async {
-                    await context.read<AuthViewmodel>().Logout();
+                    final navigator = Navigator.of(context);
+                    await context.read<AuthViewmodel>().logout();
 
-                  Navigator.pushAndRemoveUntil(
-                    context, 
-                    MaterialPageRoute(builder: (_) => const LoginScreen(),
-                    ), 
-                    (route) => false,
+                    navigator.pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
                     );
                   },
                   icon: const Icon(Icons.logout, color: Colors.redAccent),

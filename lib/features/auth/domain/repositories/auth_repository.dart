@@ -3,12 +3,12 @@ import 'package:studyflow/features/auth/domain/entities/user_entity.dart';
 /// Abstract repository defining authentication-related operations.
 abstract class AuthRepository {
   /// Registers a new user with the given [user] details and [password].
-  Future<void> Register(UserEntity user, String password);
+  Future<void> register(UserEntity user, String password);
   
   /// Logs in a user using their [email] and [password].
   /// 
   /// Note: The identifier is expected to be an email.
-  Future<UserEntity?> Login(String email, String password);
+  Future<UserEntity?> login(String email, String password);
 
   /// Checks if a given [username] is already taken.
   /// 
@@ -29,5 +29,5 @@ abstract class AuthRepository {
   Future<void> updateUserStreak(int streak, DateTime lastStreakDate, List<String> streakHistory);
 
   /// Logs out the currently authenticated user.
-  Future<void> Logout();
+  Future<void> logout();
 }

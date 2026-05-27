@@ -54,7 +54,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   /// Registers a new user with the given [fullName], [username], [email], and [password].
   /// 
   /// Returns an error message if the registration fails, or null if successful.
-  Future<String?> Register(String fullName, String username, String email, String password) async {
+  Future<String?> register(String fullName, String username, String email, String password) async {
     try {
       isLoading = true;
       notifyListenersSafely();
@@ -85,7 +85,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   /// Logs in a user with the given [email] and [password].
   /// 
   /// Returns an error message if the login fails, or null if successful.
-  Future<String?> Login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
     try {
       isLoading = true;
       notifyListenersSafely();
@@ -118,7 +118,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   /// Logs out the currently authenticated user.
-  Future<void> Logout() async {
+  Future<void> logout() async {
     await logoutUsecase();
     NotificationService.instance.show(
       AppNotification(message: 'Logout success', type: NotificationType.success)

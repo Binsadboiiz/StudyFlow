@@ -13,6 +13,6 @@ class LoginUsecase {
   /// 
   /// Returns the authenticated [UserEntity], or null if login fails.
   Future<UserEntity?> call(String email, String password) async {
-    return await repository.Login(email, password);
+    return await repository.login(email, password);
   }
 }

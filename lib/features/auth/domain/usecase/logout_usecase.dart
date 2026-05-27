@@ -10,6 +10,6 @@ class LogoutUsecase {
 
   /// Executes the logout operation.
   Future<void> call() async {
-    await repository.Logout();
+    await repository.logout();
   }
 }

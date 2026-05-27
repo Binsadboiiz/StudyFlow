@@ -7,6 +7,7 @@ import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
+import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
 
 /// `TaskScreen` is the daily task management screen.
 /// It allows users to view their task list by day, add/edit/delete tasks, and mark them as completed.
@@ -33,7 +34,6 @@ class _TaskScreenState extends State<TaskScreen> {
     final today = DateTime.now();
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -68,7 +68,11 @@ class _TaskScreenState extends State<TaskScreen> {
             if (vm.tasks.isNotEmpty)
               Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: _buildProgressBar(vm)),
             const SizedBox(height: 8),
-            Expanded(child: vm.tasks.isEmpty ? _buildEmptyState() : _buildTaskList(vm)),
+            Expanded(
+              child: vm.isLoading
+                  ? TaskSkeleton.buildList(count: 4)
+                  : (vm.tasks.isEmpty ? _buildEmptyState() : _buildTaskList(vm)),
+            ),
           ],
         ),
       ),

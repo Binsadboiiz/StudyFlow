@@ -4,7 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
-import 'package:intl/intl.dart';
 
 /// Screen displaying the user's study streak.
 ///

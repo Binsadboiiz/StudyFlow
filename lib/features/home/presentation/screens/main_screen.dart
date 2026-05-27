@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen>
       StreakScreen(),
       SettingsScreen(),
     ];
-    final currentIndex = _currentIndex.clamp(0, screens.length - 1) as int;
+    final currentIndex = _currentIndex.clamp(0, screens.length - 1);
 
     return Scaffold(
       extendBody: true, // Allows content to extend below the BottomAppBar
@@ -136,7 +136,7 @@ class _MainScreenState extends State<MainScreen>
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutBack,
-                transform: Matrix4.identity()..scale(isSelected ? 1.15 : 1.0),
+                transform: Matrix4.identity()..scaleByDouble(isSelected ? 1.15 : 1.0, isSelected ? 1.15 : 1.0, 1.0, 1.0),
                 child: Icon(
                   navItem.icon,
                   color: isSelected ? AppColors.accent : unselectedColor,

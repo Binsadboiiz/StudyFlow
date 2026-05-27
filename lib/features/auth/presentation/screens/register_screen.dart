@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     final authViewModel = context.read<AuthViewmodel>();
-    final error = await authViewModel.Register(fullName, username, email, password);
+    final error = await authViewModel.register(fullName, username, email, password);
 
     if (!mounted) return;
 

@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final authViewModel = context.read<AuthViewmodel>();
-    final error = await authViewModel.Login(identifier, password);
+    final error = await authViewModel.login(identifier, password);
 
     if (!mounted) return;
 
@@ -60,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     // final isLoading = context.watch<AuthViewmodel>().isLoading;
     final isLoading = context.select<AuthViewmodel, bool>((vm) => vm.isLoading);
 

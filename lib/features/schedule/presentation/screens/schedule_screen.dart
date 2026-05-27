@@ -9,6 +9,7 @@ import 'package:studyflow/features/schedule/presentation/widgets/timeline_view.d
 import 'package:studyflow/features/schedule/presentation/widgets/add_schedule_task_dialog.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
 
 /// [ScheduleScreen] is a screen for viewing the weekly schedule.
 /// It provides users with an overview of tasks throughout the 7 days,
@@ -66,7 +67,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             const SizedBox(height: 8),
             Expanded(
               child: vm.isLoading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
+                  ? TaskSkeleton.buildList(count: 3)
                   : TimelineView(
                       tasks: vm.selectedDayTasks,
                       selectedDay: vm.selectedDay,
