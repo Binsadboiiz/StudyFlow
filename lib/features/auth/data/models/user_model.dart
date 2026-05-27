@@ -1,24 +1,40 @@
+/// Data model representing a user in the database.
 class UserModel {
+  /// The unique identifier of the user.
   final String id;
 
+  /// The chosen username.
   final String username;
+  /// The user's email address.
   final String email;
+  /// The user's full name.
   final String fullName;
+  /// An optional URL to the user's profile photo.
   final String? photoUrl;
 
+  /// The user's current level.
   final int level;
+  /// The user's current experience points.
   final double xp;
+  /// The user's current login/activity streak.
   final int streak;
+  /// The date of the last successful streak update.
   final DateTime? lastStreakDate;
+  /// A history of dates when the streak was updated.
   final List<String> streakHistory;
 
+  /// The daily target duration for the user, in minutes.
   final int dailyTargetMinutes;
 
+  /// Indicates whether the user has verified their email.
   final bool isEmailVerified;
 
+  /// The timestamp when the account was created.
   final DateTime createdAt;
+  /// The timestamp when the account was last updated.
   final DateTime updatedAt;
 
+  /// Creates a [UserModel] instance.
   UserModel({
     required this.id,
     required this.username,
@@ -36,6 +52,9 @@ class UserModel {
     required this.updatedAt,
   });
 
+  /// Creates a [UserModel] from a map structure, usually retrieved from a database like Firestore.
+  /// 
+  /// [documentId] is the unique document ID representing the user.
   factory UserModel.fromMap(Map<String, dynamic> map, String documentId) {
     return UserModel(
       id: documentId,
@@ -59,6 +78,7 @@ class UserModel {
     );
   }
 
+  /// Converts the [UserModel] instance into a map structure suitable for database storage.
   Map<String, dynamic> toMap() {
     return {
       'username': username,

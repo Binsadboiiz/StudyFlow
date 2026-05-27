@@ -7,9 +7,9 @@ import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/screens/register_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
-/// `SettingsScreen` là màn hình cài đặt của ứng dụng.
-/// Cho phép người dùng xem thông tin tài khoản, đăng xuất, chuyển đổi giao diện Light/Dark Mode
-/// và quản lý một số cài đặt khác của hệ thống.
+/// `SettingsScreen` is the settings screen of the application.
+/// It allows users to view account information, log out, toggle Light/Dark Mode, 
+/// and manage various other system settings.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 

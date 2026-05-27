@@ -2,12 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studyflow/features/task/data/models/task_model.dart';
 
+/// Data source for managing task operations with Firebase Firestore.
 class TaskRemoteDatasource {
+  /// The Firestore instance.
   final FirebaseFirestore firestore;
+  
+  /// The FirebaseAuth instance.
   final FirebaseAuth auth;
 
   TaskRemoteDatasource({required this.firestore, required this.auth});
 
+  /// Gets a continuous stream of the user's tasks.
   Stream<List<TaskModel>> getTasksStream() {
     final userId = auth.currentUser?.uid;
     if (userId == null) return Stream.value([]);
@@ -23,6 +28,7 @@ class TaskRemoteDatasource {
         });
   }
 
+  /// Adds a new task to Firestore.
   Future<void> addTask(TaskModel task) async {
     final userId = auth.currentUser?.uid;
     if (userId == null) throw Exception("User not logged in");
@@ -36,6 +42,7 @@ class TaskRemoteDatasource {
     await docRef.set(taskData);
   }
 
+  /// Updates an existing task in Firestore.
   Future<void> updateTask(TaskModel task) async {
     final userId = auth.currentUser?.uid;
     if (userId == null) throw Exception("User not logged in");
@@ -47,10 +54,12 @@ class TaskRemoteDatasource {
     await _updateStreakIfDailyGoalCompleted(userId, task);
   }
 
+  /// Deletes a task from Firestore by its [id].
   Future<void> deleteTask(String id) async {
     await firestore.collection('tasks').doc(id).delete();
   }
 
+  /// Updates the user's streak if all daily goals are completed.
   Future<void> _updateStreakIfDailyGoalCompleted(
     String userId,
     TaskModel updatedTask,
@@ -104,9 +113,11 @@ class TaskRemoteDatasource {
     });
   }
 
+  /// Returns a [DateTime] with only year, month, and day.
   DateTime _dateOnly(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
+  /// Parses a dynamic date value into a [DateTime] object.
   DateTime? _parseDate(dynamic value) {
     if (value is String) return DateTime.tryParse(value);
     return null;

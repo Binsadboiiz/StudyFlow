@@ -11,6 +11,7 @@ import 'package:studyflow/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/register_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/update_streak_usecase.dart';
 
+/// Viewmodel for managing authentication state and operations.
 class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   final RegisterUsecase registerUsecase;
   final LoginUsecase loginUsecase;
@@ -50,6 +51,9 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   bool isAuthenticated = false;
   UserEntity? currentUser;
 
+  /// Registers a new user with the given [fullName], [username], [email], and [password].
+  /// 
+  /// Returns an error message if the registration fails, or null if successful.
   Future<String?> Register(String fullName, String username, String email, String password) async {
     try {
       isLoading = true;
@@ -78,6 +82,9 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
+  /// Logs in a user with the given [email] and [password].
+  /// 
+  /// Returns an error message if the login fails, or null if successful.
   Future<String?> Login(String email, String password) async {
     try {
       isLoading = true;
@@ -110,6 +117,7 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
+  /// Logs out the currently authenticated user.
   Future<void> Logout() async {
     await logoutUsecase();
     NotificationService.instance.show(
@@ -117,6 +125,16 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     );
   }
 
+  /// Updates the learning streak based on the task completion date.
+  /// 
+  /// Streak calculation logic:
+  /// - If the completion date is already in the history ([streakHistory]), it is ignored (meaning if multiple tasks are done in one day, the streak is only counted once).
+  /// - If there is no streak history ([lastStreakDate] == null), start a new streak = 1.
+  /// - If the difference between the current completion date and the last streak date ([lastStreakDate]) is exactly 1 day,
+  ///   increase the streak by 1 (maintaining a continuous streak).
+  /// - If the difference is more than 1 day, the user has broken the streak, reset the streak to 1.
+  /// 
+  /// Finally, add the current date to the history list and call the UseCase to update the database.
   Future<void> updateStreak(DateTime completedDate) async {
     if (currentUser == null) return;
     

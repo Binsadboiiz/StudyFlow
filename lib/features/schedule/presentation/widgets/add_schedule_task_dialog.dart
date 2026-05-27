@@ -4,9 +4,14 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 
+/// A dialog widget used to add a new task to the schedule for a specific day.
 class AddScheduleTaskDialog extends StatefulWidget {
+  /// The specific day selected for the new task.
   final DateTime selectedDay;
+  
+  /// An optional initial starting hour for the new task.
   final int? initialHour;
+  
   const AddScheduleTaskDialog({super.key, required this.selectedDay, this.initialHour});
   @override
   State<AddScheduleTaskDialog> createState() => _AddScheduleTaskDialogState();
@@ -107,6 +112,7 @@ class _AddScheduleTaskDialogState extends State<AddScheduleTaskDialog> {
     );
   }
 
+  /// Builds a customized time picker button.
   Widget _buildTimePicker({required String label, required TimeOfDay? time, required IconData icon, required VoidCallback onTap}) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
@@ -131,12 +137,14 @@ class _AddScheduleTaskDialogState extends State<AddScheduleTaskDialog> {
     );
   }
 
+  /// Opens a time picker dialog to select start or end time.
   Future<void> _pickTime({required bool isStart}) async {
     final initial = isStart ? _startTime : (_endTime ?? _startTime);
     final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked != null) setState(() { if (isStart) { _startTime = picked; } else { _endTime = picked; } });
   }
 
+  /// Submits the new task details and closes the dialog.
   void _onSubmit() {
     if (_titleController.text.trim().isEmpty) return;
     final day = widget.selectedDay;

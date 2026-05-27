@@ -4,11 +4,21 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 
+/// A widget that displays tasks in a daily timeline format.
 class TimelineView extends StatelessWidget {
+  /// The list of tasks to display in the timeline.
   final List<Task> tasks;
+  
+  /// The currently selected day.
   final DateTime selectedDay;
+  
+  /// Callback triggered when a specific hour slot is tapped.
   final Function(int hour) onHourTapped;
+  
+  /// Callback triggered to toggle the completion status of a task.
   final Function(Task task) onTaskToggle;
+  
+  /// Callback triggered to delete a task.
   final Function(Task task) onTaskDelete;
 
   const TimelineView({
@@ -33,6 +43,7 @@ class TimelineView extends StatelessWidget {
     );
   }
 
+  /// Retrieves tasks scheduled for the specified [hour].
   List<Task> _getTasksForHour(int hour) {
     return tasks.where((task) {
       if (task.startTime == null) return false;
@@ -41,6 +52,7 @@ class TimelineView extends StatelessWidget {
       ..sort((a, b) => a.startTime!.minute.compareTo(b.startTime!.minute));
   }
 
+  /// Builds a row representing a specific hour in the timeline.
   Widget _buildHourRow(BuildContext context, int hour, List<Task> hourTasks) {
     final now = DateTime.now();
     final isCurrentHour = _isSameDay(selectedDay, now) && now.hour == hour;
@@ -96,6 +108,7 @@ class TimelineView extends StatelessWidget {
     );
   }
 
+  /// Builds an empty slot when there are no tasks for the given hour.
   Widget _buildEmptySlot(BuildContext context, bool isCurrentHour) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -115,6 +128,7 @@ class TimelineView extends StatelessWidget {
     );
   }
 
+  /// Builds a task card to be displayed within the timeline.
   Widget _buildTimelineTaskCard(BuildContext context, Task task) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
@@ -168,11 +182,13 @@ class TimelineView extends StatelessWidget {
     );
   }
 
+  /// Formats the task's start and end times into a readable range.
   String _formatTimeRange(DateTime start, DateTime? end) {
     final startStr = DateFormat('HH:mm').format(start);
     if (end != null) return '$startStr - ${DateFormat('HH:mm').format(end)}';
     return startStr;
   }
 
+  /// Checks if two [DateTime] objects represent the same day.
   bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 }

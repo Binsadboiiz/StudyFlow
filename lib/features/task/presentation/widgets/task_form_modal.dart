@@ -11,7 +11,10 @@ import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.d
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 
+/// A modal bottom sheet used to create a new task or edit an existing one.
+/// It provides form fields for task title, description, date, and optional start/end times.
 class TaskFormModal extends StatefulWidget {
+  /// The task to edit. If null, a new task will be created.
   final Task? task;
   const TaskFormModal({super.key, this.task});
   @override

@@ -8,8 +8,8 @@ import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.d
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 
-/// `TaskScreen` là màn hình quản lý công việc hàng ngày.
-/// Cho phép người dùng xem danh sách công việc theo từng ngày, thêm/sửa/xóa và đánh dấu hoàn thành.
+/// `TaskScreen` is the daily task management screen.
+/// It allows users to view their task list by day, add/edit/delete tasks, and mark them as completed.
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
   @override

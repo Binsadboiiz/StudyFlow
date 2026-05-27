@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// `ThemeProvider` quản lý trạng thái giao diện hiện tại của ứng dụng (Light/Dark/System).
-/// Sử dụng `ChangeNotifier` để thông báo cho widget tree cập nhật UI mỗi khi theme thay đổi.
+/// `ThemeProvider` manages the current user interface state of the application (Light/Dark/System).
+/// It uses `ChangeNotifier` to notify the widget tree to update the UI whenever the theme changes.
 class ThemeProvider extends ChangeNotifier {
-  // Mặc định sử dụng theme theo hệ thống máy
+  // Default to using the system theme.
   ThemeMode _themeMode = ThemeMode.system;
 
+  /// Retrieves the current [ThemeMode].
   ThemeMode get themeMode => _themeMode;
 
+  /// Creates a [ThemeProvider] instance.
+  /// Automatically loads the theme saved in local storage upon initialization.
   ThemeProvider() {
-    // Tự động load theme đã lưu trong local storage khi app khởi động
     loadTheme();
   }
 
-  /// Hàm thay đổi chế độ theme và lưu vào `SharedPreferences` để giữ trạng thái cho lần mở app sau.
+  /// Changes the theme mode and saves it to `SharedPreferences` to persist the state for future app launches.
+  ///
+  /// [mode] is the new [ThemeMode] to be applied.
   Future<void> setTheme(ThemeMode mode) async {
     _themeMode = mode;
 
     final prefs = await SharedPreferences.getInstance();
 
+    // Store the selected theme mode as a string.
     if(mode == ThemeMode.light) {
       await prefs.setString('theme', 'light');
     } else if (mode == ThemeMode.dark) {
@@ -28,16 +33,17 @@ class ThemeProvider extends ChangeNotifier {
       await prefs.setString('theme', 'system');
     }
 
-    // Báo cho các widget đang lắng nghe (Consumer) biết để build lại UI
+    // Notify listening widgets (e.g., Consumers) to rebuild the UI with the new theme.
     notifyListeners();
   }
 
-  /// Hàm đọc trạng thái theme đã lưu trữ từ thiết bị (local storage).
+  /// Reads the stored theme state from the device's local storage and applies it.
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
 
     final theme = prefs.getString('theme');
 
+    // Parse the stored string into the corresponding ThemeMode.
     switch(theme) {
       case 'light':
         _themeMode = ThemeMode.light;
@@ -51,6 +57,7 @@ class ThemeProvider extends ChangeNotifier {
         _themeMode = ThemeMode.system;
     }
 
+    // Notify listeners after loading the theme to ensure the UI reflects the loaded state.
     notifyListeners();
   }
 }

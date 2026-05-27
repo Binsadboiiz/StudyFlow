@@ -6,8 +6,8 @@ import '../viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
-/// Widget hiển thị danh sách các mục tiêu (Tasks) dưới dạng List (từng hàng/row) bên dưới lịch.
-/// Sử dụng Column thay vì ListView để có thể scroll cùng với Calendar trong CustomScrollView.
+/// A widget that displays the list of daily goals (Tasks) as a List (row by row) below the calendar.
+/// It uses a [Column] instead of a [ListView] so that it can be scrolled together with the Calendar in a [CustomScrollView].
 class DailyGoalList extends StatelessWidget {
   const DailyGoalList({super.key});
 
@@ -17,10 +17,10 @@ class DailyGoalList extends StatelessWidget {
     final ext = theme.extension<AppThemeExtension>()!;
     final isDark = theme.brightness == Brightness.dark;
 
-    // Consumer lắng nghe dữ liệu từ HomeViewModel
+    // Consumer to listen for data from HomeViewModel
     return Consumer<HomeViewModel>(
       builder: (context, viewModel, child) {
-        // 1. Trạng thái Đang tải dữ liệu
+        // 1. Loading state
         if (viewModel.isLoading) {
           return const Padding(
             padding: EdgeInsets.all(32),
@@ -28,7 +28,7 @@ class DailyGoalList extends StatelessWidget {
           );
         }
 
-        // 2. Trạng thái Không có dữ liệu
+        // 2. Empty data state
         if (viewModel.dailyTasks.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(32),
@@ -41,7 +41,7 @@ class DailyGoalList extends StatelessWidget {
           );
         }
 
-        // 3. Trạng thái Có dữ liệu
+        // 3. Data available state
         return Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 100.0),
           child: Column(

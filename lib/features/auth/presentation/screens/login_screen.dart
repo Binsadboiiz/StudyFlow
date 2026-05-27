@@ -5,9 +5,10 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
 import 'dart:ui';
 
-/// `LoginScreen` là giao diện đăng nhập của ứng dụng.
-/// Màn hình này được thiết kế độc lập, không sử dụng `AppTheme` chung để giữ nguyên 
-/// hiệu ứng Glassmorphism và màu nền Gradient đặc trưng bất kể người dùng đang dùng Light hay Dark mode.
+/// `LoginScreen` is the login interface of the application.
+/// This screen is designed independently and does not use the general `AppTheme` 
+/// to maintain its Glassmorphism effect and signature Gradient background 
+/// regardless of whether the user is in Light or Dark mode.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -70,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+                colors: [Color(0xFFFDFBFB), Color(0xFFEBEDEE)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -121,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Icon(
                       Icons.bubble_chart,
                       size: 80,
-                      color: Colors.white,
+                      color: Color(0xFF203A43),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -129,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Color(0xFF203A43),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -137,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Login to continue your study flow',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 48),
@@ -145,15 +146,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Colors.white.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             spreadRadius: 1,
                           ),
@@ -164,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _buildTextField(
                             controller: _identifierController,
                             icon: Icons.person_outline,
-                            hintText: 'Username or Email',
+                            hintText: 'example@gamil.com',
                           ),
                           const SizedBox(height: 20),
                           _buildTextField(
@@ -186,8 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: isLoading ? null : _handleLogin,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF203A43),
+                                backgroundColor: const Color(0xFF203A43),
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -199,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       width: 24,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF203A43)),
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
                                   : const Text(
@@ -220,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const Text(
                           "Don't have an account?",
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: Colors.black54),
                         ),
                         TextButton(
                           onPressed: () {
@@ -232,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF203A43),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -260,29 +261,29 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextField(
       controller: controller,
       obscureText: isPassword && !isPasswordVisible,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        hintStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: Icon(icon, color: Colors.black54),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.white70,
+                  color: Colors.black54,
                 ),
                 onPressed: onVisibilityToggle,
               )
             : null,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: Colors.white.withValues(alpha: 0.5),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Color(0xFF203A43)),
         ),
       ),
     );

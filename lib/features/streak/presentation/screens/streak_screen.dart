@@ -6,6 +6,11 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:intl/intl.dart';
 
+/// Screen displaying the user's study streak.
+///
+/// This screen includes:
+/// - A counter showing the total number of current consecutive streak days.
+/// - A calendar visually marking the days the user completed their tasks (indicated by a fire icon).
 class StreakScreen extends StatefulWidget {
   const StreakScreen({super.key});
 
@@ -154,6 +159,12 @@ class _StreakScreenState extends State<StreakScreen> {
     );
   }
 
+  /// Builds a specific day cell on the calendar.
+  /// 
+  /// Display logic:
+  /// - If the day is in the streak history (`streakHistory`), it highlights the cell with a fire icon.
+  /// - If it is the current day (`isToday`), it highlights the border/color for easy recognition.
+  /// - If it is a normal day without a streak, it displays the day number as plain text.
   Widget _buildCalendarDay(DateTime day, List<String> streakHistory, ThemeData theme, AppThemeExtension ext, {bool isToday = false}) {
     final dateStr = "${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}";
     final hasStreak = streakHistory.contains(dateStr);

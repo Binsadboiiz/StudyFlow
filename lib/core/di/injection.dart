@@ -23,21 +23,32 @@ import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
 
+/// A utility class for setting up dependency injection across the application.
+/// It initializes repositories and provides a list of Providers for state management.
 class DependencyInjection {
+  /// The globally available task repository instance.
   static late final TaskRepositoryImpl taskRepository;
+  /// The globally available authentication repository instance.
   static late final AuthRepositoryImpl authRepository;
 
+  /// Initializes all the dependencies needed for the application.
+  /// This should be called before `runApp()` in `main.dart`.
   static Future<void> init() async {
+    // Initialize Firebase instances
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
 
+    // Set up data sources and repositories for tasks
     final taskRemoteDatasource = TaskRemoteDatasource(firestore: firestore, auth: auth);
     taskRepository = TaskRepositoryImpl(taskRemoteDatasource);
 
+    // Set up data sources and repositories for authentication
     final authRemoteDatasource = AuthRemoteDatasource(auth: auth, firestore: firestore);
     authRepository = AuthRepositoryImpl(authRemoteDatasource);
   }
 
+  /// Returns a list of all state management providers used in the application.
+  /// These are injected at the root level using `MultiProvider`.
   static List<SingleChildWidget> getProviders() {
     return [
       ChangeNotifierProvider(

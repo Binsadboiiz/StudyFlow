@@ -1,15 +1,28 @@
-/// Lớp đại diện cho một mục tiêu/công việc hằng ngày (Entity trong Clean Architecture).
-/// Đây là lớp dữ liệu cốt lõi, không phụ thuộc vào bất kỳ framework hoặc UI nào.
+/// Represents a daily goal/task (Entity in Clean Architecture).
+/// This is the core data class, independent of any framework or UI.
 class Task {
-  final String id; // ID duy nhất của task (String cho Firebase)
-  final String title; // Tiêu đề ngắn gọn của mục tiêu
-  final String description; // Mô tả chi tiết thêm nếu cần
-  final DateTime date; // Ngày thực hiện mục tiêu này
-  final DateTime? startTime; // Thời gian bắt đầu cụ thể (giờ:phút) - nullable vì không bắt buộc
-  final DateTime? endTime; // Thời gian kết thúc cụ thể (giờ:phút) - nullable vì không bắt buộc
-  final bool isCompleted; // Trạng thái hoàn thành (true là đã xong, false là chưa xong)
+  /// Unique ID of the task (String for Firebase compatibility).
+  final String id; 
+  
+  /// A brief title for the task.
+  final String title; 
+  
+  /// Detailed description for additional context, if needed.
+  final String description; 
+  
+  /// The specific date the task is scheduled for.
+  final DateTime date; 
+  
+  /// The starting time (hour:minute) - nullable as it is not mandatory.
+  final DateTime? startTime; 
+  
+  /// The ending time (hour:minute) - nullable as it is not mandatory.
+  final DateTime? endTime; 
+  
+  /// The completion status (true means completed, false means pending).
+  final bool isCompleted; 
 
-  // Constructor yêu cầu cung cấp các thông tin cơ bản, mặc định chưa hoàn thành (isCompleted = false)
+  /// Constructor requires basic information, defaults to uncompleted (isCompleted = false).
   Task({
     required this.id,
     required this.title,
@@ -20,9 +33,9 @@ class Task {
     this.isCompleted = false,
   });
 
-  /// Hàm hỗ trợ tạo ra một bản sao (copy) của Task hiện tại với một vài thuộc tính thay đổi.
-  /// Rất hữu ích khi chúng ta muốn thay đổi trạng thái (ví dụ: cập nhật isCompleted thành true)
-  /// mà không làm thay đổi object gốc (Đảm bảo tính bất biến - Immutable state).
+  /// Helper function to create a copy of the current Task with some updated properties.
+  /// This is very useful when modifying the state (e.g., updating isCompleted to true)
+  /// without changing the original object (Ensures immutability - Immutable state).
   Task copyWith({
     String? id,
     String? title,
@@ -33,7 +46,8 @@ class Task {
     bool? isCompleted,
   }) {
     return Task(
-      id: id ?? this.id, // Nếu không truyền giá trị mới vào thì giữ nguyên giá trị cũ
+      // Keep the old value if no new value is provided
+      id: id ?? this.id, 
       title: title ?? this.title,
       description: description ?? this.description,
       date: date ?? this.date,
@@ -43,6 +57,6 @@ class Task {
     );
   }
 
-  /// Kiểm tra task có thời gian cụ thể hay không (dùng cho Schedule)
+  /// Checks if the task has a specific time slot (used for Scheduling).
   bool get hasTimeSlot => startTime != null;
 }

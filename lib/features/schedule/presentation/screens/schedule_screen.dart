@@ -10,9 +10,9 @@ import 'package:studyflow/features/schedule/presentation/widgets/add_schedule_ta
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 
-/// `ScheduleScreen` là màn hình xem lịch trình theo tuần.
-/// Giúp người dùng có cái nhìn tổng quan về các công việc trong suốt 7 ngày, 
-/// hỗ trợ điều hướng qua lại giữa các tuần và hiển thị dưới dạng Timeline.
+/// [ScheduleScreen] is a screen for viewing the weekly schedule.
+/// It provides users with an overview of tasks throughout the 7 days,
+/// supports navigating between weeks, and displays tasks in a Timeline format.
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
   @override
@@ -91,6 +91,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
+  /// Builds a summary of tasks for the selected day.
   Widget _buildDaySummary(ScheduleViewmodel vm) {
     final tasks = vm.selectedDayTasks;
     final scheduledTasks = tasks.where((t) => t.hasTimeSlot).length;
@@ -116,6 +117,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
+  /// Builds an individual summary item (e.g., Scheduled, Done, Pending).
   Widget _buildSummaryItem({required IconData icon, required String value, required String label}) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
@@ -131,6 +133,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
+  /// Shows the dialog to add a new task to the schedule.
   Future<void> _showAddDialog(BuildContext context, ScheduleViewmodel vm, {int? initialHour}) async {
     final result = await showDialog<Task>(context: context, builder: (context) => AddScheduleTaskDialog(selectedDay: vm.selectedDay, initialHour: initialHour));
     if (result != null) {
@@ -143,6 +146,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
+  /// Shows a confirmation dialog before deleting a task.
   Future<void> _confirmDelete(BuildContext context, ScheduleViewmodel vm, Task task) async {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;

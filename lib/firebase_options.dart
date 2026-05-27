@@ -15,6 +15,8 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class DefaultFirebaseOptions {
+  /// Gets the [FirebaseOptions] for the current platform.
+  /// Throws an [UnsupportedError] if the platform is not supported.
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
@@ -40,6 +42,7 @@ class DefaultFirebaseOptions {
     }
   }
 
+  /// Firebase configuration for Android.
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA61GYPY8_eZkj3Tm01D_MFYAwsFqwnWrU',
     appId: '1:252578618828:android:58995d5f2ad864bb53d169',
@@ -48,6 +51,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'studyflow-ngnphcng.firebasestorage.app',
   );
 
+  /// Firebase configuration for Web.
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBUK9cOXfWF4__1jGhgmyuc3TkduZy_tTU',
     appId: '1:252578618828:web:fc4153117be6df8b53d169',
@@ -58,6 +62,7 @@ class DefaultFirebaseOptions {
     measurementId: 'G-PHXWHPKD1B',
   );
 
+  /// Firebase configuration for macOS.
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDXvIHtbGvgdoXKqw5L6A8k74TbR3b7IqI',
     appId: '1:252578618828:ios:e86c1b3415cfe36b53d169',
@@ -68,6 +73,7 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.studyflow',
   );
 
+  /// Firebase configuration for iOS.
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDXvIHtbGvgdoXKqw5L6A8k74TbR3b7IqI',
     appId: '1:252578618828:ios:e86c1b3415cfe36b53d169',
@@ -78,6 +84,7 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.studyflow',
   );
 
+  /// Firebase configuration for Windows.
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyBUK9cOXfWF4__1jGhgmyuc3TkduZy_tTU',
     appId: '1:252578618828:web:794bbfddfd466f1153d169',

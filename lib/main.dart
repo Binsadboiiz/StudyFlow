@@ -11,54 +11,55 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  // Đảm bảo Flutter framework đã được khởi tạo trước khi gọi các native code hoặc async.
+  // Ensure the Flutter framework is initialized before calling native or async code.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo locale data cho intl package (để format ngày tháng theo ngôn ngữ máy).
+  // Initialize locale data for the intl package (to format dates based on device language).
   await initializeDateFormatting();
 
-  // Khởi tạo firebase
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print("STEP 1");
 
-  // Khởi tạo toàn bộ các dependency (database, repositories, v.v...) trước khi chạy UI.
+  // Initialize all dependencies (database, repositories, etc.) before running the UI.
   await DependencyInjection.init();
   print("STEP 2");
 
-  // Bắt đầu render ứng dụng.
+  // Start rendering the application.
   runApp(const StudyFlowApp());
 
   print("STEP 3");
 }
 
-/// Widget gốc của ứng dụng.
-/// Sử dụng `MultiProvider` để cung cấp state (ViewModels) xuống toàn bộ widget tree.
+/// The root widget of the application.
+/// Uses `MultiProvider` to inject state (ViewModels) down the entire widget tree.
 class StudyFlowApp extends StatelessWidget {
+  /// Constructor for StudyFlowApp.
   const StudyFlowApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      // Lấy danh sách các Provider từ DependencyInjection
+      // Retrieve the list of Providers from DependencyInjection
       providers: DependencyInjection.getProviders(),
-      // Consumer lắng nghe sự thay đổi của ThemeProvider để tự động cập nhật theme (Light/Dark/System)
+      // Consumer listens to ThemeProvider changes to automatically update the theme (Light/Dark/System)
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
             title: 'StudyFlow',
-            // Cấu hình theme sáng mặc định
+            // Configure default light theme
             theme: AppTheme.lightTheme,
-            // Cấu hình theme tối
+            // Configure dark theme
             darkTheme: AppTheme.darkTheme,
-            // Chế độ theme hiện tại đang được chọn (lấy từ ThemeProvider)
+            // The currently selected theme mode (retrieved from ThemeProvider)
             themeMode: themeProvider.themeMode,
             scaffoldMessengerKey:
                 NotificationService.instance.scaffoldMessengerKey,
-            // builder này bao bọc toàn bộ app bằng GlobalSnackbar để có thể hiển thị thông báo ở bất kỳ đâu
+            // This builder wraps the entire app with GlobalSnackbar to display notifications anywhere
             builder: (context, child) {
               return GlobalSnackbar(child: child!);
             },
-            // Màn hình đầu tiên load lên là AuthGate để kiểm tra xem đã đăng nhập chưa
+            // The initial screen loaded is AuthGate to check authentication status
             home: const AuthGate(),
             debugShowCheckedModeBanner: false,
           );

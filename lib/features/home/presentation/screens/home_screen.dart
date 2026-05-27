@@ -7,9 +7,9 @@ import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 
-/// Màn hình chính của ứng dụng (View trong MVVM).
-/// Nhiệm vụ duy nhất của nó là ghép nối các Widget nhỏ hơn lại với nhau
-/// để tạo thành một màn hình hoàn chỉnh, không chứa logic nghiệp vụ phức tạp ở đây.
+/// The main screen of the application (View in MVVM).
+/// Its only responsibility is to compose smaller widgets together 
+/// to form a complete screen, without containing complex business logic here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -22,8 +22,8 @@ class HomeScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true, // Để background tràn lên trên dưới AppBar
-      // AppBar hiện đại với hiệu ứng kính mờ (Glassmorphism)
+      extendBodyBehindAppBar: true, // Allows the background to extend behind the AppBar
+      // Modern AppBar with Glassmorphism effect
       appBar: AppBar(
         backgroundColor: isDark
             ? Colors.black.withValues(alpha: 0.3)
@@ -144,7 +144,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
 
-      // Nội dung chính: Toàn bộ màn hình scroll được (Calendar + Task list)
+      // Main content: Entire scrollable screen (Calendar + Task list)
       body: Container(
         decoration: BoxDecoration(
           color: isDark ? AppColors.backgroundDark : null,
@@ -157,17 +157,17 @@ class HomeScreen extends StatelessWidget {
         ),
         child: SafeArea(
           bottom:
-              false, // Không cần thiết lập SafeArea cho bottom vì có extendBody rồi
+              false, // No need to set SafeArea for bottom because extendBody is true
           child: CustomScrollView(
             slivers: [
-              // Khoảng trống đẩy nội dung xuống dưới AppBar
+              // Spacer to push content down below the AppBar
               const SliverToBoxAdapter(child: SizedBox(height: 70)),
-              // 1. Phần Widget hiển thị lịch
+              // 1. Calendar display widget
               const SliverToBoxAdapter(child: HomeCalendar()),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
-              // 2. Phần Widget hiển thị danh sách mục tiêu hằng ngày
-              // Dùng SliverFillRemaining với hasScrollBody: false để DailyGoalList
-              // chiếm phần còn lại và scroll cùng Calendar
+              // 2. Daily goal list display widget
+              // Use SliverFillRemaining with hasScrollBody: false so DailyGoalList
+              // occupies the remaining space and scrolls with the Calendar
               const SliverToBoxAdapter(child: DailyGoalList()),
             ],
           ),

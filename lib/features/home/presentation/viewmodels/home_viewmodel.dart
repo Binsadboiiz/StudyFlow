@@ -4,6 +4,7 @@ import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import '../../../../features/task/domain/entities/task.dart';
 import '../../../../features/task/domain/repositories/task_repository.dart';
 
+/// Viewmodel for managing the state of the Home screen.
 class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   final TaskRepository _taskRepository;
   StreamSubscription? _taskSubscription;
@@ -31,11 +32,19 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   List<Task> _dailyTasks = [];
   bool _isLoading = false;
 
+  /// The currently selected date on the calendar.
   DateTime get selectedDate => _selectedDate;
+  
+  /// The currently focused date on the calendar.
   DateTime get focusedDate => _focusedDate;
+  
+  /// The list of tasks for the selected date.
   List<Task> get dailyTasks => _dailyTasks;
+  
+  /// Whether the viewmodel is currently loading data.
   bool get isLoading => _isLoading;
 
+  /// Handles the event when a day is selected on the calendar.
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     _selectedDate = selectedDay;
     _focusedDate = focusedDay;
@@ -51,10 +60,12 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
     }).toList();
   }
 
+  /// Refreshes the tasks.
   Future<void> refreshTasks() async {
     // Stream auto updates, no manual refresh needed
   }
 
+  /// Toggles the completion status of a [task].
   Future<void> toggleTaskCompletion(Task task) async {
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
     await _taskRepository.updateTask(updatedTask);

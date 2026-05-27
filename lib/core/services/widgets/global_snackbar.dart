@@ -4,12 +4,14 @@ import 'package:studyflow/core/services/notification/app_notification.dart';
 import 'package:studyflow/core/services/notification/notification_service.dart';
 import 'package:studyflow/core/services/notification/notification_type.dart';
 
-/// `GlobalSnackbar` là một widget bọc ngoài cùng (wrapper) của ứng dụng.
-/// Nhiệm vụ của nó là lắng nghe các sự kiện thông báo từ `NotificationService`
-/// và hiển thị `SnackBar` tương ứng ở bất kỳ đâu trong app mà không cần truyền `BuildContext` xuống sâu.
+/// `GlobalSnackbar` is an outermost wrapper widget of the application.
+/// Its responsibility is to listen to notification events from `NotificationService`
+/// and display the corresponding `SnackBar` anywhere in the app without passing down `BuildContext`.
 class GlobalSnackbar extends StatefulWidget {
+  /// The child widget to be wrapped by the global snackbar.
   final Widget child;
 
+  /// Constructor for [GlobalSnackbar].
   const GlobalSnackbar({super.key, required this.child});
 
   @override
@@ -24,11 +26,11 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
   void initState() {
     super.initState();
 
-    // Lấy luồng dữ liệu (stream) chứa các thông báo từ NotificationService (Singleton)
+    // Get the data stream containing notifications from NotificationService (Singleton).
     _stream = NotificationService.instance.notificationStream;
 
-    // Đăng ký lắng nghe: Mỗi khi có thông báo mới được push vào stream,
-    // hàm _showNotification sẽ được gọi
+    // Register listener: Every time a new notification is pushed into the stream,
+    // the _showNotification function will be called.
     _subscription = _stream.listen((notification) {
       _showNotification(notification);
     });
@@ -36,15 +38,16 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
 
   @override
   void dispose() {
-    // Hủy đăng ký lắng nghe khi widget bị hủy để tránh rò rỉ bộ nhớ (memory leak)
+    // Unsubscribe when the widget is disposed to prevent memory leaks.
     _subscription?.cancel();
     super.dispose();
   }
 
-  /// Hàm hiển thị SnackBar thực tế lên màn hình dựa vào loại thông báo
+  /// Function to actually display the SnackBar on the screen based on the notification type.
   void _showNotification(AppNotification notification) {
     Color backgroundColor;
 
+    // Determine the background color based on the notification type.
     switch (notification.type) {
       case NotificationType.success:
         backgroundColor = Colors.green;
@@ -63,6 +66,7 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
         break;
     }
 
+    // Display the SnackBar using the globally accessible scaffoldMessengerKey.
     NotificationService.instance.scaffoldMessengerKey.currentState
         ?.showSnackBar(
           SnackBar(

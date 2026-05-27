@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../viewmodels/home_viewmodel.dart';
 
-/// Widget hiển thị phần Lịch (Calendar) ở nửa trên của màn hình Home.
+/// A widget that displays the Calendar in the upper half of the Home screen.
 class HomeCalendar extends StatelessWidget {
   const HomeCalendar({super.key});
 

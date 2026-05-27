@@ -4,9 +4,9 @@ import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'dart:ui';
 
-/// `RegisterScreen` là giao diện đăng ký tài khoản mới của ứng dụng.
-/// Tương tự như màn hình Login, màn hình này sử dụng giao diện Glassmorphism độc lập 
-/// để duy trì tính thẩm mỹ nhất quán ở bước đăng nhập/đăng ký.
+/// `RegisterScreen` is the application's new account registration interface.
+/// Similar to the Login screen, this screen uses an independent Glassmorphism interface 
+/// to maintain consistent aesthetics during the login/registration steps.
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -98,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF2C5364), Color(0xFF203A43), Color(0xFF0F2027)],
+                colors: [Color(0xFFFDFBFB), Color(0xFFEBEDEE)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -149,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const Icon(
                       Icons.person_add_alt_1,
                       size: 70,
-                      color: Colors.white,
+                      color: Color(0xFF203A43),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -157,7 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Color(0xFF203A43),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -165,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'Join us and start organizing your tasks',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 36),
@@ -173,15 +173,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Colors.white.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             spreadRadius: 1,
                           ),
@@ -240,8 +240,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: ElevatedButton(
                               onPressed: isLoading ? null : _handleRegister,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF203A43),
+                                backgroundColor: const Color(0xFF203A43),
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -253,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       width: 24,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF203A43)),
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
                                   : const Text(
@@ -274,7 +274,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         const Text(
                           "Already have an account?",
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: Colors.black54),
                         ),
                         TextButton(
                           onPressed: () {
@@ -286,7 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: const Text(
                             'Login',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Color(0xFF203A43),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -316,29 +316,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       controller: controller,
       obscureText: isPassword && !isPasswordVisible,
       keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        hintStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: Icon(icon, color: Colors.black54),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.white70,
+                  color: Colors.black54,
                 ),
                 onPressed: onVisibilityToggle,
               )
             : null,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: Colors.white.withValues(alpha: 0.5),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Color(0xFF203A43)),
         ),
       ),
     );

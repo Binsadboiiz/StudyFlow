@@ -1,9 +1,11 @@
+/// Represents the priority level of a task.
 enum TaskPriority {
   low,
   medium,
   high,
 }
 
+/// Represents the current status of a task.
 enum TaskStatus {
   pending,
   inProgress,
@@ -11,34 +13,60 @@ enum TaskStatus {
   cancelled,
 }
 
+/// Model representing a task in the application.
 class TaskModel {
+  /// The unique identifier of the task.
   final String id;
+  
+  /// The ID of the user who owns the task.
   final String userId;
 
+  /// The title of the task.
   final String title;
+  
+  /// The description of the task.
   final String description;
 
+  /// The date of the task.
   final DateTime date;
 
+  /// The optional starting time of the task.
   final DateTime? startTime;
+  
+  /// The optional ending time of the task.
   final DateTime? endTime;
 
+  /// Whether the task is completed.
   final bool isCompleted;
 
+  /// The priority level of the task.
   final TaskPriority priority;
+  
+  /// The current status of the task.
   final TaskStatus status;
 
+  /// The category of the task.
   final String category;
 
+  /// Indicates if the task has a reminder set.
   final bool hasReminder;
+  
+  /// The time when the reminder should trigger.
   final DateTime? reminderTime;
 
+  /// Indicates if the task repeats.
   final bool isRepeated;
+  
+  /// The type of repetition (e.g., daily, weekly).
   final String? repeatType;
 
+  /// The estimated minutes of focus required for the task.
   final int focusMinutes;
 
+  /// The timestamp when the task was created.
   final DateTime createdAt;
+  
+  /// The timestamp when the task was last updated.
   final DateTime updatedAt;
 
   TaskModel({
@@ -62,6 +90,7 @@ class TaskModel {
     required this.updatedAt,
   });
 
+  /// Creates a [TaskModel] from a Map structure.
   factory TaskModel.fromMap(
     Map<String, dynamic> map,
     String documentId,
@@ -100,6 +129,7 @@ class TaskModel {
     );
   }
 
+  /// Converts the [TaskModel] to a Map structure.
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,

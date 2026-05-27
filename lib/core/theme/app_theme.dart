@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 
-/// `AppThemeExtension` là một ThemeExtension tùy chỉnh để lưu trữ các màu sắc đặc thù
-/// của ứng dụng (app-specific colors) mà không có sẵn trong hệ thống màu chuẩn `ColorScheme` của Material Design.
-/// Điều này giúp dễ dàng gọi màu thông qua `Theme.of(context).extension<AppThemeExtension>()!`
+/// `AppThemeExtension` is a custom ThemeExtension to store app-specific colors
+/// that are not available in the standard `ColorScheme` of Material Design.
+/// This allows easy access to colors via `Theme.of(context).extension<AppThemeExtension>()!`.
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
+  /// The fill color for input fields.
   final Color inputFill;
+  /// The color for subtext elements.
   final Color subtext;
+  /// The default color for icons.
   final Color icon;
+  /// The background color for cards.
   final Color cardBackground;
+  /// The color for surface elements.
   final Color surface;
 
+  /// Constructor for [AppThemeExtension].
   const AppThemeExtension({
     required this.inputFill,
     required this.subtext,
@@ -36,8 +42,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     );
   }
 
-  /// Hàm `lerp` (linear interpolation) dùng để tạo hiệu ứng chuyển đổi mượt mà 
-  /// giữa các màu khi thay đổi theme (từ Light sang Dark và ngược lại).
+  /// `lerp` (linear interpolation) function creates a smooth transition effect 
+  /// between colors when changing themes (from Light to Dark and vice versa).
   @override
   AppThemeExtension lerp(covariant ThemeExtension<AppThemeExtension>? other, double t) {
     if (other is! AppThemeExtension) return this;
@@ -51,15 +57,15 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   }
 }
 
-/// Lớp `AppTheme` định nghĩa toàn bộ giao diện (ThemeData) của ứng dụng.
-/// Cung cấp 2 theme chính: `lightTheme` (Giao diện sáng) và `darkTheme` (Giao diện tối).
+/// The `AppTheme` class defines the overall appearance (ThemeData) of the application.
+/// It provides 2 main themes: `lightTheme` (Light UI) and `darkTheme` (Dark UI).
 class AppTheme {
-  /// Cấu hình giao diện Sáng mặc định của ứng dụng
+  /// Default Light UI configuration of the application.
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.backgroundLight,
 
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.accent,
       onPrimary: Colors.white,
       surface: AppColors.cardLight,
@@ -131,11 +137,12 @@ class AppTheme {
     ],
   );
 
+  /// Default Dark UI configuration of the application.
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.backgroundDark,
 
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: AppColors.accent,
       onPrimary: Colors.white,
       surface: AppColors.cardDark,
@@ -174,7 +181,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
       ),
-      hintStyle: TextStyle(color: AppColors.subtextDark),
+      hintStyle: const TextStyle(color: AppColors.subtextDark),
     ),
 
     elevatedButtonTheme: ElevatedButtonThemeData(

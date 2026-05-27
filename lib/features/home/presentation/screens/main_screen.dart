@@ -11,9 +11,9 @@ import 'package:studyflow/features/home/presentation/screens/settings_screen.dar
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 
-/// `MainScreen` là màn hình gốc chứa thanh điều hướng dưới (Bottom Navigation Bar)
-/// và quản lý việc chuyển đổi giữa các màn hình chính của ứng dụng: Home, Task, Schedule, Settings.
-/// Màn hình này cũng chứa nút FloatingActionButton (FAB) để thêm nhanh công việc.
+/// `MainScreen` is the root screen containing the bottom navigation bar
+/// and managing navigation between the main screens of the app: Home, Task, Schedule, Settings.
+/// This screen also contains a FloatingActionButton (FAB) to quickly add tasks.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
 
-  // Labels cho BottomAppBar items
+  // Labels for BottomAppBar items
   static const List<_NavItem> _navItems = [
     _NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
     _NavItem(icon: Icons.article_outlined, label: 'Tasks'),
@@ -48,7 +48,7 @@ class _MainScreenState extends State<MainScreen>
     final currentIndex = _currentIndex.clamp(0, screens.length - 1) as int;
 
     return Scaffold(
-      extendBody: true, // Cho phép nội dung tràn xuống dưới BottomAppBar
+      extendBody: true, // Allows content to extend below the BottomAppBar
       body: IndexedStack(
         index: currentIndex,
         children: screens,
@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen>
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 10.0, // Khoảng cách lõm xuống
+        notchMargin: 10.0, // Notch margin distance
         color: theme.bottomAppBarTheme.color,
         elevation: 10,
         shadowColor: isDark ? Colors.black87 : Colors.black45,
@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Nhóm icon bên trái
+              // Left icon group
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -87,9 +87,9 @@ class _MainScreenState extends State<MainScreen>
                   ],
                 ),
               ),
-              // Khoảng trống ở giữa cho FloatingActionButton
+              // Center spacing for FloatingActionButton
               const SizedBox(width: 48),
-              // Nhóm icon bên phải
+              // Right icon group
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,7 +107,7 @@ class _MainScreenState extends State<MainScreen>
     );
   }
 
-  // Hàm tạo từng nút trong BottomAppBar kèm animation + subtitle
+  // Function to create each button in BottomAppBar with animation + subtitle
   Widget _buildNavItem({required _NavItem navItem, required int index}) {
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
@@ -132,7 +132,7 @@ class _MainScreenState extends State<MainScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon với hiệu ứng phóng to khi được chọn
+              // Icon with zoom effect when selected
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutBack,
@@ -165,7 +165,7 @@ class _MainScreenState extends State<MainScreen>
     );
   }
 
-  /// Reload data cho tab vừa chuyển sang để đảm bảo đồng bộ
+  /// Reloads data for the newly selected tab to ensure synchronization
   void _reloadTabData(int tabIndex) {
     switch (tabIndex) {
       case 0: // Home
@@ -183,7 +183,7 @@ class _MainScreenState extends State<MainScreen>
   }
 }
 
-/// Model cho navigation item
+/// Model for a navigation item
 class _NavItem {
   final IconData icon;
   final String label;

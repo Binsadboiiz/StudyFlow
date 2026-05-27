@@ -1,18 +1,18 @@
 import '../entities/task.dart';
 
-/// Interface (Giao thức) định nghĩa các thao tác lấy/lưu dữ liệu liên quan đến Task.
-/// Domain Layer chỉ định nghĩa interface này, không quan tâm nó lấy dữ liệu từ đâu (API hay Database local).
-/// Giúp tách biệt logic ứng dụng khỏi công nghệ cơ sở dữ liệu.
+/// Interface defining data retrieval/storage operations related to Task.
+/// The Domain Layer only defines this interface without knowing where data comes from (API or Local Database).
+/// This helps separate the application logic from the underlying database technology.
 abstract class TaskRepository {
-  /// Lấy tất cả task của người dùng dưới dạng Stream (Real-time updates)
+  /// Retrieves all tasks for the user as a Stream (Real-time updates).
   Stream<List<Task>> getTasksStream();
   
-  /// Thêm một task mới vào hệ thống
+  /// Adds a new task to the system.
   Future<void> addTask(Task task);
   
-  /// Cập nhật thông tin một task đã có (ví dụ như đánh dấu hoàn thành/chưa hoàn thành)
+  /// Updates information of an existing task (e.g., marking it as completed/uncompleted).
   Future<void> updateTask(Task task);
   
-  /// Xóa một task dựa vào ID
+  /// Deletes a task based on its ID.
   Future<void> deleteTask(String id);
 }

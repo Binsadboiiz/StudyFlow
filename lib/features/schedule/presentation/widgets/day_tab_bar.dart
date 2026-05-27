@@ -3,12 +3,24 @@ import 'package:intl/intl.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 
+/// A tab bar widget that displays the days of the current week.
 class DayTabBar extends StatelessWidget {
+  /// The list of days in the current week.
   final List<DateTime> weekDays;
+  
+  /// The currently selected day.
   final DateTime selectedDay;
+  
+  /// The starting day of the current week.
   final DateTime currentWeekStart;
+  
+  /// Callback triggered when a day is selected.
   final ValueChanged<DateTime> onDaySelected;
+  
+  /// Callback triggered to navigate to the previous week.
   final VoidCallback onPreviousWeek;
+  
+  /// Callback triggered to navigate to the next week.
   final VoidCallback onNextWeek;
 
   const DayTabBar({
@@ -89,6 +101,7 @@ class DayTabBar extends StatelessWidget {
     );
   }
 
+  /// Builds a navigation button for switching weeks.
   Widget _buildNavButton(BuildContext context, IconData icon, VoidCallback onTap) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
@@ -107,5 +120,6 @@ class DayTabBar extends StatelessWidget {
     );
   }
 
+  /// Checks if two [DateTime] objects represent the same day.
   bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 }
