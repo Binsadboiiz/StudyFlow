@@ -44,3 +44,34 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ==============================================================================
+# .NET Backend (StudyFlowBackend)
+# ==============================================================================
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio / IDE folders
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.suo
+*.sln.docstates
+
+# Backend Secrets & Configs
+# Đừng bao giờ push các file chứa Secret Key, Database Connection String thực tế lên mạng
+appsettings.Development.json
+appsettings.Production.json
+*.pfx
+*.publishsettings
+*firebase-admin*.json
+
+# Entity Framework Core
+*.db
+*.db-shm
+*.db-wal
+
+# Mac OS
+.DS_Store

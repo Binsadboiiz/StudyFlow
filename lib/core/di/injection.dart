@@ -39,7 +39,7 @@ class DependencyInjection {
     final firestore = FirebaseFirestore.instance;
 
     // Set up data sources and repositories for tasks
-    final taskRemoteDatasource = TaskRemoteDatasource(firestore: firestore, auth: auth);
+    final taskRemoteDatasource = TaskRemoteDatasource(auth: auth);
     taskRepository = TaskRepositoryImpl(taskRemoteDatasource);
 
     // Set up data sources and repositories for authentication
