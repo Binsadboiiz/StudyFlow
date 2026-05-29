@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using StudyFlowBackend.Data;
 using StudyFlowBackend.Services;
+using StudyFlowBackend.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +18,36 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); // Hỗ trợ pgvector
 });
 
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:57798", "https://localhost:5173", "http://localhost:59981") // Add any specific flutter web ports if needed or AllowAnyOrigin() for dev
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Careful with AllowCredentials, WithOrigins should list exact origins
+    });
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://securetoken.google.com/studyflow-ngnphcng";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "https://securetoken.google.com/studyflow-ngnphcng",
+            ValidateAudience = true,
+            ValidAudience = "studyflow-ngnphcng",
+            ValidateLifetime = true
+        };
+    });
+
 // Đăng ký Services
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IUserUtils, UserUtils>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -31,19 +62,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

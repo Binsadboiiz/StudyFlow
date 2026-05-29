@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
+import 'package:studyflow/core/network/api_constants.dart';
 
 /// A remote data source class for handling authentication-related operations
 /// using Firebase Authentication and Firestore.
@@ -39,12 +42,37 @@ class AuthRemoteDatasource {
   Future<String> registerWithEmailAndPassword(
     String email,
     String password,
+    String fullName,
+    String username,
   ) async {
     final userCredential = await auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    return userCredential.user!.uid;
+    final uid = userCredential.user!.uid;
+
+    // Sync user with .NET Backend
+    try {
+      final token = await auth.currentUser?.getIdToken();
+      final url = Uri.parse('${ApiConstants.baseUrl}/users/sync');
+      await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'email': email,
+          'username': username,
+          'fullName': fullName,
+        }),
+      );
+    } catch (e) {
+      // Ignore sync error for now, or handle it depending on requirement
+      print('Sync to Postgres failed: $e');
+    }
+
+    return uid;
   }
 
   /// Logs in an existing user using their [email] and [password].

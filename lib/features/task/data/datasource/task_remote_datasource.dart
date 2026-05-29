@@ -17,7 +17,8 @@ class TaskRemoteDatasource {
     final response = await http.get(Uri.parse(taskEndpoint), headers: headers);
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      final List<dynamic> jsonList = responseBody['data'] ?? [];
       return jsonList.map((json) => TaskModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load tasks from API');

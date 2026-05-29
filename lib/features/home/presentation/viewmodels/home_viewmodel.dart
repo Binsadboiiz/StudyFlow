@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:studyflow/core/utils/safe_change_notifier.dart';
 import '../../../../features/task/domain/entities/task.dart';
 import '../../../../features/task/domain/repositories/task_repository.dart';
+import 'package:studyflow/core/network/network_checker.dart';
 
 /// Viewmodel for managing the state of the Home screen.
 class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
@@ -13,9 +14,23 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   HomeViewModel({required TaskRepository taskRepository})
       : _taskRepository = taskRepository {
     _isLoading = true;
+    _init();
+  }
+
+  Future<void> _init() async {
+    bool isConnected = await NetworkChecker.isServerReachable();
+    if (!isConnected) {
+      _isLoading = false;
+      notifyListenersSafely();
+      return;
+    }
+
     _taskSubscription = _taskRepository.getTasksStream().listen((tasks) {
       _allTasks = tasks;
       _updateDailyTasks();
+      _isLoading = false;
+      notifyListenersSafely();
+    }, onError: (e) {
       _isLoading = false;
       notifyListenersSafely();
     });

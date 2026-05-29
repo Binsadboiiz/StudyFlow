@@ -61,6 +61,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final uid = await remoteDatasource.registerWithEmailAndPassword(
       user.email,
       password,
+      user.fullName,
+      user.username,
     );
 
     // Create a new UserModel with the generated UID.

@@ -6,6 +6,7 @@ import 'package:studyflow/features/task/domain/usecase/add__task.dart';
 import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
 import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
+import 'package:studyflow/core/network/network_checker.dart';
 
 /// ViewModel responsible for managing the state and business logic related to tasks.
 /// Uses Clean Architecture use cases to interact with the repository.
@@ -41,10 +42,24 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
     required this.getTaskUseCase,
     required this.updateTaskUseCase,
   }) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    bool isConnected = await NetworkChecker.isServerReachable();
+    if (!isConnected) {
+      _isLoading = false;
+      notifyListenersSafely();
+      return;
+    }
+
     _taskSubscription = getTaskUseCase().listen((taskData) {
       _allTasks = taskData;
       _isLoading = false;
       _updateTasks();
+      notifyListenersSafely();
+    }, onError: (e) {
+      _isLoading = false;
       notifyListenersSafely();
     });
   }
