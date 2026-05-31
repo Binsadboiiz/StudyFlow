@@ -18,7 +18,6 @@ class DailyGoalList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
-    final isDark = theme.brightness == Brightness.dark;
 
     // Consumer to listen for data from HomeViewModel
     return Consumer<HomeViewModel>(
@@ -88,10 +87,9 @@ class DailyGoalList extends StatelessWidget {
                   child: GlassCard(
                     padding: const EdgeInsets.all(16.0),
                     borderRadius: 16.0,
-                    color: task.isCompleted
-                        ? (isDark ? AppColors.accent.withValues(alpha: 0.2) : Colors.green.shade50)
-                        : ext.cardBackground,
-                    border: task.isCompleted ? Border.all(color: AppColors.accent.withValues(alpha: 0.5), width: 1.5) : null,
+                    color: task.isCompleted ? AppColors.accent : null,
+                    opacity: task.isCompleted ? 0.15 : 0.06,
+                    border: task.isCompleted ? Border.all(color: AppColors.accent.withValues(alpha: 0.4), width: 1.2) : null,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [

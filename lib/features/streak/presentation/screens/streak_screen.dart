@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 
 /// Screen displaying the user's study streak.
 ///
@@ -24,7 +25,6 @@ class _StreakScreenState extends State<StreakScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
-    final isDark = theme.brightness == Brightness.dark;
     
     final authVm = context.watch<AuthViewmodel>();
     final user = authVm.currentUser;
@@ -38,7 +38,7 @@ class _StreakScreenState extends State<StreakScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -47,20 +47,9 @@ class _StreakScreenState extends State<StreakScreen> {
               children: [
                 const SizedBox(height: 20),
                 // Prominent streak counter
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+                GlassCard(
+                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+                  borderRadius: 24,
                   child: Column(
                     children: [
                       const Icon(
@@ -91,18 +80,8 @@ class _StreakScreenState extends State<StreakScreen> {
                 ),
                 const SizedBox(height: 32),
                 // Calendar view
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+                GlassCard(
+                  borderRadius: 24,
                   padding: const EdgeInsets.all(16),
                   child: TableCalendar(
                     firstDay: DateTime.utc(2020, 1, 1),

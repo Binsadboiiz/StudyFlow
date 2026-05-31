@@ -10,12 +10,11 @@ import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.d
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
-import 'package:studyflow/core/widgets/animated_background.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
 
 /// `MainScreen` is the root screen containing the bottom navigation bar
-/// and managing navigation between the main screens of the app: Home, Task, Schedule, Settings.
-/// This screen also contains a FloatingActionButton (FAB) to quickly add tasks.
+/// and managing navigation between the main screens of the app.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -27,20 +26,18 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
 
-  // Labels for BottomAppBar items
+  // Labels for bottom navigation items using rounded icons for premium look
   static const List<_NavItem> _navItems = [
-    _NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
-    _NavItem(icon: Icons.timer_outlined, label: 'Focus'),
-    _NavItem(icon: Icons.article_outlined, label: 'Tasks'),
-    _NavItem(icon: Icons.calendar_view_week_rounded, label: 'Schedule'),
-    _NavItem(icon: Icons.local_fire_department_outlined, label: 'Streak'),
-    _NavItem(icon: Icons.settings_outlined, label: 'Settings'),
+    _NavItem(icon: Icons.grid_view_rounded, label: 'Home'),
+    _NavItem(icon: Icons.hourglass_empty_rounded, label: 'Focus'),
+    _NavItem(icon: Icons.assignment_rounded, label: 'Tasks'),
+    _NavItem(icon: Icons.event_note_rounded, label: 'Schedule'),
+    _NavItem(icon: Icons.local_fire_department_rounded, label: 'Streak'),
+    _NavItem(icon: Icons.settings_rounded, label: 'Settings'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     const screens = [
       HomeScreen(),
       FocusScreen(),
@@ -52,74 +49,94 @@ class _MainScreenState extends State<MainScreen>
     final currentIndex = _currentIndex.clamp(0, screens.length - 1);
 
     return Scaffold(
-      extendBody: true, // Allows content to extend below the BottomAppBar
-      body: AnimatedBackground(
-        child: IndexedStack(
-          index: currentIndex,
-          children: screens,
-        ),
+      extendBody: true, // Content flows behind the floating dock
+      backgroundColor: Colors.transparent,
+      body: IndexedStack(
+        index: currentIndex,
+        children: screens,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => const TaskFormModal(),
-        ),
-        backgroundColor: AppColors.accent,
-        shape: const CircleBorder(),
-        elevation: 4,
-        child: const Icon(Icons.add, color: Colors.white, size: 30),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 10.0, // Notch margin distance
-        color: theme.bottomAppBarTheme.color,
-        elevation: 10,
-        shadowColor: isDark ? Colors.black87 : Colors.black45,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Left icon group
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(navItem: _navItems[0], index: 0),
-                    _buildNavItem(navItem: _navItems[1], index: 1),
-                    _buildNavItem(navItem: _navItems[2], index: 2),
-                  ],
-                ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 14.0, right: 14.0, bottom: 14.0),
+          child: GlassCard(
+            borderRadius: 32,
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  // Left icon group
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(navItem: _navItems[0], index: 0),
+                        _buildNavItem(navItem: _navItems[1], index: 1),
+                        _buildNavItem(navItem: _navItems[2], index: 2),
+                      ],
+                    ),
+                  ),
+                  
+                  // Center Floating Action Button (integrated in dock)
+                  GestureDetector(
+                    onTap: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const TaskFormModal(),
+                    ),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.accent, AppColors.accentLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accent.withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+
+                  // Right icon group
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(navItem: _navItems[3], index: 3),
+                        _buildNavItem(navItem: _navItems[4], index: 4),
+                        _buildNavItem(navItem: _navItems[5], index: 5),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              // Center spacing for FloatingActionButton
-              const SizedBox(width: 48),
-              // Right icon group
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(navItem: _navItems[3], index: 3),
-                    _buildNavItem(navItem: _navItems[4], index: 4),
-                    _buildNavItem(navItem: _navItems[5], index: 5),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Function to create each button in BottomAppBar with animation + subtitle
+  // Function to create each button in the dock with a modern scale animation
   Widget _buildNavItem({required _NavItem navItem, required int index}) {
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final unselectedColor = isDark ? Colors.grey.shade600 : Colors.grey.shade400;
+    final unselectedColor = isDark ? Colors.grey.shade500 : Colors.grey.shade400;
 
     return Expanded(
       child: GestureDetector(
@@ -134,39 +151,36 @@ class _MainScreenState extends State<MainScreen>
             _reloadTabData(index);
           });
         },
-        child: SizedBox(
-          height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon with zoom effect when selected
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutBack,
-                transform: Matrix4.identity()..scaleByDouble(isSelected ? 1.15 : 1.0, isSelected ? 1.15 : 1.0, 1.0, 1.0),
-                child: Icon(
-                  navItem.icon,
-                  color: isSelected ? AppColors.accent : unselectedColor,
-                  size: 24,
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Icon with zoom effect when selected
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              transform: Matrix4.identity()..scaleByDouble(isSelected ? 1.2 : 1.0, isSelected ? 1.2 : 1.0, 1.0, 1.0),
+              child: Icon(
+                navItem.icon,
+                color: isSelected ? AppColors.accent : unselectedColor,
+                size: 22,
               ),
-              const SizedBox(height: 4),
-              // Subtitle text
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? AppColors.accent : unselectedColor,
-                ),
-                child: Text(
-                  navItem.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            ),
+            const SizedBox(height: 2),
+            // Tab subtitle
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppColors.accent : unselectedColor,
               ),
-            ],
-          ),
+              child: Text(
+                navItem.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );

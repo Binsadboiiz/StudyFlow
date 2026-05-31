@@ -8,6 +8,7 @@ import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.d
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 
 /// `TaskScreen` is the daily task management screen.
 /// It allows users to view their task list by day, add/edit/delete tasks, and mark them as completed.
@@ -36,7 +37,7 @@ class _TaskScreenState extends State<TaskScreen> {
     final ext = theme.extension<AppThemeExtension>()!;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,12 +128,21 @@ class _TaskScreenState extends State<TaskScreen> {
               width: 54,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.accent : ext.cardBackground,
+                color: isSelected
+                    ? AppColors.accent
+                    : (isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.04)),
                 borderRadius: BorderRadius.circular(16),
-                border: isCurrentDay && !isSelected ? Border.all(color: AppColors.accent, width: 1.5) : null,
+                border: isSelected
+                    ? null
+                    : Border.all(
+                        color: isCurrentDay
+                            ? AppColors.accent
+                            : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                        width: 1.2,
+                      ),
                 boxShadow: isSelected
                     ? [BoxShadow(color: AppColors.accent.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))]
-                    : [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+                    : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -156,13 +166,9 @@ class _TaskScreenState extends State<TaskScreen> {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
     final isDark = theme.brightness == Brightness.dark;
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ext.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
+      borderRadius: 16,
       child: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('Progress', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ext.subtext)),
@@ -171,7 +177,12 @@ class _TaskScreenState extends State<TaskScreen> {
         const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(value: progress, backgroundColor: isDark ? AppColors.surfaceDark : Colors.grey.shade200, valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent), minHeight: 8),
+          child: LinearProgressIndicator(
+            value: progress, 
+            backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05), 
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent), 
+            minHeight: 8
+          ),
         ),
       ]),
     );
@@ -229,16 +240,17 @@ class _TaskScreenState extends State<TaskScreen> {
         padding: const EdgeInsets.only(right: 24),
         child: const Icon(Icons.delete_outline, color: Colors.white, size: 24),
       ),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: ext.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: GlassCard(
+          borderRadius: 16,
+          padding: EdgeInsets.zero,
+          color: task.isCompleted ? AppColors.accent : null,
+          opacity: task.isCompleted ? 0.15 : 0.06,
+          border: task.isCompleted ? Border.all(color: AppColors.accent.withValues(alpha: 0.4), width: 1.2) : null,
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: () => showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (context) => TaskFormModal(task: task)),
@@ -294,6 +306,7 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

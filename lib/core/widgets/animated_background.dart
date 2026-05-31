@@ -12,52 +12,15 @@ class AnimatedBackground extends StatefulWidget {
 
 class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final List<Particle> _particles = [];
-  final Random _random = Random();
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 10))
-      ..addListener(() {
-        setState(() {
-          _updateParticles();
-        });
-      })
-      ..repeat();
-  }
-  
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_particles.isEmpty) {
-      final size = MediaQuery.of(context).size;
-      _generateParticles(size);
-    }
-  }
-
-  void _generateParticles(Size size) {
-    for (int i = 0; i < 40; i++) {
-      _particles.add(Particle(
-        x: _random.nextDouble() * size.width,
-        y: _random.nextDouble() * size.height,
-        speedX: (_random.nextDouble() - 0.5) * 0.5,
-        speedY: (_random.nextDouble() - 0.5) * 0.5,
-        radius: _random.nextDouble() * 3 + 1,
-        alpha: _random.nextDouble() * 0.5 + 0.1,
-      ));
-    }
-  }
-
-  void _updateParticles() {
-    final size = MediaQuery.of(context).size;
-    for (var particle in _particles) {
-      particle.x += particle.speedX;
-      particle.y += particle.speedY;
-
-      if (particle.x < 0 || particle.x > size.width) particle.speedX *= -1;
-      if (particle.y < 0 || particle.y > size.height) particle.speedY *= -1;
-    }
+    // 30 seconds for a very slow, calming, and organic fluid movement
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 30),
+    )..repeat();
   }
 
   @override
@@ -68,60 +31,105 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Translucent glowing colors optimized for overlaying glass cards
+    final blobColors = isDark
+        ? [
+            const Color(0xFF10B981).withValues(alpha: 0.15), // Emerald glow
+            const Color(0xFF6366F1).withValues(alpha: 0.13), // Deep Indigo
+            const Color(0xFF06B6D4).withValues(alpha: 0.15), // Electric Cyan
+            const Color(0xFFD946EF).withValues(alpha: 0.10), // Soft Orchid
+          ]
+        : [
+            const Color(0xFF34D399).withValues(alpha: 0.20), // Mint Green
+            const Color(0xFF818CF8).withValues(alpha: 0.16), // Lavender
+            const Color(0xFF22D3EE).withValues(alpha: 0.20), // Sky Cyan
+            const Color(0xFFF472B6).withValues(alpha: 0.14), // Rose Pink
+          ];
+
     return Stack(
       children: [
-        // Base Background
+        // Base solid color
         Container(
           width: double.infinity,
           height: double.infinity,
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: theme.scaffoldBackgroundColor,
         ),
-        // Particles
-        CustomPaint(
-          size: Size.infinite,
-          painter: ParticlePainter(particles: _particles, color: Theme.of(context).colorScheme.primary),
+        // Animated liquid mesh blobs
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              size: Size.infinite,
+              painter: LiquidMeshPainter(
+                progress: _controller.value,
+                colors: blobColors,
+              ),
+            );
+          },
         ),
-        // Foreground Content
+        // Content overlay
         widget.child,
       ],
     );
   }
 }
 
-class Particle {
-  double x;
-  double y;
-  double speedX;
-  double speedY;
-  double radius;
-  double alpha;
+class LiquidMeshPainter extends CustomPainter {
+  final double progress;
+  final List<Color> colors;
 
-  Particle({
-    required this.x,
-    required this.y,
-    required this.speedX,
-    required this.speedY,
-    required this.radius,
-    required this.alpha,
-  });
-}
-
-class ParticlePainter extends CustomPainter {
-  final List<Particle> particles;
-  final Color color;
-
-  ParticlePainter({required this.particles, required this.color});
+  LiquidMeshPainter({required this.progress, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (var particle in particles) {
-      final paint = Paint()
-        ..color = color.withValues(alpha: particle.alpha)
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(particle.x, particle.y), particle.radius, paint);
-    }
+    final angle = progress * 2 * pi;
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    // Scale blur relative to size to look perfect on both mobile & tablets
+    final blurSigma = size.width * 0.25;
+
+    // Blob 1: Top-Left region, rotates clockwise
+    final offset1 = Offset(
+      size.width * (0.25 + 0.15 * sin(angle)),
+      size.height * (0.25 + 0.10 * cos(angle)),
+    );
+    paint.color = colors[0];
+    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
+    canvas.drawCircle(offset1, size.width * 0.35, paint);
+
+    // Blob 2: Bottom-Right region, rotates counter-clockwise
+    final offset2 = Offset(
+      size.width * (0.75 + 0.12 * cos(angle + pi / 2)),
+      size.height * (0.70 + 0.15 * sin(angle + pi / 2)),
+    );
+    paint.color = colors[1];
+    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma * 1.2);
+    canvas.drawCircle(offset2, size.width * 0.40, paint);
+
+    // Blob 3: Center-Left region, moves in a slow figure-8
+    final offset3 = Offset(
+      size.width * (0.35 + 0.18 * sin(angle * 2)),
+      size.height * (0.60 + 0.12 * cos(angle)),
+    );
+    paint.color = colors[2];
+    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
+    canvas.drawCircle(offset3, size.width * 0.33, paint);
+
+    // Blob 4: Center-Right region, moves diagonally
+    final offset4 = Offset(
+      size.width * (0.70 + 0.15 * sin(angle + pi)),
+      size.height * (0.30 + 0.15 * cos(angle + pi)),
+    );
+    paint.color = colors[3];
+    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma * 0.9);
+    canvas.drawCircle(offset4, size.width * 0.30, paint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant LiquidMeshPainter oldDelegate) {
+    return oldDelegate.progress != progress || oldDelegate.colors != colors;
+  }
 }

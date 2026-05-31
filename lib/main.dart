@@ -7,6 +7,7 @@ import 'package:studyflow/core/services/widgets/auth_gate.dart';
 import 'package:studyflow/core/services/widgets/global_snackbar.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
+import 'package:studyflow/core/widgets/animated_background.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -53,7 +54,9 @@ class StudyFlowApp extends StatelessWidget {
                 NotificationService.instance.scaffoldMessengerKey,
             // This builder wraps the entire app with GlobalSnackbar to display notifications anywhere
             builder: (context, child) {
-              return GlobalSnackbar(child: child!);
+              return GlobalSnackbar(
+                child: AnimatedBackground(child: child!),
+              );
             },
             // The initial screen loaded is AuthGate to check authentication status
             home: const AuthGate(),

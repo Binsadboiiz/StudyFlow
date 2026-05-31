@@ -6,6 +6,7 @@ import 'package:studyflow/core/theme/theme_provider.dart';
 import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/screens/register_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -22,7 +23,7 @@ class SettingsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Settings',
@@ -31,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
             color: theme.colorScheme.onSurface,
           ),
         ),
-        backgroundColor: ext.cardBackground,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
@@ -117,7 +118,7 @@ class SettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
+          colors: [AppColors.accent, AppColors.accentLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -196,20 +197,9 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildProfileSection(BuildContext context, dynamic user, ThemeData theme, AppThemeExtension ext, bool isDark) {
-    return Container(
-      width: double.infinity,
+    return GlassCard(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: ext.cardBackground,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      borderRadius: 24,
       child: Row(
         children: [
           Container(
@@ -287,22 +277,15 @@ class SettingsScreen extends StatelessWidget {
         currentThemeLabel = 'System';
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: ext.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        child: ListTile(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        borderRadius: 16,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -335,7 +318,8 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       ),
-    );
+      ),
+      );
   }
 
   /// Bottom sheet to pick theme mode
@@ -510,22 +494,15 @@ class SettingsScreen extends StatelessWidget {
     final ext = theme.extension<AppThemeExtension>()!;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: ext.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        child: ListTile(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        borderRadius: 16,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -556,6 +533,7 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       ),
-    );
+      ),
+      );
   }
 }

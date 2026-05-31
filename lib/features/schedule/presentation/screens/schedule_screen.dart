@@ -10,6 +10,7 @@ import 'package:studyflow/features/schedule/presentation/widgets/add_schedule_ta
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 
 /// [ScheduleScreen] is a screen for viewing the weekly schedule.
 /// It provides users with an overview of tasks throughout the 7 days,
@@ -27,7 +28,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,16 +99,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final scheduledTasks = tasks.where((t) => t.hasTimeSlot).length;
     final completed = tasks.where((t) => t.isCompleted).length;
     final theme = Theme.of(context);
-    final ext = theme.extension<AppThemeExtension>()!;
-    final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: ext.cardBackground,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03), blurRadius: 6, offset: const Offset(0, 2))],
-      ),
+      borderRadius: 14,
       child: Row(children: [
         _buildSummaryItem(icon: Icons.event_note_rounded, value: '$scheduledTasks', label: 'Scheduled'),
         Container(width: 1, height: 30, color: theme.dividerColor, margin: const EdgeInsets.symmetric(horizontal: 16)),

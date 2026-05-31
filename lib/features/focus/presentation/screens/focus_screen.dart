@@ -188,9 +188,11 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                       color: AppColors.accent,
                     ),
                     labelColor: Colors.white,
-                    unselectedLabelColor: theme.colorScheme.onSurface,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                    unselectedLabelColor: theme.brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: 0.7)
+                        : Colors.black.withValues(alpha: 0.85),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     dividerColor: Colors.transparent,
                     tabs: const [
                       Tab(text: 'Custom'),
@@ -292,10 +294,11 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                     child: GlassCard(
                       borderRadius: 40,
                       padding: const EdgeInsets.all(20),
-                      color: _isRunning ? Colors.redAccent : AppColors.accent,
+                      color: _isRunning ? Colors.red.shade600 : AppColors.accent,
+                      opacity: 0.95, // High opacity to prevent it from looking washed out
                       child: Icon(
                         _isRunning ? Icons.stop_rounded : Icons.play_arrow_rounded,
-                        color: Colors.white, // Keep this white since background is primary/red
+                        color: Colors.white,
                         size: 40,
                       ),
                     ),
