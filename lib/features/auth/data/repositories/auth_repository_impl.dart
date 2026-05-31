@@ -19,10 +19,15 @@ class AuthRepositoryImpl implements AuthRepository {
       username: userModel.username,
       email: userModel.email,
       fullName: userModel.fullName,
+      photoUrl: userModel.photoUrl,
+      level: userModel.level,
+      xp: userModel.xp,
       streak: _effectiveStreak(userModel),
       dailyTargetMinutes: userModel.dailyTargetMinutes,
       lastStreakDate: userModel.lastStreakDate,
       streakHistory: userModel.streakHistory,
+      createdAt: userModel.createdAt,
+      updatedAt: userModel.updatedAt,
     );
   }
 

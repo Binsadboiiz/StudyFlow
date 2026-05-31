@@ -9,7 +9,7 @@ using StudyFlowBackend.Utils;
 namespace StudyFlowBackend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [Authorize]
     public class UsersController : ControllerBase
     {
@@ -27,6 +27,7 @@ namespace StudyFlowBackend.Controllers
             public string Email { get; set; } = string.Empty;
             public string Username { get; set; } = string.Empty;
             public string FullName { get; set; } = string.Empty;
+            public string? AvatarUrl { get; set; }
         }
 
         [HttpPost("sync")]
@@ -48,8 +49,13 @@ namespace StudyFlowBackend.Controllers
                 Email = dto.Email,
                 Username = dto.Username,
                 FullName = dto.FullName,
+                AvatarUrl = dto.AvatarUrl ?? string.Empty,
                 Streak = 0,
-                DailyTargetMinutes = 120
+                Level = 1,
+                ExpPoints = 0,
+                DailyTargetMinutes = 60,
+                CreatedAt = System.DateTime.UtcNow,
+                UpdatedAt = System.DateTime.UtcNow
             };
 
             _context.Users.Add(newUser);

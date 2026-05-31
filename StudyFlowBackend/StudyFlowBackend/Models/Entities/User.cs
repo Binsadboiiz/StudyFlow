@@ -15,12 +15,17 @@ namespace StudyFlowBackend.Models
         public string Email { get; set; } = string.Empty;
         
         public string FullName { get; set; } = string.Empty;
+        public string AvatarUrl { get; set; } = string.Empty;
+        public int Level { get; set; } = 1;
+        public double ExpPoints { get; set; } = 0;
         
         public int Streak { get; set; } = 0;
         
-        public int DailyTargetMinutes { get; set; } = 120;
+        public int DailyTargetMinutes { get; set; } = 60;
         
         public DateTime? LastStreakDate { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         
         /// <summary>
         /// EF Core 8 hỗ trợ map trực tiếp List<string> xuống PostgreSQL Array type.

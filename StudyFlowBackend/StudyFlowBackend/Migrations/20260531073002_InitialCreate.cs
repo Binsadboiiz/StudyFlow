@@ -12,9 +12,6 @@ namespace StudyFlowBackend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:PostgresExtension:vector", ",,");
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -23,9 +20,14 @@ namespace StudyFlowBackend.Migrations
                     Username = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: false),
+                    AvatarUrl = table.Column<string>(type: "text", nullable: false),
+                    Level = table.Column<int>(type: "integer", nullable: false),
+                    ExpPoints = table.Column<double>(type: "double precision", nullable: false),
                     Streak = table.Column<int>(type: "integer", nullable: false),
                     DailyTargetMinutes = table.Column<int>(type: "integer", nullable: false),
                     LastStreakDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     StreakHistory = table.Column<List<string>>(type: "text[]", nullable: false)
                 },
                 constraints: table =>

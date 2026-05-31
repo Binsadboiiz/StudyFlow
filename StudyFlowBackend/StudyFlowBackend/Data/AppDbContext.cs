@@ -17,7 +17,8 @@ namespace StudyFlowBackend.Data
             base.OnModelCreating(modelBuilder);
 
             // Bật extension pgvector cho PostgreSQL nếu cần làm AI Recommendation sau này
-            modelBuilder.HasPostgresExtension("vector");
+            // modelBuilder.HasPostgresExtension("vector"); // Tạm thời comment vì máy bạn chưa cài pgvector
+
 
             // Cấu hình khoá chính cho User
             modelBuilder.Entity<User>()

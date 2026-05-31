@@ -6,6 +6,9 @@ using StudyFlowBackend.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
+// Fix PostgreSQL DateTime Unspecified Kind error
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -24,10 +27,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:57798", "https://localhost:5173", "http://localhost:59981") // Add any specific flutter web ports if needed or AllowAnyOrigin() for dev
+        policy.SetIsOriginAllowed(origin => true)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Careful with AllowCredentials, WithOrigins should list exact origins
+              .AllowCredentials();
     });
 });
 
@@ -61,8 +64,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else 
+{
 
-app.UseHttpsRedirection();
+    // app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowFrontend");
 

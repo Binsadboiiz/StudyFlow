@@ -46,7 +46,7 @@ class UserModel {
     this.streak = 0,
     this.lastStreakDate,
     this.streakHistory = const [],
-    this.dailyTargetMinutes = 120,
+    this.dailyTargetMinutes = 60,
     this.isEmailVerified = false,
     required this.createdAt,
     required this.updatedAt,
@@ -71,7 +71,7 @@ class UserModel {
       streakHistory: map['streakHistory'] != null 
           ? List<String>.from(map['streakHistory']) 
           : [],
-      dailyTargetMinutes: map['dailyTargetMinutes'] ?? 120,
+      dailyTargetMinutes: map['dailyTargetMinutes'] ?? 60,
       isEmailVerified: map['isEmailVerified'] ?? false,
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),

@@ -13,7 +13,7 @@ using StudyFlowBackend.Data;
 namespace StudyFlowBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260528082953_InitialCreate")]
+    [Migration("20260531073002_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,7 +24,6 @@ namespace StudyFlowBackend.Migrations
                 .HasAnnotation("ProductVersion", "8.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("StudyFlowBackend.Models.StudyTask", b =>
@@ -69,12 +68,22 @@ namespace StudyFlowBackend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("DailyTargetMinutes")
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<double>("ExpPoints")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -83,12 +92,18 @@ namespace StudyFlowBackend.Migrations
                     b.Property<DateTime?>("LastStreakDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Streak")
                         .HasColumnType("integer");
 
                     b.Property<List<string>>("StreakHistory")
                         .IsRequired()
                         .HasColumnType("text[]");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Username")
                         .IsRequired()
