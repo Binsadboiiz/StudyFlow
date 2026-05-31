@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:studyflow/core/utils/safe_change_notifier.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../../../../features/task/domain/entities/task.dart';
 import '../../../../features/task/domain/repositories/task_repository.dart';
 import 'package:studyflow/core/network/network_checker.dart';
@@ -44,6 +45,7 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedDate = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.month;
   List<Task> _dailyTasks = [];
   bool _isLoading = false;
 
@@ -52,6 +54,9 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   
   /// The currently focused date on the calendar.
   DateTime get focusedDate => _focusedDate;
+
+  /// The current calendar format.
+  CalendarFormat get calendarFormat => _calendarFormat;
   
   /// The list of tasks for the selected date.
   List<Task> get dailyTasks => _dailyTasks;
@@ -65,6 +70,14 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
     _focusedDate = focusedDay;
     _updateDailyTasks();
     notifyListenersSafely();
+  }
+
+  /// Handles the event when the calendar format is changed.
+  void onFormatChanged(CalendarFormat format) {
+    if (_calendarFormat != format) {
+      _calendarFormat = format;
+      notifyListenersSafely();
+    }
   }
 
   void _updateDailyTasks() {

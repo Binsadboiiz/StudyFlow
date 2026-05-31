@@ -33,9 +33,9 @@ class AppColors {
   /// Primary color for the dark theme.
   static const Color primaryDark = Color(0xFF4CAF50);
   /// Background color for the dark theme.
-  static const Color backgroundDark = Color(0xFF121212);
+  static const Color backgroundDark = Color(0xFF0F1A13);
   /// Card background color for the dark theme.
-  static const Color cardDark = Color(0xFF1E1E1E);
+  static const Color cardDark = Color(0xFF162419);
   /// Surface color for the dark theme.
   static const Color surfaceDark = Color(0xFF2A2A2A);
   /// Main text color for the dark theme.

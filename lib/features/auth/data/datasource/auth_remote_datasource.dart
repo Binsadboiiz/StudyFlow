@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,7 +70,7 @@ class AuthRemoteDatasource {
       );
     } catch (e) {
       // Ignore sync error for now, or handle it depending on requirement
-      print('Sync to Postgres failed: $e');
+      debugPrint('Sync to Postgres failed: $e');
     }
 
     return uid;

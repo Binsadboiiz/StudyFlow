@@ -8,7 +8,7 @@ import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 
 /// The main screen of the application (View in MVVM).
-/// Its only responsibility is to compose smaller widgets together 
+/// Its only responsibility is to compose smaller widgets together
 /// to form a complete screen, without containing complex business logic here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,7 +22,9 @@ class HomeScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true, // Allows the background to extend behind the AppBar
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar:
+          true, // Allows the background to extend behind the AppBar
       // Modern AppBar with Glassmorphism effect
       appBar: AppBar(
         backgroundColor: isDark
@@ -146,15 +148,7 @@ class HomeScreen extends StatelessWidget {
 
       // Main content: Entire scrollable screen (Calendar + Task list)
       body: Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.backgroundDark : null,
-          image: isDark
-              ? null
-              : const DecorationImage(
-                  image: AssetImage('assets/backgrounds/background_app.jpg'),
-                  fit: BoxFit.cover,
-                ),
-        ),
+        color: Colors.transparent,
         child: SafeArea(
           bottom:
               false, // No need to set SafeArea for bottom because extendBody is true

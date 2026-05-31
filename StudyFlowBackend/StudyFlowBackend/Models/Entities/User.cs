@@ -34,5 +34,8 @@ namespace StudyFlowBackend.Models
 
         // Navigation Property: 1 User có nhiều Tasks
         public ICollection<StudyTask> Tasks { get; set; } = new List<StudyTask>();
+
+        // Navigation Property: 1 User có nhiều FocusSessions
+        public ICollection<FocusSession> FocusSessions { get; set; } = new List<FocusSession>();
     }
 }

@@ -11,6 +11,7 @@ namespace StudyFlowBackend.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<StudyTask> Tasks { get; set; }
+        public DbSet<FocusSession> FocusSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,13 @@ namespace StudyFlowBackend.Data
                 .WithMany(u => u.Tasks)
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade); // Nếu xóa User thì xóa luôn các Tasks
+
+            // Cấu hình mối quan hệ 1-N (1 User có nhiều FocusSessions)
+            modelBuilder.Entity<FocusSession>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.FocusSessions)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

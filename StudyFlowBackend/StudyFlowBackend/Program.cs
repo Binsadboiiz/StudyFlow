@@ -50,6 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Đăng ký Services
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IFocusSessionService, FocusSessionService>();
 builder.Services.AddScoped<IUserUtils, UserUtils>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

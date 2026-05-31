@@ -9,7 +9,7 @@ using StudyFlowBackend.Utils;
 namespace StudyFlowBackend.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/[controller]")]
     [Authorize]
     public class UsersController : ControllerBase
     {

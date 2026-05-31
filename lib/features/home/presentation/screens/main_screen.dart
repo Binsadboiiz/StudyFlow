@@ -10,6 +10,8 @@ import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.d
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
+import 'package:studyflow/core/widgets/animated_background.dart';
+import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
 
 /// `MainScreen` is the root screen containing the bottom navigation bar
 /// and managing navigation between the main screens of the app: Home, Task, Schedule, Settings.
@@ -28,6 +30,7 @@ class _MainScreenState extends State<MainScreen>
   // Labels for BottomAppBar items
   static const List<_NavItem> _navItems = [
     _NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
+    _NavItem(icon: Icons.timer_outlined, label: 'Focus'),
     _NavItem(icon: Icons.article_outlined, label: 'Tasks'),
     _NavItem(icon: Icons.calendar_view_week_rounded, label: 'Schedule'),
     _NavItem(icon: Icons.local_fire_department_outlined, label: 'Streak'),
@@ -40,6 +43,7 @@ class _MainScreenState extends State<MainScreen>
     final isDark = theme.brightness == Brightness.dark;
     const screens = [
       HomeScreen(),
+      FocusScreen(),
       TaskScreen(),
       ScheduleScreen(),
       StreakScreen(),
@@ -49,9 +53,11 @@ class _MainScreenState extends State<MainScreen>
 
     return Scaffold(
       extendBody: true, // Allows content to extend below the BottomAppBar
-      body: IndexedStack(
-        index: currentIndex,
-        children: screens,
+      body: AnimatedBackground(
+        child: IndexedStack(
+          index: currentIndex,
+          children: screens,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showModalBottomSheet(
@@ -84,6 +90,7 @@ class _MainScreenState extends State<MainScreen>
                   children: [
                     _buildNavItem(navItem: _navItems[0], index: 0),
                     _buildNavItem(navItem: _navItems[1], index: 1),
+                    _buildNavItem(navItem: _navItems[2], index: 2),
                   ],
                 ),
               ),
@@ -94,9 +101,9 @@ class _MainScreenState extends State<MainScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(navItem: _navItems[2], index: 2),
                     _buildNavItem(navItem: _navItems[3], index: 3),
                     _buildNavItem(navItem: _navItems[4], index: 4),
+                    _buildNavItem(navItem: _navItems[5], index: 5),
                   ],
                 ),
               ),
@@ -171,12 +178,12 @@ class _MainScreenState extends State<MainScreen>
       case 0: // Home
         context.read<HomeViewModel>().refreshTasks();
         break;
-      case 1: // Tasks
+      case 2: // Tasks
         context.read<TaskViewmodel>().loadTask(
           context.read<TaskViewmodel>().selectedDate,
         );
         break;
-      case 2: // Schedule
+      case 3: // Schedule
         context.read<ScheduleViewmodel>().loadWeekTasks();
         break;
     }
