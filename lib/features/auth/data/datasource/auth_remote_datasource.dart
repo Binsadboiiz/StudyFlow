@@ -3,12 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
 import 'package:studyflow/core/network/api_constants.dart';
 
 /// A remote data source class for handling authentication-related operations
 /// using Firebase Authentication and Firestore.
 class AuthRemoteDatasource {
+  static bool _isGoogleSignInInitialized = false;
+
   /// Instance of [FirebaseAuth] used for user authentication.
   final FirebaseAuth auth;
   
@@ -96,6 +99,70 @@ class AuthRemoteDatasource {
   /// Logs out the currently authenticated user.
   Future<void> logout() async {
     await auth.signOut();
+    if (!kIsWeb) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {}
+    }
+  }
+
+  /// Authenticates using Google Sign-in.
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      if (kIsWeb) {
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        return await auth.signInWithPopup(googleProvider);
+      } else {
+        final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+        if (!_isGoogleSignInInitialized) {
+          await googleSignIn.initialize(
+            clientId: ApiConstants.googleClientId,
+          );
+          _isGoogleSignInInitialized = true;
+        }
+
+        final googleUser = await googleSignIn.authenticate();
+        final googleAuth = googleUser.authentication;
+        final List<String> scopes = ['email', 'profile'];
+        final clientAuth = await googleUser.authorizationClient.authorizeScopes(scopes);
+        final String accessToken = clientAuth.accessToken;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        return await auth.signInWithCredential(credential);
+      }
+    } catch (e) {
+      debugPrint('Google sign-in error: $e');
+      return null;
+    }
+  }
+
+  /// Reauthenticates user using current email/password (required before changing password).
+  Future<void> reauthenticate(String password) async {
+    final user = auth.currentUser;
+    if (user == null || user.email == null) return;
+    final credential = EmailAuthProvider.credential(email: user.email!, password: password);
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  /// Updates user's password in Firebase Auth.
+  Future<void> updatePassword(String newPassword) async {
+    final user = auth.currentUser;
+    if (user == null) return;
+    await user.updatePassword(newPassword);
+  }
+
+  /// Updates user's display name and photo url in Firebase Auth profile.
+  Future<void> updateFirebaseProfile(String fullName, String? photoUrl) async {
+    final user = auth.currentUser;
+    if (user == null) return;
+    await user.updateDisplayName(fullName);
+    if (photoUrl != null) {
+      await user.updatePhotoURL(photoUrl);
+    }
   }
 
   /// Saves the given [UserModel] data to Firestore.

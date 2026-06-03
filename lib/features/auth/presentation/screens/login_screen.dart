@@ -58,6 +58,43 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleGoogleLogin() async {
+    final authViewModel = context.read<AuthViewmodel>();
+    final error = await authViewModel.loginWithGoogle();
+
+    if (!mounted) return;
+
+    if (error != null) {
+      if (error != "Google sign-in cancelled") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+        );
+      });
+    }
+  }
+
+  static Widget _fallbackGoogleIcon(BuildContext context, Object error, StackTrace? stackTrace) {
+    return const Text(
+      'G',
+      style: TextStyle(
+        fontFamily: 'Roboto',
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        color: Colors.blue,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // final isLoading = context.watch<AuthViewmodel>().isLoading;
@@ -209,6 +246,59 @@ class _LoginScreenState extends State<LoginScreen> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              const Expanded(child: Divider(color: Colors.black12)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'or',
+                                  style: TextStyle(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const Expanded(child: Divider(color: Colors.black12)),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 55,
+                            child: OutlinedButton.icon(
+                              onPressed: isLoading ? null : _handleGoogleLogin,
+                              icon: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Image(
+                                  image: NetworkImage('https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png'),
+                                  width: 20,
+                                  height: 20,
+                                  errorBuilder: _fallbackGoogleIcon,
+                                ),
+                              ),
+                              label: const Text(
+                                'Continue with Google',
+                                style: TextStyle(
+                                  color: Color(0xFF203A43),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.black26, width: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
                             ),
                           ),
                         ],

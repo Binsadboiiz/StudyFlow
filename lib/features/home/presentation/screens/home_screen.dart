@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
+import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
@@ -56,11 +57,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const CircleAvatar(
+              child: UserAvatar(
+                photoUrl: user?.photoUrl,
                 radius: 22,
-                backgroundImage: AssetImage(
-                  'assets/images/8b4635fd93dc6e874f686435da83a210.jpg',
-                ),
               ),
             ),
             const SizedBox(width: 12),

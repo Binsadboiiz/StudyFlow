@@ -11,6 +11,12 @@ class ApiConstants {
     return 'http://localhost:5141/api';
   }
 
+  static String get googleClientId {
+    if (kIsWeb) return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
+    if (Platform.isAndroid) return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
+    return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
+  }
+
   /// Helper tạo Headers đính kèm Firebase ID Token
   static Future<Map<String, String>> getAuthHeaders(FirebaseAuth auth) async {
     final token = await auth.currentUser?.getIdToken();

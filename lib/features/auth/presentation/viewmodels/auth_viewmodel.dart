@@ -10,6 +10,8 @@ import 'package:studyflow/features/auth/domain/usecase/login_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/register_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/update_streak_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/login_with_google_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/update_profile_usecase.dart';
 
 /// Viewmodel for managing authentication state and operations.
 class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
@@ -18,6 +20,8 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   final CheckAuthUsecase checkAuthUsecase;
   final LogoutUsecase logoutUsecase;
   final UpdateStreakUsecase updateStreakUsecase;
+  final LoginWithGoogleUsecase loginWithGoogleUsecase;
+  final UpdateProfileUsecase updateProfileUsecase;
   StreamSubscription? _authSubscription;
 
   AuthViewmodel({
@@ -26,6 +30,8 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     required this.checkAuthUsecase,
     required this.logoutUsecase,
     required this.updateStreakUsecase,
+    required this.loginWithGoogleUsecase,
+    required this.updateProfileUsecase,
   }) {
     _authSubscription = checkAuthUsecase().listen((user) {
       if (user != null) {
@@ -165,5 +171,65 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
     final newHistory = List<String>.from(currentUser!.streakHistory)..add(dateStr);
     
     await updateStreakUsecase(newStreak, completedDate, newHistory);
+  }
+
+  /// Logs in a user using Google authentication.
+  Future<String?> loginWithGoogle() async {
+    try {
+      isLoading = true;
+      notifyListenersSafely();
+
+      final user = await loginWithGoogleUsecase();
+
+      if (user == null) {
+        return "Google sign-in cancelled";
+      }
+
+      NotificationService.instance.show(
+        AppNotification(message: "Login Successfully", type: NotificationType.success)
+      );
+      return null;
+    } catch (e) {
+      NotificationService.instance.show(
+        AppNotification(message: "Google sign-in failed", type: NotificationType.error)
+      );
+      return e.toString().replaceFirst("Exception: ", "");
+    } finally {
+      isLoading = false;
+      notifyListenersSafely();
+    }
+  }
+
+  /// Updates the user's profile details.
+  Future<String?> updateProfile({
+    required String fullName,
+    String? photoUrl,
+    String? newPassword,
+    String? currentPassword,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListenersSafely();
+
+      await updateProfileUsecase(
+        fullName: fullName,
+        photoUrl: photoUrl,
+        newPassword: newPassword,
+        currentPassword: currentPassword,
+      );
+
+      NotificationService.instance.show(
+        AppNotification(message: "Profile updated successfully!", type: NotificationType.success)
+      );
+      return null;
+    } catch (e) {
+      NotificationService.instance.show(
+        AppNotification(message: "Profile update failed", type: NotificationType.error)
+      );
+      return e.toString().replaceFirst("Exception: ", "");
+    } finally {
+      isLoading = false;
+      notifyListenersSafely();
+    }
   }
 }

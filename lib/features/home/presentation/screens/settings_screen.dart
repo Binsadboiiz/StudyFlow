@@ -9,6 +9,8 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_heatmap_screen.dart';
 import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
+import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
+import 'package:studyflow/features/auth/presentation/screens/profile_screen.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -59,6 +61,19 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+            if (user != null)
+              _buildSettingItem(
+                context: context,
+                icon: Icons.person_outline_rounded,
+                title: 'Edit Profile',
+                subtitle: 'Customize name, avatar, and password',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                  );
+                },
+              ),
             _buildSettingItem(
               context: context,
               icon: Icons.notifications_none_outlined,
@@ -216,63 +231,67 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildProfileSection(BuildContext context, dynamic user, ThemeData theme, AppThemeExtension ext, bool isDark) {
-    return GlassCard(
-      padding: const EdgeInsets.all(24),
-      borderRadius: 24,
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.accent, width: 2),
-            ),
-            child: const CircleAvatar(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        );
+      },
+      child: GlassCard(
+        padding: const EdgeInsets.all(24),
+        borderRadius: 24,
+        child: Row(
+          children: [
+            UserAvatar(
+              photoUrl: user.photoUrl,
               radius: 36,
-              backgroundColor: Colors.blueAccent,
-              backgroundImage: AssetImage('assets/images/8b4635fd93dc6e874f686435da83a210.jpg'),
+              borderColor: AppColors.accent,
+              borderWidth: 2,
             ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.fullName,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  user.email,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: ext.subtext,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'Pro Member',
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.fullName,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.accent,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    user.email,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ext.subtext,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Pro Member',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.accent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Icon(Icons.chevron_right, color: ext.subtext),
+          ],
+        ),
       ),
     );
   }

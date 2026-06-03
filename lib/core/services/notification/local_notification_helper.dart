@@ -27,7 +27,7 @@ class LocalNotificationHelper {
     );
 
     await _notificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         // Có thể bổ sung điều hướng khi người dùng nhấn vào thông báo
       },
@@ -63,11 +63,11 @@ class LocalNotificationHelper {
     final int notificationId = taskId.hashCode;
 
     await _notificationsPlugin.zonedSchedule(
-      notificationId,
-      title,
-      body,
-      tz.TZDateTime.from(reminderTime, tz.local),
-      const NotificationDetails(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(reminderTime, tz.local),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'task_reminder_channel',
           'Task Reminders',
@@ -83,14 +83,12 @@ class LocalNotificationHelper {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
   /// Cancel a scheduled notification.
   static Future<void> cancelNotification(String taskId) async {
-    await _notificationsPlugin.cancel(taskId.hashCode);
+    await _notificationsPlugin.cancel(id: taskId.hashCode);
   }
 
   /// Schedule the daily reminder at 20:00.
@@ -117,11 +115,11 @@ class LocalNotificationHelper {
     }
 
     await _notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      const NotificationDetails(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_reminder_channel',
           'Daily Reminders',
@@ -136,14 +134,12 @@ class LocalNotificationHelper {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
 
   /// Cancel the daily reminder.
   static Future<void> cancelDailyReminder(int id) async {
-    await _notificationsPlugin.cancel(id);
+    await _notificationsPlugin.cancel(id: id);
   }
 }

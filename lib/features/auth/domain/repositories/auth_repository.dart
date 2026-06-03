@@ -30,4 +30,16 @@ abstract class AuthRepository {
 
   /// Logs out the currently authenticated user.
   Future<void> logout();
-}
+
+  /// Logs in a user using their Google account.
+  Future<UserEntity?> loginWithGoogle();
+
+  /// Updates the user's profile details.
+  Future<void> updateProfile({
+    required String fullName,
+    String? photoUrl,
+    String? newPassword,
+    String? currentPassword,
+  });
+}
+

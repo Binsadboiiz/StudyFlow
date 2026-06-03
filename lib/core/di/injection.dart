@@ -11,6 +11,8 @@ import 'package:studyflow/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:studyflow/features/auth/domain/usecase/register_usecase.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/auth/domain/usecase/update_streak_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/login_with_google_usecase.dart';
+import 'package:studyflow/features/auth/domain/usecase/update_profile_usecase.dart';
 
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/data/datasource/task_remote_datasource.dart';
@@ -88,6 +90,8 @@ class DependencyInjection {
           checkAuthUsecase: CheckAuthUsecase(authRepository),
           logoutUsecase: LogoutUsecase(authRepository),
           updateStreakUsecase: UpdateStreakUsecase(authRepository),
+          loginWithGoogleUsecase: LoginWithGoogleUsecase(authRepository),
+          updateProfileUsecase: UpdateProfileUsecase(authRepository),
         ),
       ),
       ChangeNotifierProvider(
