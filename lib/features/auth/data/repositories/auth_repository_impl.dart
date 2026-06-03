@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyflow/core/network/api_constants.dart';
 import 'package:studyflow/features/auth/data/datasource/auth_remote_datasource.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
@@ -12,8 +15,32 @@ class AuthRepositoryImpl implements AuthRepository {
   /// The remote data source for authentication.
   final AuthRemoteDatasource remoteDatasource;
 
+  /// Cache of the actual/real user avatar URL.
+  String? _cachedAvatarUrl;
+
+  /// Trigger to notify stream listeners that the local avatar cache has been updated.
+  final StreamController<void> _cacheUpdateTrigger = StreamController<void>.broadcast();
+
   /// Creates an [AuthRepositoryImpl] instance with the required [remoteDatasource].
   AuthRepositoryImpl(this.remoteDatasource);
+
+  /// Loads the cached avatar URL from SharedPreferences.
+  Future<void> _loadAvatarCache(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _cachedAvatarUrl = prefs.getString('user_avatar_$userId');
+    } catch (_) {}
+  }
+
+  /// Updates the cached avatar URL and persists it to SharedPreferences.
+  Future<void> _updateAvatarCache(String userId, String avatarUrl) async {
+    try {
+      _cachedAvatarUrl = avatarUrl;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_avatar_$userId', avatarUrl);
+      _cacheUpdateTrigger.add(null);
+    } catch (_) {}
+  }
 
   /// Converts a [UserModel] into a [UserEntity] for use in the domain layer.
   UserEntity _toEntity(UserModel userModel) {
@@ -22,7 +49,9 @@ class AuthRepositoryImpl implements AuthRepository {
       username: userModel.username,
       email: userModel.email,
       fullName: userModel.fullName,
-      photoUrl: userModel.photoUrl,
+      photoUrl: (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty)
+          ? _cachedAvatarUrl
+          : (userModel.photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg'),
       level: userModel.level,
       xp: userModel.xp,
       streak: _effectiveStreak(userModel),
@@ -96,9 +125,15 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     if (uid == null) return null;
 
+    // Load actual avatar URL from cache before converting to Entity
+    await _loadAvatarCache(uid);
+
     // Fetch user details from Firestore.
     final userModel = await remoteDatasource.getUserFromFirestore(uid);
     if (userModel == null) return null;
+
+    // Synchronize to the backend in case previous attempts failed (self-healing)
+    await _syncUserToBackend(userModel);
 
     return _toEntity(userModel);
   }
@@ -110,11 +145,45 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<UserEntity?> get authStateChanges {
-    // Listen to changes from the remote datasource and map them to UserEntity.
-    return remoteDatasource.userChanges.map((userModel) {
-      if (userModel == null) return null;
-      return _toEntity(userModel);
-    });
+    final controller = StreamController<UserEntity?>();
+    StreamSubscription? userChangesSub;
+    StreamSubscription? triggerSub;
+    UserModel? lastModel;
+
+    Future<void> emitLatest() async {
+      if (lastModel == null) {
+        if (!controller.isClosed) {
+          controller.add(null);
+        }
+        return;
+      }
+      await _loadAvatarCache(lastModel!.id);
+      if (!controller.isClosed) {
+        controller.add(_toEntity(lastModel!));
+      }
+    }
+
+    controller.onListen = () {
+      userChangesSub = remoteDatasource.userChanges.listen((userModel) async {
+        lastModel = userModel;
+        await emitLatest();
+        if (userModel != null) {
+          // Asynchronously sync in background when Firestore model changes to load cache from Postgres.
+          _syncUserToBackend(userModel);
+        }
+      });
+
+      triggerSub = _cacheUpdateTrigger.stream.listen((_) {
+        emitLatest();
+      });
+    };
+
+    controller.onCancel = () {
+      userChangesSub?.cancel();
+      triggerSub?.cancel();
+    };
+
+    return controller.stream;
   }
 
   @override
@@ -123,9 +192,15 @@ class AuthRepositoryImpl implements AuthRepository {
     final uid = remoteDatasource.currentUserId;
     if (uid == null) return null;
 
+    // Load actual avatar from cache
+    await _loadAvatarCache(uid);
+
     // Fetch and return the corresponding user entity.
     final userModel = await remoteDatasource.getUserFromFirestore(uid);
     if (userModel == null) return null;
+
+    // Sync with backend to heal database state and fetch the latest avatar URL from Postgres.
+    await _syncUserToBackend(userModel);
 
     return _toEntity(userModel);
   }
@@ -157,6 +232,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final user = userCredential.user;
     if (user == null) return null;
 
+    // Load actual avatar URL from cache
+    await _loadAvatarCache(user.uid);
+
     // Check if the user document already exists in Firestore
     var userModel = await remoteDatasource.getUserFromFirestore(user.uid);
     if (userModel == null) {
@@ -173,48 +251,81 @@ class AuthRepositoryImpl implements AuthRepository {
       final fullName = user.displayName ?? 'Google User';
       final photoUrl = user.photoURL;
 
-      // Initialize user in Firestore
+      // Initialize user in Firestore (using local default avatar to prevent length limit issues)
       userModel = UserModel(
         id: user.uid,
         username: username,
         email: email,
         fullName: fullName,
-        photoUrl: photoUrl,
+        photoUrl: 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
       await remoteDatasource.saveUserToFirestore(userModel);
 
-      // Sync user with .NET Backend
-      try {
-        final token = await user.getIdToken();
-        final url = Uri.parse('${ApiConstants.baseUrl}/users/sync');
-        await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-            if (token != null) 'Authorization': 'Bearer $token',
-          },
-          body: jsonEncode({
-            'email': email,
-            'username': username,
-            'fullName': fullName,
-            'avatarUrl': photoUrl,
-          }),
-        );
-      } catch (e) {
-        // Ignore sync error
+      // Save initial actual avatar from Google to local cache so it syncs to Postgres
+      if (photoUrl != null && photoUrl.isNotEmpty) {
+        await _updateAvatarCache(user.uid, photoUrl);
       }
     }
 
+    // Force sync user with .NET Backend on every login (self-healing)
+    await _syncUserToBackend(userModel);
+
     return _toEntity(userModel);
+  }
+
+  /// Private helper method to handle idempotent synchronization to the backend (self-healing).
+  Future<void> _syncUserToBackend(UserModel userModel) async {
+    try {
+      final user = remoteDatasource.auth.currentUser;
+      if (user == null) return;
+      final token = await user.getIdToken();
+      final url = Uri.parse('${ApiConstants.baseUrl}/users/sync');
+
+      // Load current cached avatar to sync to backend if Postgres is missing it
+      final avatarToSync = (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty)
+          ? _cachedAvatarUrl
+          : (userModel.photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'email': userModel.email,
+          'username': userModel.username,
+          'fullName': userModel.fullName,
+          'avatarUrl': avatarToSync,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] != null) {
+          final realAvatarUrl = body['data']['avatarUrl'];
+          if (realAvatarUrl != null && realAvatarUrl.isNotEmpty) {
+            final oldAvatarUrl = _cachedAvatarUrl;
+            await _updateAvatarCache(userModel.id, realAvatarUrl);
+            if (oldAvatarUrl != realAvatarUrl) {
+              _cacheUpdateTrigger.add(null);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Log sync failure but do not crash the app, permitting subsequent self-healing attempts
+      debugPrint('Self-healing sync to backend failed: $e');
+    }
   }
 
   @override
   Future<void> updateProfile({
     required String fullName,
-    String? photoUrl,
+    String? photoUrl, // This is the actual avatar URL chosen by the user
     String? newPassword,
     String? currentPassword,
   }) async {
@@ -232,17 +343,46 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDatasource.updatePassword(newPassword);
     }
 
-    // Update Firebase display name & photo url
+    // Update Firebase display name & photo url (using default asset path in Auth profile)
     await remoteDatasource.updateFirebaseProfile(fullName, photoUrl);
 
-    // Update Firestore user document
+    // Call PUT endpoint on Backend to save actual profile details in Postgres
+    try {
+      final user = remoteDatasource.auth.currentUser;
+      if (user != null) {
+        final token = await user.getIdToken();
+        final url = Uri.parse('${ApiConstants.baseUrl}/users/profile');
+        final response = await http.put(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({
+            'fullName': fullName,
+            'avatarUrl': photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
+          }),
+        );
+        
+        if (response.statusCode != 200) {
+          debugPrint('Backend profile update returned status: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      debugPrint('Backend profile update failed: $e');
+    }
+
+    // Update local cache with actual avatar URL
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      await _updateAvatarCache(uid, photoUrl);
+    }
+
+    // Update Firestore user document (using default local avatar to prevent character limit errors)
     final updates = {
       'fullName': fullName,
+      'photoUrl': 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
       'updatedAt': DateTime.now().toIso8601String(),
     };
-    if (photoUrl != null) {
-      updates['photoUrl'] = photoUrl;
-    }
     await remoteDatasource.updateUserFields(uid, updates);
   }
 }

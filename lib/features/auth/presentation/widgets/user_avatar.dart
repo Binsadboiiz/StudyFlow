@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/// A reusable avatar widget that handles loading user profile photos.
-/// Supports network images (such as Google profile URLs), local asset paths,
-/// and falls back to a default asset placeholder when no image is specified.
+/// A robust avatar widget that handles loading user profile photos.
+/// Uses ClipRRect instead of CircleAvatar to support proper error/loading indicators,
+/// handle CORS limitations on Flutter Web, and prevent visual image overflow.
 class UserAvatar extends StatelessWidget {
   /// The photo URL or asset path of the user's avatar.
   final String? photoUrl;
@@ -26,35 +27,97 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider imageProvider;
+    final size = radius * 2;
     final hasImage = photoUrl != null && photoUrl!.isNotEmpty;
 
+    debugPrint('UserAvatar: building with photoUrl = "$photoUrl"');
+
+    Widget imageWidget;
     if (hasImage) {
       if (photoUrl!.startsWith('http://') || photoUrl!.startsWith('https://')) {
-        imageProvider = NetworkImage(photoUrl!);
+        // Bypass CORS on Flutter Web using images.weserv.nl proxy
+        final resolvedUrl = kIsWeb
+            ? 'https://images.weserv.nl/?url=${Uri.encodeComponent(photoUrl!)}'
+            : photoUrl!;
+        
+        debugPrint('UserAvatar: Resolved network url = "$resolvedUrl"');
+
+        imageWidget = Image.network(
+          resolvedUrl,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('UserAvatar: Error loading network image "$photoUrl": $error');
+            return _buildFallbackImage(size);
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: SizedBox(
+                width: size * 0.4,
+                height: size * 0.4,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
       } else {
-        imageProvider = AssetImage(photoUrl!);
+        imageWidget = Image.asset(
+          photoUrl!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('UserAvatar: Error loading asset image "$photoUrl": $error');
+            return _buildFallbackImage(size);
+          },
+        );
       }
     } else {
-      imageProvider = const AssetImage('assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
+      imageWidget = _buildFallbackImage(size);
     }
 
-    final avatar = CircleAvatar(
-      radius: radius,
-      backgroundColor: Colors.grey.shade200,
-      backgroundImage: imageProvider,
+    final avatar = ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: Container(
+        width: size,
+        height: size,
+        color: Colors.grey.shade200,
+        child: imageWidget,
+      ),
     );
 
     if (borderWidth > 0 && borderColor != null) {
       return Container(
+        width: size + (borderWidth * 2),
+        height: size + (borderWidth * 2),
+        padding: EdgeInsets.all(borderWidth),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: borderColor!, width: borderWidth),
         ),
-        child: avatar,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius),
+          child: avatar,
+        ),
       );
     }
 
     return avatar;
+  }
+
+  Widget _buildFallbackImage(double size) {
+    return Image.asset(
+      'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+    );
   }
 }

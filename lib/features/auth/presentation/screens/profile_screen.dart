@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isConfirmPasswordVisible = false;
 
   final List<String> _presetAvatars = const [
-    'assets/images/8b4635fd93dc6e874f686435da83a210.jpg',
+    'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
     'https://api.dicebear.com/7.x/adventurer/png?seed=Felix',
     'https://api.dicebear.com/7.x/adventurer/png?seed=Aneka',
     'https://api.dicebear.com/7.x/bottts/png?seed=Buster',

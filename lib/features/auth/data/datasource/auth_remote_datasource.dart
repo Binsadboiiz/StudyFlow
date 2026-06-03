@@ -160,9 +160,8 @@ class AuthRemoteDatasource {
     final user = auth.currentUser;
     if (user == null) return;
     await user.updateDisplayName(fullName);
-    if (photoUrl != null) {
-      await user.updatePhotoURL(photoUrl);
-    }
+    // Always store the default asset avatar path in Firebase Auth to prevent character limit errors
+    await user.updatePhotoURL('assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
   }
 
   /// Saves the given [UserModel] data to Firestore.

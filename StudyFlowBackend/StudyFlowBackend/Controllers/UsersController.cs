@@ -30,6 +30,12 @@ namespace StudyFlowBackend.Controllers
             public string? AvatarUrl { get; set; }
         }
 
+        public class UpdateProfileDto
+        {
+            public string FullName { get; set; } = string.Empty;
+            public string AvatarUrl { get; set; } = string.Empty;
+        }
+
         [HttpPost("sync")]
         public async Task<IActionResult> SyncUser([FromBody] SyncUserDto dto)
         {
@@ -62,6 +68,26 @@ namespace StudyFlowBackend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(ApiResponse<User>.SuccessResponse(newUser, "User synced successfully"));
+        }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return NotFound(ApiResponse<object>.ErrorResponse("User not found"));
+
+            user.FullName = dto.FullName;
+            user.AvatarUrl = dto.AvatarUrl;
+            user.UpdatedAt = System.DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(ApiResponse<User>.SuccessResponse(user, "Profile updated successfully"));
         }
     }
 }
