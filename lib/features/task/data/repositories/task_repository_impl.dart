@@ -22,6 +22,7 @@ class TaskRepositoryImpl implements TaskRepository {
         startTime: model.startTime,
         endTime: model.endTime,
         isCompleted: model.isCompleted,
+        reminderTime: model.reminderTime,
       )).toList();
     });
   }
@@ -37,6 +38,7 @@ class TaskRepositoryImpl implements TaskRepository {
       startTime: task.startTime,
       endTime: task.endTime,
       isCompleted: task.isCompleted,
+      reminderTime: task.reminderTime,
     );
     await remoteDatasource.addTask(model);
   }
@@ -52,6 +54,7 @@ class TaskRepositoryImpl implements TaskRepository {
       startTime: task.startTime,
       endTime: task.endTime,
       isCompleted: task.isCompleted,
+      reminderTime: task.reminderTime,
     );
     await remoteDatasource.updateTask(model);
   }

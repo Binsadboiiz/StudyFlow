@@ -24,6 +24,10 @@ namespace StudyFlowBackend.Models
         
         public bool IsCompleted { get; set; } = false;
 
+        public DateTime? ReminderTime { get; set; }
+
+        public bool IsReminderSent { get; set; } = false;
+
         // --- Foreign Key ---
         // Liên kết Task này thuộc về User nào (dựa trên Firebase UID)
         public string UserId { get; set; } = string.Empty;

@@ -48,7 +48,9 @@ namespace StudyFlowBackend.Services
                 Date = dto.Date,
                 StartTime = dto.StartTime,
                 EndTime = dto.EndTime,
-                IsCompleted = false
+                IsCompleted = false,
+                ReminderTime = dto.ReminderTime,
+                IsReminderSent = false
             };
 
             _context.Tasks.Add(task);
@@ -70,6 +72,13 @@ namespace StudyFlowBackend.Services
             if (dto.StartTime.HasValue) task.StartTime = dto.StartTime.Value;
             if (dto.EndTime.HasValue) task.EndTime = dto.EndTime.Value;
             if (dto.IsCompleted.HasValue) task.IsCompleted = dto.IsCompleted.Value;
+            
+            // Check if ReminderTime is modified
+            if (dto.ReminderTime != task.ReminderTime)
+            {
+                task.ReminderTime = dto.ReminderTime;
+                task.IsReminderSent = false;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -99,7 +108,8 @@ namespace StudyFlowBackend.Services
                 StartTime = task.StartTime,
                 EndTime = task.EndTime,
                 IsCompleted = task.IsCompleted,
-                UserId = task.UserId
+                UserId = task.UserId,
+                ReminderTime = task.ReminderTime
             };
         }
     }

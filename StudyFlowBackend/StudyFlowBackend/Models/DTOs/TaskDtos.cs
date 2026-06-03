@@ -12,6 +12,7 @@ namespace StudyFlowBackend.DTOs
         public DateTime? EndTime { get; set; }
         public bool IsCompleted { get; set; }
         public string UserId { get; set; } = string.Empty;
+        public DateTime? ReminderTime { get; set; }
     }
 
     public class CreateTaskDto
@@ -21,6 +22,7 @@ namespace StudyFlowBackend.DTOs
         public DateTime Date { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public DateTime? ReminderTime { get; set; }
     }
 
     public class UpdateTaskDto
@@ -31,5 +33,6 @@ namespace StudyFlowBackend.DTOs
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public bool? IsCompleted { get; set; }
+        public DateTime? ReminderTime { get; set; }
     }
 }

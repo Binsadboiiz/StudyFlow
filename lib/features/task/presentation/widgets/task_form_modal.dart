@@ -27,6 +27,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
   late DateTime _selectedDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+  TimeOfDay? _reminderTime;
 
   @override
   void initState() {
@@ -42,6 +43,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
     }
     if (task?.endTime != null) {
       _endTime = TimeOfDay.fromDateTime(task!.endTime!);
+    }
+    if (task?.reminderTime != null) {
+      _reminderTime = TimeOfDay.fromDateTime(task!.reminderTime!);
     }
   }
 
@@ -301,6 +305,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            _buildReminderPicker(context),
             const SizedBox(height: 20),
             // Submit button
             SizedBox(
@@ -323,6 +329,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                   final navigator = Navigator.of(context);
                   DateTime? startDateTime;
                   DateTime? endDateTime;
+                  DateTime? reminderDateTime;
                   if (_startTime != null) {
                     startDateTime = DateTime(
                       _selectedDate.year,
@@ -341,6 +348,15 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       _endTime!.minute,
                     );
                   }
+                  if (_reminderTime != null) {
+                    reminderDateTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      _reminderTime!.hour,
+                      _reminderTime!.minute,
+                    );
+                  }
                   if (isEditMode) {
                     final updatedTask = widget.task!.copyWith(
                       title: _titleController.text.trim(),
@@ -352,6 +368,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       ),
                       startTime: startDateTime,
                       endTime: endDateTime,
+                      reminderTime: reminderDateTime,
                     );
                     await vm.updateTask(updatedTask);
                   } else {
@@ -366,6 +383,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       ),
                       startTime: startDateTime,
                       endTime: endDateTime,
+                      reminderTime: reminderDateTime,
                     );
                     await vm.addTask(newTask);
                   }
@@ -398,6 +416,81 @@ class _TaskFormModalState extends State<TaskFormModal> {
               ),
             ),
             const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReminderPicker(BuildContext context) {
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: _reminderTime ?? TimeOfDay.now(),
+        );
+        if (picked != null) {
+          setState(() {
+            _reminderTime = picked;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: ext.inputFill,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.notifications_active_outlined,
+              size: 18,
+              color: AppColors.accent,
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reminder',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: ext.subtext,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _reminderTime != null
+                      ? '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}'
+                      : 'None / No Reminder',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: _reminderTime != null
+                        ? theme.colorScheme.onSurface
+                        : ext.subtext,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            if (_reminderTime != null)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _reminderTime = null;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Icon(Icons.clear, color: ext.subtext, size: 18),
+                ),
+              ),
           ],
         ),
       ),

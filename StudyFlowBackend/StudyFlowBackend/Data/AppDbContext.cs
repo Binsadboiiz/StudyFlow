@@ -12,6 +12,7 @@ namespace StudyFlowBackend.Data
         public DbSet<User> Users { get; set; }
         public DbSet<StudyTask> Tasks { get; set; }
         public DbSet<FocusSession> FocusSessions { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,10 @@ namespace StudyFlowBackend.Data
             modelBuilder.Entity<StudyTask>()
                 .HasKey(t => t.Id);
 
+            // Cấu hình khoá chính cho UserNotification
+            modelBuilder.Entity<UserNotification>()
+                .HasKey(un => un.Id);
+
             // Cấu hình mối quan hệ 1-N (1 User có nhiều StudyTasks)
             modelBuilder.Entity<StudyTask>()
                 .HasOne(t => t.User)
@@ -41,6 +46,13 @@ namespace StudyFlowBackend.Data
                 .HasOne(f => f.User)
                 .WithMany(u => u.FocusSessions)
                 .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Cấu hình mối quan hệ User - UserNotification
+            modelBuilder.Entity<UserNotification>()
+                .HasOne(un => un.User)
+                .WithMany()
+                .HasForeignKey(un => un.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

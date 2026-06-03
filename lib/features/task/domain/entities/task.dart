@@ -22,6 +22,9 @@ class Task {
   /// The completion status (true means completed, false means pending).
   final bool isCompleted; 
 
+  /// Custom reminder time for this task.
+  final DateTime? reminderTime;
+
   /// Constructor requires basic information, defaults to uncompleted (isCompleted = false).
   Task({
     required this.id,
@@ -31,6 +34,7 @@ class Task {
     this.startTime,
     this.endTime,
     this.isCompleted = false,
+    this.reminderTime,
   });
 
   /// Helper function to create a copy of the current Task with some updated properties.
@@ -44,6 +48,7 @@ class Task {
     DateTime? startTime,
     DateTime? endTime,
     bool? isCompleted,
+    DateTime? reminderTime,
   }) {
     return Task(
       // Keep the old value if no new value is provided
@@ -54,6 +59,7 @@ class Task {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       isCompleted: isCompleted ?? this.isCompleted,
+      reminderTime: reminderTime ?? this.reminderTime,
     );
   }
 

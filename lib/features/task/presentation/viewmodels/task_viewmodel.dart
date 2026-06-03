@@ -7,6 +7,7 @@ import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
 import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 import 'package:studyflow/core/network/network_checker.dart';
+import 'package:studyflow/core/services/notification/local_notification_helper.dart';
 
 /// ViewModel responsible for managing the state and business logic related to tasks.
 /// Uses Clean Architecture use cases to interact with the repository.
@@ -57,6 +58,7 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
       _allTasks = taskData;
       _isLoading = false;
       _updateTasks();
+      _syncLocalNotifications();
       notifyListenersSafely();
     }, onError: (e) {
       _isLoading = false;
@@ -101,6 +103,53 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
     }).toList();
   }
 
+  /// Synchronizes local push notifications with tasks in the list.
+  void _syncLocalNotifications() {
+    try {
+      for (final task in _allTasks) {
+        if (task.reminderTime != null) {
+          if (task.isCompleted || task.reminderTime!.isBefore(DateTime.now())) {
+            LocalNotificationHelper.cancelNotification(task.id);
+          } else {
+            LocalNotificationHelper.scheduleTaskReminder(
+              taskId: task.id,
+              title: 'Reminder of work appointment: ${task.title}',
+              body: task.description.isNotEmpty
+                  ? task.description
+                  : 'Time to do your work!',
+              reminderTime: task.reminderTime!,
+            );
+          }
+        }
+      }
+      _scheduleDailyReminderIfTasksIncomplete();
+    } catch (e) {
+      debugPrint('Error syncing local notifications: $e');
+    }
+  }
+
+  /// Schedules daily incomplete tasks reminder at 20:00 PM.
+  void _scheduleDailyReminderIfTasksIncomplete() {
+    final today = DateTime.now();
+    final hasIncompleteToday = _allTasks.any((t) =>
+        t.date.year == today.year &&
+        t.date.month == today.month &&
+        t.date.day == today.day &&
+        !t.isCompleted);
+
+    if (hasIncompleteToday) {
+      LocalNotificationHelper.scheduleDailyReminder(
+        id: 9999, // Static ID for daily reminder
+        hour: 20,
+        minute: 0,
+        title: 'Daily reminder',
+        body: 'You still have some tasks today that have not been completed. Let\'s get them done!',
+      );
+    } else {
+      LocalNotificationHelper.cancelDailyReminder(9999);
+    }
+  }
+
   /// Adds a new task by calling the corresponding use case.
   Future<void> addTask(Task task) async {
     await addTaskUseCase(task);
@@ -109,6 +158,7 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   /// Deletes a task by ID. Requires the task's date to possibly update state if needed.
   Future<void> deleteTask(String id, DateTime date) async {
     await deleteTaskUseCase(id);
+    LocalNotificationHelper.cancelNotification(id);
   }
 
   /// Toggles the completion status of a task and updates it in the repository.

@@ -6,6 +6,7 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
+import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
 
 /// The main screen of the application (View in MVVM).
 /// Its only responsibility is to compose smaller widgets together
@@ -139,7 +140,14 @@ class HomeScreen extends StatelessWidget {
                   Icons.notifications_none_rounded,
                   color: theme.colorScheme.onSurface,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationScreen(),
+                    ),
+                  );
+                },
               ),
             ),
           ),

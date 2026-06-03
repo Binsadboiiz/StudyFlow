@@ -22,6 +22,9 @@ import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
+import 'package:studyflow/features/notification/data/datasource/notification_remote_datasource.dart';
+import 'package:studyflow/features/notification/data/repositories/notification_repository_impl.dart';
+import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
 
 /// A utility class for setting up dependency injection across the application.
 /// It initializes repositories and provides a list of Providers for state management.
@@ -30,6 +33,8 @@ class DependencyInjection {
   static late final TaskRepositoryImpl taskRepository;
   /// The globally available authentication repository instance.
   static late final AuthRepositoryImpl authRepository;
+  /// The globally available notification repository instance.
+  static late final NotificationRepositoryImpl notificationRepository;
 
   /// Initializes all the dependencies needed for the application.
   /// This should be called before `runApp()` in `main.dart`.
@@ -45,6 +50,10 @@ class DependencyInjection {
     // Set up data sources and repositories for authentication
     final authRemoteDatasource = AuthRemoteDatasource(auth: auth, firestore: firestore);
     authRepository = AuthRepositoryImpl(authRemoteDatasource);
+
+    // Set up data sources and repositories for notifications
+    final notificationRemoteDatasource = NotificationRemoteDatasource(auth: auth);
+    notificationRepository = NotificationRepositoryImpl(notificationRemoteDatasource);
   }
 
   /// Returns a list of all state management providers used in the application.
@@ -79,6 +88,11 @@ class DependencyInjection {
           checkAuthUsecase: CheckAuthUsecase(authRepository),
           logoutUsecase: LogoutUsecase(authRepository),
           updateStreakUsecase: UpdateStreakUsecase(authRepository),
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => NotificationViewModel(
+          repository: notificationRepository,
         ),
       ),
       ChangeNotifierProvider(

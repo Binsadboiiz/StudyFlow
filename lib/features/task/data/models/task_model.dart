@@ -7,6 +7,7 @@ class TaskModel {
   final DateTime? startTime;
   final DateTime? endTime;
   final bool isCompleted;
+  final DateTime? reminderTime;
 
   TaskModel({
     required this.id,
@@ -17,6 +18,7 @@ class TaskModel {
     this.startTime,
     this.endTime,
     this.isCompleted = false,
+    this.reminderTime,
   });
 
   /// Factory constructor to create a TaskModel from JSON (returned by .NET API)
@@ -30,6 +32,7 @@ class TaskModel {
       startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
       endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
       isCompleted: json['isCompleted'] ?? false,
+      reminderTime: json['reminderTime'] != null ? DateTime.parse(json['reminderTime']) : null,
     );
   }
 
@@ -44,6 +47,7 @@ class TaskModel {
       'startTime': startTime?.toIso8601String(),
       'endTime': endTime?.toIso8601String(),
       'isCompleted': isCompleted,
+      'reminderTime': reminderTime?.toIso8601String(),
     };
   }
 }

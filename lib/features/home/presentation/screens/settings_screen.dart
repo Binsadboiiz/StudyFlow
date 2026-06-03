@@ -7,6 +7,8 @@ import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/screens/register_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/features/focus/presentation/screens/focus_heatmap_screen.dart';
+import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -61,7 +63,24 @@ class SettingsScreen extends StatelessWidget {
               context: context,
               icon: Icons.notifications_none_outlined,
               title: 'Notifications',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                );
+              },
+            ),
+            _buildSettingItem(
+              context: context,
+              icon: Icons.bar_chart_rounded,
+              title: 'Focus History & Charts',
+              subtitle: 'View charts and statistics of focus mode',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FocusHeatmapScreen()),
+                );
+              },
             ),
             _buildThemeSettingItem(context),
             _buildSettingItem(

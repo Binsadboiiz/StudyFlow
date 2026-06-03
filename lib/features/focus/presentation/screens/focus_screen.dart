@@ -5,6 +5,7 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/data/repositories/focus_repository.dart';
 import 'package:studyflow/features/focus/data/models/focus_session_model.dart';
+import 'package:studyflow/features/focus/presentation/screens/focus_heatmap_screen.dart';
 
 class FocusScreen extends StatefulWidget {
   const FocusScreen({super.key});
@@ -160,15 +161,22 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
+                    const SizedBox(width: 48), // Balance for centering
                     Text(
                       'Focus Mode',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                     ),
-                    const SizedBox(width: 48), // Balance
+                    IconButton(
+                      icon: Icon(Icons.bar_chart_rounded, color: theme.colorScheme.onSurface),
+                      tooltip: 'Focus Analytics',
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const FocusHeatmapScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

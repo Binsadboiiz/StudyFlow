@@ -48,4 +48,23 @@ class FocusRepository {
       return [];
     }
   }
+
+  Future<List<FocusSessionModel>> getFocusSessions() async {
+    try {
+      final headers = await ApiConstants.getAuthHeaders(_auth);
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/Focus/sessions'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        return jsonList.map((json) => FocusSessionModel.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error fetching focus sessions: $e');
+      return [];
+    }
+  }
 }
