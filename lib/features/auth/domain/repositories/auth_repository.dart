@@ -26,7 +26,11 @@ abstract class AuthRepository {
   /// [streak] is the new streak count.
   /// [lastStreakDate] is the timestamp of the last streak update.
   /// [streakHistory] is the historical record of streak dates.
-  Future<void> updateUserStreak(int streak, DateTime lastStreakDate, List<String> streakHistory);
+  Future<void> updateUserStreak(
+    int streak, 
+    DateTime lastStreakDate, 
+    List<String> streakHistory
+  );
 
   /// Logs out the currently authenticated user.
   Future<void> logout();
@@ -42,4 +46,4 @@ abstract class AuthRepository {
     String? currentPassword,
   });
 }
-
+

@@ -136,7 +136,7 @@ class _MainScreenState extends State<MainScreen>
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final unselectedColor = isDark ? Colors.grey.shade500 : Colors.grey.shade400;
+    final unselectedColor = isDark ? Colors.grey.shade500 : const Color.fromARGB(255, 51, 51, 51);
 
     return Expanded(
       child: GestureDetector(
