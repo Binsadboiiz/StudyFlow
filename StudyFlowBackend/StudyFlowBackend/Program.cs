@@ -91,6 +91,11 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<AppDbContext>();
 
+        // Tự động áp dụng Migration khi deploy lên Render/Production
+        Console.WriteLine(" - Checking and applying database migrations...");
+        dbContext.Database.Migrate();
+        Console.WriteLine(" - Database migrations checked successfully.");
+
         var canConnect = dbContext.Database.CanConnect();
 
         var urls = app.Urls.Any() ? string.Join(", ", app.Urls) : "Unknow URL";
