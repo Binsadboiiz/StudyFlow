@@ -5,15 +5,15 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project file and restore dependencies first (caching optimization)
-COPY ["StudyFlowBackend/StudyFlowBackend.csproj", "StudyFlowBackend/"]
-RUN dotnet restore "StudyFlowBackend/StudyFlowBackend.csproj"
+COPY StudyFlowBackend/StudyFlowBackend/StudyFlowBackend.csproj StudyFlowBackend/StudyFlowBackend/
+RUN dotnet restore StudyFlowBackend/StudyFlowBackend/StudyFlowBackend.csproj
 
 # Copy the remaining source code
 COPY . .
 
 # Build and publish the release build
 WORKDIR "/src/StudyFlowBackend"
-RUN dotnet publish "StudyFlowBackend.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
 # ==========================================
 # 2. Runtime Stage
