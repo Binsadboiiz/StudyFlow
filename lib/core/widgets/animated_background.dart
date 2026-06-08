@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studyflow/core/providers/performance_provider.dart';
 
 class AnimatedBackground extends StatefulWidget {
   final Widget child;
@@ -20,7 +22,8 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 30),
-    )..repeat();
+    );
+    // Note: We don't start the controller here because build will manage it based on performance provider
   }
 
   @override
@@ -33,6 +36,47 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    
+    final isLowPerf = context.watch<PerformanceProvider>().isLowPerformance;
+
+    // Manage animation ticking state based on Performance Mode
+    if (isLowPerf) {
+      if (_controller.isAnimating) {
+        _controller.stop();
+      }
+    } else {
+      if (!_controller.isAnimating) {
+        _controller.repeat();
+      }
+    }
+
+    if (isLowPerf) {
+      // Return a clean, premium static gradient background for low performance mode
+      return Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [
+                        theme.scaffoldBackgroundColor,
+                        const Color(0xFF1E272C), // Sleek charcoal tint
+                      ]
+                    : [
+                        theme.scaffoldBackgroundColor,
+                        const Color(0xFFF0F4F8), // Soft slate/ice tint
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          widget.child,
+        ],
+      );
+    }
 
     // Translucent glowing colors optimized for overlaying glass cards
     final blobColors = isDark
@@ -57,18 +101,20 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
           height: double.infinity,
           color: theme.scaffoldBackgroundColor,
         ),
-        // Animated liquid mesh blobs
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return CustomPaint(
-              size: Size.infinite,
-              painter: LiquidMeshPainter(
-                progress: _controller.value,
-                colors: blobColors,
-              ),
-            );
-          },
+        // Animated liquid mesh blobs wrapped in RepaintBoundary to prevent constant app-wide repaints
+        RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return CustomPaint(
+                size: Size.infinite,
+                painter: LiquidMeshPainter(
+                  progress: _controller.value,
+                  colors: blobColors,
+                ),
+              );
+            },
+          ),
         ),
         // Content overlay
         widget.child,

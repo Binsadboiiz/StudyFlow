@@ -15,4 +15,7 @@ abstract class TaskRepository {
   
   /// Deletes a task based on its ID.
   Future<void> deleteTask(String id);
+
+  /// Forces a refresh of tasks from remote datasource.
+  Future<void> refresh();
 }

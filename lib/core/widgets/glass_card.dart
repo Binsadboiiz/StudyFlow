@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studyflow/core/providers/performance_provider.dart';
 
 class GlassCard extends StatelessWidget {
   final Widget child;
@@ -25,6 +27,26 @@ class GlassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    
+    // Check if low performance mode is enabled
+    final isLowPerf = context.watch<PerformanceProvider>().isLowPerformance;
+
+    if (isLowPerf) {
+      // In low performance mode, completely bypass BackdropFilter and custom shader painters
+      final baseColor = color ?? (isDark ? const Color(0xFF1E1E1E) : Colors.white);
+      return Container(
+        padding: padding ?? const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: baseColor.withValues(alpha: isDark ? 0.90 : 0.95),
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: border ?? Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
+            width: 1.2,
+          ),
+        ),
+        child: child,
+      );
+    }
     
     // Choose appropriate base tint color if not explicitly defined
     final baseColor = color ?? (isDark ? Colors.white : Colors.black);

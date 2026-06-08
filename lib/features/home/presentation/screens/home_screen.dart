@@ -9,6 +9,8 @@ import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
 
+import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
+
 /// The main screen of the application (View in MVVM).
 /// Its only responsibility is to compose smaller widgets together
 /// to form a complete screen, without containing complex business logic here.
@@ -127,27 +129,54 @@ class HomeScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.notifications_none_rounded,
-                  color: theme.colorScheme.onSurface,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationScreen(),
+            child: Consumer<NotificationViewModel>(
+              builder: (context, notificationVm, child) {
+                final hasNotifications = notificationVm.notifications.isNotEmpty;
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.white.withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.notifications_none_rounded,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
+                    if (hasNotifications)
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDark ? Colors.black : Colors.white,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
         ],

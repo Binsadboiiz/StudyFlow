@@ -90,7 +90,7 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   /// Refreshes the tasks.
   Future<void> refreshTasks() async {
-    // Stream auto updates, no manual refresh needed
+    await _taskRepository.refresh();
   }
 
   /// Toggles the completion status of a [task].

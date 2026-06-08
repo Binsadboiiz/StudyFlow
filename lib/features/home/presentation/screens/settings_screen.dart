@@ -9,8 +9,9 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_heatmap_screen.dart';
 import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
-import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
 import 'package:studyflow/features/auth/presentation/screens/profile_screen.dart';
+import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
+import 'package:studyflow/core/providers/performance_provider.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -98,6 +99,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             _buildThemeSettingItem(context),
+            _buildPerformanceSettingItem(context),
             _buildSettingItem(
               context: context,
               icon: Icons.language_outlined,
@@ -573,5 +575,57 @@ class SettingsScreen extends StatelessWidget {
       ),
       ),
       );
+  }
+
+  /// Toggle setting item for Low Performance Mode (smooth rendering for older devices)
+  Widget _buildPerformanceSettingItem(BuildContext context) {
+    final perfProvider = context.watch<PerformanceProvider>();
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        borderRadius: 16,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            secondary: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.speed_rounded,
+                color: theme.colorScheme.onSurface,
+                size: 24,
+              ),
+            ),
+            title: Text(
+              'Low Performance Mode',
+              style: TextStyle(
+                fontWeight: FontWeight.w600, 
+                fontSize: 16,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            subtitle: Text(
+              'Disable blurs/animations for smoother UI',
+              style: TextStyle(fontSize: 13, color: ext.subtext),
+            ),
+            value: perfProvider.isLowPerformance,
+            activeThumbColor: AppColors.accent,
+            onChanged: (bool value) {
+              perfProvider.setLowPerformanceMode(value);
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

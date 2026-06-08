@@ -24,6 +24,7 @@ import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
+import 'package:studyflow/core/providers/performance_provider.dart';
 import 'package:studyflow/features/notification/data/datasource/notification_remote_datasource.dart';
 import 'package:studyflow/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
@@ -101,6 +102,9 @@ class DependencyInjection {
       ),
       ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => PerformanceProvider(),
       ),
     ];
   }

@@ -11,6 +11,7 @@ import 'package:studyflow/features/home/presentation/screens/settings_screen.dar
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
 
 /// `MainScreen` is the root screen containing the bottom navigation bar
@@ -25,6 +26,26 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  
+  // Cache screens in RAM to avoid re-constructing them on every build
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = const [
+      HomeScreen(),
+      FocusScreen(),
+      TaskScreen(),
+      ScheduleScreen(),
+      StreakScreen(),
+      SettingsScreen(),
+    ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<NotificationViewModel>().fetchNotifications();
+    });
+  }
 
   // Labels for bottom navigation items using rounded icons for premium look
   static const List<_NavItem> _navItems = [
@@ -38,22 +59,14 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   Widget build(BuildContext context) {
-    const screens = [
-      HomeScreen(),
-      FocusScreen(),
-      TaskScreen(),
-      ScheduleScreen(),
-      StreakScreen(),
-      SettingsScreen(),
-    ];
-    final currentIndex = _currentIndex.clamp(0, screens.length - 1);
+    final currentIndex = _currentIndex.clamp(0, _screens.length - 1);
 
     return Scaffold(
       extendBody: true, // Content flows behind the floating dock
       backgroundColor: Colors.transparent,
       body: IndexedStack(
         index: currentIndex,
-        children: screens,
+        children: _screens,
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(

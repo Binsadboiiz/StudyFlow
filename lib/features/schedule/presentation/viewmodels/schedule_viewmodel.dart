@@ -130,7 +130,7 @@ class ScheduleViewmodel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   Future<void> loadWeekTasks() async {
-    // Handled by stream
+    await getTaskUseCase.repository.refresh();
   }
 
   /// Adds a new [task] to the schedule.

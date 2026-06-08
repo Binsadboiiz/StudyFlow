@@ -29,6 +29,10 @@ class UserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = radius * 2;
     final hasImage = photoUrl != null && photoUrl!.isNotEmpty;
+    
+    // Calculate optimal cache size based on screen pixel density to optimize RAM usage
+    final devicePixelRatio = MediaQuery.maybeDevicePixelRatioOf(context) ?? 2.0;
+    final cacheSize = (size * devicePixelRatio).round();
 
     debugPrint('UserAvatar: building with photoUrl = "$photoUrl"');
 
@@ -46,10 +50,12 @@ class UserAvatar extends StatelessWidget {
           resolvedUrl,
           width: size,
           height: size,
+          cacheWidth: cacheSize,
+          cacheHeight: cacheSize,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             debugPrint('UserAvatar: Error loading network image "$photoUrl": $error');
-            return _buildFallbackImage(size);
+            return _buildFallbackImage(context, size, cacheSize);
           },
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
@@ -72,15 +78,17 @@ class UserAvatar extends StatelessWidget {
           photoUrl!,
           width: size,
           height: size,
+          cacheWidth: cacheSize,
+          cacheHeight: cacheSize,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             debugPrint('UserAvatar: Error loading asset image "$photoUrl": $error');
-            return _buildFallbackImage(size);
+            return _buildFallbackImage(context, size, cacheSize);
           },
         );
       }
     } else {
-      imageWidget = _buildFallbackImage(size);
+      imageWidget = _buildFallbackImage(context, size, cacheSize);
     }
 
     final avatar = ClipRRect(
@@ -112,11 +120,13 @@ class UserAvatar extends StatelessWidget {
     return avatar;
   }
 
-  Widget _buildFallbackImage(double size) {
+  Widget _buildFallbackImage(BuildContext context, double size, int cacheSize) {
     return Image.asset(
       'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
       width: size,
       height: size,
+      cacheWidth: cacheSize,
+      cacheHeight: cacheSize,
       fit: BoxFit.cover,
     );
   }
