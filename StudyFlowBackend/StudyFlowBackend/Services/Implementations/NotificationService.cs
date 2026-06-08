@@ -53,6 +53,25 @@ namespace StudyFlowBackend.Services
             return true;
         }
 
+        public async Task<UserNotificationDto> CreateNotificationAsync(string userId, string title, string message, string type)
+        {
+            var notification = new UserNotification
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Title = title,
+                Message = message,
+                Type = type,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.UserNotifications.Add(notification);
+            await _context.SaveChangesAsync();
+
+            return MapToDto(notification);
+        }
+
         private static UserNotificationDto MapToDto(UserNotification notification)
         {
             return new UserNotificationDto

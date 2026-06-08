@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -6,15 +7,15 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 /// Chứa các hằng số và helper cho việc gọi API
 class ApiConstants {
   static String get baseUrl {
-    if (kIsWeb) return 'http://192.168.1.81:5141/api';
-    if (Platform.isAndroid) return 'http://192.168.1.81:5141/api';
-    return 'http://192.168.1.81:5141/api';
+    final url = dotenv.env['BACKEND_URL'];
+    if (url == null) throw Exception('BACKEND_URL not found');
+    return url;
   }
 
   static String get googleClientId {
-    if (kIsWeb) return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
-    if (Platform.isAndroid) return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
-    return '252578618828-i7lamrdbktcpft29733n5uhsqpmiuf99.apps.googleusercontent.com';
+    final clientId = dotenv.env['GOOGLE_CLIENT_ID'];
+    if (clientId == null) throw Exception('GOOGLE_CLIENT_ID not found');
+    return clientId;
   }
 
   /// Helper tạo Headers đính kèm Firebase ID Token

@@ -20,6 +20,9 @@ namespace StudyFlowBackend.Models
         public double ExpPoints { get; set; } = 0;
         
         public int Streak { get; set; } = 0;
+        public int Coins { get; set; } = 0;
+        public Guid? FeaturedBadgeId { get; set; }
+        public Badge? FeaturedBadge { get; set; }
         
         public int DailyTargetMinutes { get; set; } = 60;
         
@@ -31,6 +34,12 @@ namespace StudyFlowBackend.Models
         /// EF Core 8 hỗ trợ map trực tiếp List<string> xuống PostgreSQL Array type.
         /// </summary>
         public List<string> StreakHistory { get; set; } = new List<string>();
+
+        // Navigation Property: 1 User có 1 StudyPet
+        public StudyPet? Pet { get; set; }
+
+        // Navigation Property: 1 User có nhiều UserBadges
+        public ICollection<UserBadge> UserBadges { get; set; } = new List<UserBadge>();
 
         // Navigation Property: 1 User có nhiều Tasks
         public ICollection<StudyTask> Tasks { get; set; } = new List<StudyTask>();

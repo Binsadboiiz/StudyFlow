@@ -4,7 +4,8 @@ import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/screens/task_screen.dart';
 import 'package:studyflow/features/schedule/presentation/screens/schedule_screen.dart';
-import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
+import 'package:studyflow/features/gamification/presentation/screens/gamification_hub_screen.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
@@ -13,6 +14,9 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:studyflow/features/home/presentation/widgets/tutorial_overlay.dart';
+import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
 /// `MainScreen` is the root screen containing the bottom navigation bar
 /// and managing navigation between the main screens of the app.
@@ -26,6 +30,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  bool _showTutorial = false;
   
   // Cache screens in RAM to avoid re-constructing them on every build
   late final List<Widget> _screens;
@@ -38,13 +43,44 @@ class _MainScreenState extends State<MainScreen>
       FocusScreen(),
       TaskScreen(),
       ScheduleScreen(),
-      StreakScreen(),
+      GamificationHubScreen(),
       SettingsScreen(),
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<NotificationViewModel>().fetchNotifications();
+      _checkTutorialStatus();
     });
+  }
+
+  void _checkTutorialStatus() async {
+    final authViewModel = context.read<AuthViewmodel>();
+    final userId = authViewModel.currentUser?.id;
+    if (userId == null || userId.isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final tutorialShown = prefs.getBool('tutorial_shown_$userId') ?? false;
+
+    if (!tutorialShown && mounted) {
+      setState(() {
+        _showTutorial = true;
+      });
+    }
+  }
+
+  void _dismissTutorial() async {
+    final authViewModel = context.read<AuthViewmodel>();
+    final userId = authViewModel.currentUser?.id;
+    if (userId != null && userId.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('tutorial_shown_$userId', true);
+    }
+    if (mounted) {
+      setState(() {
+        _showTutorial = false;
+        _currentIndex = 0; // Return to Home tab
+      });
+    }
   }
 
   // Labels for bottom navigation items using rounded icons for premium look
@@ -53,7 +89,7 @@ class _MainScreenState extends State<MainScreen>
     _NavItem(icon: Icons.hourglass_empty_rounded, label: 'Focus'),
     _NavItem(icon: Icons.assignment_rounded, label: 'Tasks'),
     _NavItem(icon: Icons.event_note_rounded, label: 'Schedule'),
-    _NavItem(icon: Icons.local_fire_department_rounded, label: 'Streak'),
+    _NavItem(icon: Icons.emoji_events_rounded, label: 'Quest'),
     _NavItem(icon: Icons.settings_rounded, label: 'Settings'),
   ];
 
@@ -64,9 +100,24 @@ class _MainScreenState extends State<MainScreen>
     return Scaffold(
       extendBody: true, // Content flows behind the floating dock
       backgroundColor: Colors.transparent,
-      body: IndexedStack(
-        index: currentIndex,
-        children: _screens,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: currentIndex,
+            children: _screens,
+          ),
+          if (_showTutorial)
+            TutorialOverlay(
+              onComplete: _dismissTutorial,
+              onStepChanged: (step) {
+                if (mounted) {
+                  setState(() {
+                    _currentIndex = step;
+                  });
+                }
+              },
+            ),
+        ],
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -212,6 +263,9 @@ class _MainScreenState extends State<MainScreen>
         break;
       case 3: // Schedule
         context.read<ScheduleViewmodel>().loadWeekTasks();
+        break;
+      case 4: // Quest Hub
+        context.read<GamificationViewModel>().refreshAll();
         break;
     }
   }

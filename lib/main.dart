@@ -10,9 +10,12 @@ import 'package:studyflow/core/theme/theme_provider.dart';
 import 'package:studyflow/core/widgets/animated_background.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:studyflow/core/services/notification/local_notification_helper.dart';
 
 void main() async {
+    await dotenv.load(fileName: ".env");
+
   // Ensure the Flutter framework is initialized before calling native or async code.
   WidgetsFlutterBinding.ensureInitialized();
 

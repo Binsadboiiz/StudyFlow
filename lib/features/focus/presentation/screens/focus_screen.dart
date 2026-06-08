@@ -327,7 +327,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                 ],
               ),
               
-              const SizedBox(height: 60),
+              const SizedBox(height: 100),
             ],
           ),
         ),

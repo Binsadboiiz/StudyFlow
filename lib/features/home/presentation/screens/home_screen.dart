@@ -8,8 +8,9 @@ import '../widgets/home_calendar.dart';
 import '../widgets/daily_goal_list.dart';
 import 'package:studyflow/features/streak/presentation/screens/streak_screen.dart';
 import 'package:studyflow/features/notification/presentation/screens/notification_screen.dart';
-
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
 
 /// The main screen of the application (View in MVVM).
 /// Its only responsibility is to compose smaller widgets together
@@ -24,6 +25,10 @@ class HomeScreen extends StatelessWidget {
     final streak = user?.streak ?? 0;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    
+    // Watch gamification summary to show featured badge
+    final gamificationVm = context.watch<GamificationViewModel>();
+    final summary = gamificationVm.summary;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -65,27 +70,41 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Have a good day,',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w600,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Have a good day,',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Text(
-                  '$displayName 👋',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        '$displayName 👋',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (summary?.featuredBadgeName != null)
+                        FeaturedBadgeTag(
+                          badgeName: summary!.featuredBadgeName!,
+                          iconKey: summary.featuredBadgeIcon,
+                        ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

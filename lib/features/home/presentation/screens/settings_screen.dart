@@ -12,6 +12,11 @@ import 'package:studyflow/features/notification/presentation/screens/notificatio
 import 'package:studyflow/features/auth/presentation/screens/profile_screen.dart';
 import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
 import 'package:studyflow/core/providers/performance_provider.dart';
+import 'package:studyflow/features/gamification/data/models/gamification_summary_model.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
+import 'package:studyflow/features/home/presentation/screens/about_screen.dart';
+import 'package:studyflow/features/home/presentation/screens/privacy_policy_screen.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -26,6 +31,10 @@ class SettingsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
     final isDark = theme.brightness == Brightness.dark;
+    
+    // Watch gamification summary to show featured badge
+    final gamificationVm = context.watch<GamificationViewModel>();
+    final summary = gamificationVm.summary;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -51,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (user == null) _buildGuestSection(context, theme) else _buildProfileSection(context, user, theme, ext, isDark),
+            if (user == null) _buildGuestSection(context, theme) else _buildProfileSection(context, user, summary, theme, ext, isDark),
             const SizedBox(height: 40),
             Text(
               'General Settings',
@@ -111,7 +120,23 @@ class SettingsScreen extends StatelessWidget {
               context: context,
               icon: Icons.info_outline_rounded,
               title: 'About',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AboutScreen()),
+                );
+              },
+            ),
+            _buildSettingItem(
+              context: context,
+              icon: Icons.policy_outlined,
+              title: 'Privacy Policy',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                );
+              },
             ),
             if (user != null) ...[
               const SizedBox(height: 40),
@@ -232,7 +257,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileSection(BuildContext context, dynamic user, ThemeData theme, AppThemeExtension ext, bool isDark) {
+  Widget _buildProfileSection(BuildContext context, dynamic user, GamificationSummaryModel? summary, ThemeData theme, AppThemeExtension ext, bool isDark) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -256,13 +281,25 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    user.fullName,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        user.fullName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      if (summary?.featuredBadgeName != null)
+                        FeaturedBadgeTag(
+                          badgeName: summary!.featuredBadgeName!,
+                          iconKey: summary.featuredBadgeIcon,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(

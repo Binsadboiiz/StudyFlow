@@ -12,10 +12,12 @@ namespace StudyFlowBackend.Services
     public class FocusSessionService : IFocusSessionService
     {
         private readonly AppDbContext _context;
+        private readonly IGamificationService _gamificationService;
 
-        public FocusSessionService(AppDbContext context)
+        public FocusSessionService(AppDbContext context, IGamificationService gamificationService)
         {
             _context = context;
+            _gamificationService = gamificationService;
         }
 
         public async Task<FocusSessionDto> CreateFocusSessionAsync(string userId, CreateFocusSessionDto dto)
@@ -32,6 +34,19 @@ namespace StudyFlowBackend.Services
 
             _context.FocusSessions.Add(session);
             await _context.SaveChangesAsync();
+
+            // Cộng XP và Coins (+2 XP và +2 Coins mỗi phút tập trung)
+            int earnedXp = session.DurationMinutes * 2;
+            int earnedCoins = session.DurationMinutes * 2;
+            await _gamificationService.AddXpAndCoinsAsync(userId, earnedXp, earnedCoins, $"The training session has been completed. {session.DurationMinutes} phút ({session.Mode})");
+
+            // Kiểm tra và cập nhật tiến trình Daily Target & Streak
+            var todayUtc = DateTime.UtcNow.Date;
+            var todayMinutes = await _context.FocusSessions
+                .Where(f => f.UserId == userId && f.StartTime >= todayUtc)
+                .SumAsync(f => f.DurationMinutes);
+
+            await _gamificationService.UpdateDailyTargetProgressAsync(userId, todayMinutes);
 
             return new FocusSessionDto
             {

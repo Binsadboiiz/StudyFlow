@@ -10,5 +10,6 @@ namespace StudyFlowBackend.Services
         Task<IEnumerable<UserNotificationDto>> GetNotificationsByUserIdAsync(string userId);
         Task<bool> DeleteNotificationAsync(Guid id, string userId);
         Task<bool> ClearAllNotificationsAsync(string userId);
+        Task<UserNotificationDto> CreateNotificationAsync(string userId, string title, string message, string type);
     }
 }

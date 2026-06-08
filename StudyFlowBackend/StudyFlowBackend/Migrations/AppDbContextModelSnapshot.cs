@@ -23,6 +23,181 @@ namespace StudyFlowBackend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("StudyFlowBackend.Models.Badge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetricType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ThresholdValue")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Badges");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Reach Level 5",
+                            IconUrl = "school",
+                            MetricType = "Level",
+                            Name = "Noob No More",
+                            ThresholdValue = 5
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Reach Level 10",
+                            IconUrl = "workspace_premium",
+                            MetricType = "Level",
+                            Name = "Touching Grass? Never",
+                            ThresholdValue = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Reach Level 20",
+                            IconUrl = "psychology",
+                            MetricType = "Level",
+                            Name = "Certified Brainrot",
+                            ThresholdValue = 20
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Reach Level 50",
+                            IconUrl = "military_tech",
+                            MetricType = "Level",
+                            Name = "Main Character Energy",
+                            ThresholdValue = 50
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Accumulate 1 hour of focus time",
+                            IconUrl = "timer",
+                            MetricType = "FocusMinutes",
+                            Name = "Locked In",
+                            ThresholdValue = 60
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Accumulate 10 hours of focus time",
+                            IconUrl = "hourglass_full",
+                            MetricType = "FocusMinutes",
+                            Name = "Distraction Who?",
+                            ThresholdValue = 600
+                        },
+                        new
+                        {
+                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Accumulate 50 hours of focus time",
+                            IconUrl = "self_improvement",
+                            MetricType = "FocusMinutes",
+                            Name = "Sigma Study Grind",
+                            ThresholdValue = 3000
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Accumulate 100 hours of focus time",
+                            IconUrl = "local_fire_department",
+                            MetricType = "FocusMinutes",
+                            Name = "Ultra Instinct",
+                            ThresholdValue = 6000
+                        },
+                        new
+                        {
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Complete your first task",
+                            IconUrl = "done_outline",
+                            MetricType = "TasksCompleted",
+                            Name = "The First W",
+                            ThresholdValue = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Complete 10 tasks",
+                            IconUrl = "playlist_add_check",
+                            MetricType = "TasksCompleted",
+                            Name = "Task Destroyer",
+                            ThresholdValue = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Complete 50 tasks",
+                            IconUrl = "trending_up",
+                            MetricType = "TasksCompleted",
+                            Name = "Productivity Monster",
+                            ThresholdValue = 50
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Maintain a 3-day streak",
+                            IconUrl = "bolt",
+                            MetricType = "StreakDays",
+                            Name = "Day One or One Day?",
+                            ThresholdValue = 3
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Maintain a 7-day streak",
+                            IconUrl = "verified",
+                            MetricType = "StreakDays",
+                            Name = "Built Different",
+                            ThresholdValue = 7
+                        },
+                        new
+                        {
+                            Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                            CreatedAt = new DateTime(2026, 6, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Maintain a 30-day streak",
+                            IconUrl = "workspace_premium",
+                            MetricType = "StreakDays",
+                            Name = "Grassless Legend",
+                            ThresholdValue = 30
+                        });
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.FocusSession", b =>
                 {
                     b.Property<Guid>("Id")
@@ -54,6 +229,51 @@ namespace StudyFlowBackend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FocusSessions");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.StudyPet", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EvolutionStage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("Exp")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Hunger")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastFedTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PetType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("StudyPets");
                 });
 
             modelBuilder.Entity("StudyFlowBackend.Models.StudyTask", b =>
@@ -108,6 +328,9 @@ namespace StudyFlowBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Coins")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -120,6 +343,9 @@ namespace StudyFlowBackend.Migrations
 
                     b.Property<double>("ExpPoints")
                         .HasColumnType("double precision");
+
+                    b.Property<Guid?>("FeaturedBadgeId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -147,7 +373,27 @@ namespace StudyFlowBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FeaturedBadgeId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.UserBadge", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("BadgeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EarnedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("UserId", "BadgeId");
+
+                    b.HasIndex("BadgeId");
+
+                    b.ToTable("UserBadges");
                 });
 
             modelBuilder.Entity("StudyFlowBackend.Models.UserNotification", b =>
@@ -196,6 +442,17 @@ namespace StudyFlowBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("StudyFlowBackend.Models.StudyPet", b =>
+                {
+                    b.HasOne("StudyFlowBackend.Models.User", "User")
+                        .WithOne("Pet")
+                        .HasForeignKey("StudyFlowBackend.Models.StudyPet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.StudyTask", b =>
                 {
                     b.HasOne("StudyFlowBackend.Models.User", "User")
@@ -203,6 +460,35 @@ namespace StudyFlowBackend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.User", b =>
+                {
+                    b.HasOne("StudyFlowBackend.Models.Badge", "FeaturedBadge")
+                        .WithMany()
+                        .HasForeignKey("FeaturedBadgeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("FeaturedBadge");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.UserBadge", b =>
+                {
+                    b.HasOne("StudyFlowBackend.Models.Badge", "Badge")
+                        .WithMany("UserBadges")
+                        .HasForeignKey("BadgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudyFlowBackend.Models.User", "User")
+                        .WithMany("UserBadges")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Badge");
 
                     b.Navigation("User");
                 });
@@ -218,11 +504,20 @@ namespace StudyFlowBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("StudyFlowBackend.Models.Badge", b =>
+                {
+                    b.Navigation("UserBadges");
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.User", b =>
                 {
                     b.Navigation("FocusSessions");
 
+                    b.Navigation("Pet");
+
                     b.Navigation("Tasks");
+
+                    b.Navigation("UserBadges");
                 });
 #pragma warning restore 612, 618
         }

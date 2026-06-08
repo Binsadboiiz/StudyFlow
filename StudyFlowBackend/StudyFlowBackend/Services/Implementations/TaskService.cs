@@ -12,10 +12,12 @@ namespace StudyFlowBackend.Services
     public class TaskService : ITaskService
     {
         private readonly AppDbContext _context;
+        private readonly IGamificationService _gamificationService;
 
-        public TaskService(AppDbContext context)
+        public TaskService(AppDbContext context, IGamificationService gamificationService)
         {
             _context = context;
+            _gamificationService = gamificationService;
         }
 
         public async Task<IEnumerable<TaskDto>> GetTasksByUserIdAsync(string userId)
@@ -66,6 +68,8 @@ namespace StudyFlowBackend.Services
 
             if (task == null) return null;
 
+            bool wasCompleted = task.IsCompleted;
+
             if (dto.Title != null) task.Title = dto.Title;
             if (dto.Description != null) task.Description = dto.Description;
             if (dto.Date.HasValue) task.Date = dto.Date.Value;
@@ -81,6 +85,12 @@ namespace StudyFlowBackend.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // Nếu nhiệm vụ được chuyển trạng thái sang Hoàn thành (từ chưa hoàn thành)
+            if (task.IsCompleted && !wasCompleted)
+            {
+                await _gamificationService.AddXpAndCoinsAsync(userId, 10, 10, $"Task completed: {task.Title}");
+            }
 
             return MapToDto(task);
         }

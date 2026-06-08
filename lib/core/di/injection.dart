@@ -28,6 +28,10 @@ import 'package:studyflow/core/providers/performance_provider.dart';
 import 'package:studyflow/features/notification/data/datasource/notification_remote_datasource.dart';
 import 'package:studyflow/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
+import 'package:studyflow/features/gamification/data/repositories/gamification_repository.dart';
+import 'package:studyflow/features/gamification/data/repositories/pet_repository.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
 
 /// A utility class for setting up dependency injection across the application.
 /// It initializes repositories and provides a list of Providers for state management.
@@ -38,6 +42,10 @@ class DependencyInjection {
   static late final AuthRepositoryImpl authRepository;
   /// The globally available notification repository instance.
   static late final NotificationRepositoryImpl notificationRepository;
+  /// The globally available gamification repository instance.
+  static late final GamificationRepository gamificationRepository;
+  /// The globally available study pet repository instance.
+  static late final PetRepository petRepository;
 
   /// Initializes all the dependencies needed for the application.
   /// This should be called before `runApp()` in `main.dart`.
@@ -57,6 +65,10 @@ class DependencyInjection {
     // Set up data sources and repositories for notifications
     final notificationRemoteDatasource = NotificationRemoteDatasource(auth: auth);
     notificationRepository = NotificationRepositoryImpl(notificationRemoteDatasource);
+
+    // Set up gamification and pet repositories
+    gamificationRepository = GamificationRepository();
+    petRepository = PetRepository();
   }
 
   /// Returns a list of all state management providers used in the application.
@@ -105,6 +117,16 @@ class DependencyInjection {
       ),
       ChangeNotifierProvider(
         create: (_) => PerformanceProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => GamificationViewModel(
+          gamificationRepository: gamificationRepository,
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => PetViewModel(
+          petRepository: petRepository,
+        ),
       ),
     ];
   }
