@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/widgets/initial_loading_screen.dart';
 import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
@@ -17,11 +18,7 @@ class AuthGate extends StatelessWidget {
 
     // Show a loading indicator while checking the authentication status.
     if(authVM.isChecking) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const InitialLoadingScreen();
     }
 
     // Navigate to the main screen if the user is authenticated.

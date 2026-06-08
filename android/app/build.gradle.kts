@@ -37,6 +37,15 @@ android {
         }
     }
 }
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set(
+                "StudyFlow-v${variant.versionName.get()}.apk"
+            )
+        }
+    }
+}
 
 dependencies {
     coreLibraryDesugaring(

@@ -399,27 +399,44 @@ class LeaderboardTab extends StatelessWidget {
               end: Alignment.bottomCenter,
             ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            border: Border(
-              top: BorderSide(color: isMe ? AppColors.accent : rankColor, width: 2),
-              left: BorderSide(color: (isMe ? AppColors.accent : rankColor).withValues(alpha: 0.2), width: 1),
-              right: BorderSide(color: (isMe ? AppColors.accent : rankColor).withValues(alpha: 0.2), width: 1),
+            border: Border.all(
+              color: (isMe ? AppColors.accent : rankColor).withValues(alpha: 0.2),
+              width: 1,
             ),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$rank',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
+          child: Stack(
+            children: [
+              // Highlight top border
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 2,
+                  decoration: BoxDecoration(
                     color: isMe ? AppColors.accent : rankColor,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   ),
                 ),
-                _buildPodiumMetricBottom(entry, sortBy, theme),
-              ],
-            ),
+              ),
+              // Main content
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$rank',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: isMe ? AppColors.accent : rankColor,
+                      ),
+                    ),
+                    _buildPodiumMetricBottom(entry, sortBy, theme),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
