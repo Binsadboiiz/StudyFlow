@@ -327,7 +327,7 @@ class BadgesTab extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      'Đóng',
+                      'Close',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),

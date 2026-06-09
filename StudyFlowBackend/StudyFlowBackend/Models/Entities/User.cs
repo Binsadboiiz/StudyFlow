@@ -25,6 +25,7 @@ namespace StudyFlowBackend.Models
         public Badge? FeaturedBadge { get; set; }
         
         public int DailyTargetMinutes { get; set; } = 60;
+        public string Timezone { get; set; } = "Asia/Ho_Chi_Minh";
         
         public DateTime? LastStreakDate { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

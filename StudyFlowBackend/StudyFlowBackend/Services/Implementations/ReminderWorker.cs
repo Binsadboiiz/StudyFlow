@@ -50,56 +50,73 @@ namespace StudyFlowBackend.Services
 
         private async Task CheckRemindersAsync(AppDbContext context)
         {
-            var now = DateTime.Now;
-            var todayStart = DateTime.Today;
-            var todayEnd = todayStart.AddDays(1);
-
-            // 1. Xử lý nhắc hẹn tuỳ chỉnh của các Task
-            var pendingCustomReminders = await context.Tasks
-                .Where(t => t.ReminderTime != null && !t.IsReminderSent && t.ReminderTime <= now && !t.IsCompleted)
-                .ToListAsync();
-
-            if (pendingCustomReminders.Any())
+            var users = await context.Users.ToListAsync();
+            foreach (var user in users)
             {
-                _logger.LogInformation($"Found {pendingCustomReminders.Count} pending custom task reminders to send.");
-                foreach (var task in pendingCustomReminders)
+                // Resolve user's timezone, fallback to "Asia/Ho_Chi_Minh"
+                var userTimezoneId = string.IsNullOrEmpty(user.Timezone) ? "Asia/Ho_Chi_Minh" : user.Timezone;
+                TimeZoneInfo userTimeZone;
+                try
                 {
-                    var notification = new UserNotification
-                    {
-                        Id = Guid.NewGuid(),
-                        UserId = task.UserId,
-                        Title = "Task Reminder",
-                        Message = $"It's time to complete the task: {task.Title}",
-                        CreatedAt = now,
-                        IsRead = false,
-                        Type = "CustomTask"
-                    };
-                    context.UserNotifications.Add(notification);
-                    task.IsReminderSent = true;
+                    userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimezoneId);
                 }
-            }
-
-            // 2. Xử lý nhắc nhở hàng ngày vào lúc 20:00 pm (8:00 PM) cho các task chưa hoàn thành
-            if (now.Hour >= 20)
-            {
-                var users = await context.Users.ToListAsync();
-                foreach (var user in users)
+                catch
                 {
-                    // Kiểm tra xem User này có task nào của ngày hôm nay chưa hoàn thành không
+                    try
+                    {
+                        userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                    }
+                    catch
+                    {
+                        userTimeZone = TimeZoneInfo.Utc;
+                    }
+                }
+
+                var userNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTimeZone);
+                var userTodayStart = userNow.Date;
+                var userTodayEnd = userTodayStart.AddDays(1);
+
+                // 1. Custom task reminders
+                var pendingCustomReminders = await context.Tasks
+                    .Where(t => t.UserId == user.Id && t.ReminderTime != null && !t.IsReminderSent && t.ReminderTime <= userNow && !t.IsCompleted)
+                    .ToListAsync();
+
+                if (pendingCustomReminders.Any())
+                {
+                    _logger.LogInformation($"Found {pendingCustomReminders.Count} pending custom task reminders to send for user {user.Id}.");
+                    foreach (var task in pendingCustomReminders)
+                    {
+                        var notification = new UserNotification
+                        {
+                            Id = Guid.NewGuid(),
+                            UserId = user.Id,
+                            Title = "Task Reminder",
+                            Message = $"It's time to complete the task: {task.Title}",
+                            CreatedAt = userNow,
+                            IsRead = false,
+                            Type = "CustomTask"
+                        };
+                        context.UserNotifications.Add(notification);
+                        task.IsReminderSent = true;
+                    }
+                }
+
+                // 2. Daily reminder at 20:00 (8:00 PM) for incomplete tasks
+                if (userNow.Hour >= 20)
+                {
                     var hasIncompleteTasks = await context.Tasks.AnyAsync(t =>
                         t.UserId == user.Id &&
-                        t.Date >= todayStart &&
-                        t.Date < todayEnd &&
+                        t.Date >= userTodayStart &&
+                        t.Date < userTodayEnd &&
                         !t.IsCompleted);
 
                     if (hasIncompleteTasks)
-                    {
-                        // Kiểm tra xem đã gửi thông báo Daily cho user này trong ngày hôm nay chưa
+                      {
                         var alreadySentToday = await context.UserNotifications.AnyAsync(un =>
                             un.UserId == user.Id &&
                             un.Type == "Daily" &&
-                            un.CreatedAt >= todayStart &&
-                            un.CreatedAt < todayEnd);
+                            un.CreatedAt >= userTodayStart &&
+                            un.CreatedAt < userTodayEnd);
 
                         if (!alreadySentToday)
                         {
@@ -110,7 +127,7 @@ namespace StudyFlowBackend.Services
                                 UserId = user.Id,
                                 Title = "Daily Reminder",
                                 Message = "You still have some unfinished tasks for today. Try to complete them as soon as possible!",
-                                CreatedAt = now,
+                                CreatedAt = userNow,
                                 IsRead = false,
                                 Type = "Daily"
                             };

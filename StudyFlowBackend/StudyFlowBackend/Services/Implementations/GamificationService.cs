@@ -56,6 +56,13 @@ namespace StudyFlowBackend.Services
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
+            await _notificationService.CreateNotificationAsync(
+                userId,
+                "Reward earned",
+                $"{reason}: +{xpAmount} XP and +{coinsAmount} coins.",
+                "Reward"
+            );
+
             // Gửi thông báo thăng cấp nếu có
             if (leveledUp)
             {

@@ -64,7 +64,6 @@ class _TaskFormModalState extends State<TaskFormModal> {
     final scheduleVm = context.read<ScheduleViewmodel>();
     final homeVm = context.read<HomeViewModel>();
     final navigator = Navigator.of(context);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -105,11 +104,10 @@ class _TaskFormModalState extends State<TaskFormModal> {
       scheduleVm.loadWeekTasks();
       homeVm.refreshTasks();
       navigator.pop();
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Task deleted successfully!'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.redAccent,
+      NotificationService.instance.show(
+        AppNotification(
+          message: 'Task deleted successfully!',
+          type: NotificationType.success,
         ),
       );
     }
@@ -159,7 +157,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
-                isEditMode
+                isEditMode && widget.task?.isCompleted != true
                     ? IconButton(
                         icon: const Icon(
                           Icons.delete_outline,
@@ -326,13 +324,20 @@ class _TaskFormModalState extends State<TaskFormModal> {
 
                   final now = DateTime.now();
                   final todayDate = DateTime(now.year, now.month, now.day);
-                  final selectedDateOnly = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+                  final selectedDateOnly = DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                  );
                   final isToday = selectedDateOnly.isAtSameMomentAs(todayDate);
 
                   if (isToday && _startTime != null) {
                     final startDateTimeVal = DateTime(
-                      now.year, now.month, now.day,
-                      _startTime!.hour, _startTime!.minute,
+                      now.year,
+                      now.month,
+                      now.day,
+                      _startTime!.hour,
+                      _startTime!.minute,
                     );
                     if (startDateTimeVal.isBefore(now)) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -350,7 +355,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     if (_endTime!.hour == 0 && _endTime!.minute == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('End time cannot be 00:00 (please use up to 23:59)!'),
+                          content: Text(
+                            'End time cannot be 00:00 (please use up to 23:59)!',
+                          ),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.redAccent,
                         ),
@@ -358,7 +365,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       return;
                     }
                     if (_startTime != null) {
-                      final startMin = _startTime!.hour * 60 + _startTime!.minute;
+                      final startMin =
+                          _startTime!.hour * 60 + _startTime!.minute;
                       final endMin = _endTime!.hour * 60 + _endTime!.minute;
                       if (endMin <= startMin) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -375,8 +383,11 @@ class _TaskFormModalState extends State<TaskFormModal> {
 
                   if (isToday && _reminderTime != null) {
                     final reminderDateTimeVal = DateTime(
-                      now.year, now.month, now.day,
-                      _reminderTime!.hour, _reminderTime!.minute,
+                      now.year,
+                      now.month,
+                      now.day,
+                      _reminderTime!.hour,
+                      _reminderTime!.minute,
                     );
                     if (reminderDateTimeVal.isBefore(now)) {
                       ScaffoldMessenger.of(context).showSnackBar(

@@ -58,13 +58,12 @@ class StudyFlowApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             // The currently selected theme mode (retrieved from ThemeProvider)
             themeMode: themeProvider.themeMode,
+            navigatorKey: NotificationService.instance.navigatorKey,
             scaffoldMessengerKey:
                 NotificationService.instance.scaffoldMessengerKey,
             // This builder wraps the entire app with GlobalSnackbar to display notifications anywhere
             builder: (context, child) {
-              return GlobalSnackbar(
-                child: AnimatedBackground(child: child!),
-              );
+              return GlobalSnackbar(child: AnimatedBackground(child: child!));
             },
             // The initial screen loaded is AuthGate to check authentication status
             home: const AuthGate(),

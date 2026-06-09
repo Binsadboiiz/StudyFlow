@@ -99,17 +99,30 @@ class _GamificationHubScreenState extends State<GamificationHubScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    SizedBox(
-                      width: 130,
-                      height: 6,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: summary != null ? (summary.xpPoints / summary.nextLevelXp) : 0.0,
-                          backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 110,
+                          height: 6,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: LinearProgressIndicator(
+                              value: summary != null ? (summary.xpPoints / summary.nextLevelXp) : 0.0,
+                              backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${summary?.xpPoints.round() ?? 0}/${summary?.nextLevelXp.round() ?? 100} XP',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

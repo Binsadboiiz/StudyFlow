@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:studyflow/core/services/notification/local_notification_helper.dart';
+import 'package:studyflow/core/widgets/permission_explanation_dialog.dart';
 import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/screens/task_screen.dart';
@@ -67,6 +71,8 @@ class _MainScreenState extends State<MainScreen>
       setState(() {
         _showTutorial = true;
       });
+    } else {
+      _checkReminderPermissions();
     }
   }
 
@@ -82,6 +88,46 @@ class _MainScreenState extends State<MainScreen>
         _showTutorial = false;
         _currentIndex = 0; // Return to Home tab
       });
+      _checkReminderPermissions();
+    }
+  }
+
+  void _checkReminderPermissions() async {
+    final authViewModel = context.read<AuthViewmodel>();
+    final userId = authViewModel.currentUser?.id;
+    if (userId == null || userId.isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final explained = prefs.getBool('timezone_permission_explained_$userId') ?? false;
+    if (explained) return;
+
+    final isNotificationGranted = await Permission.notification.isGranted;
+    bool isAlarmGranted = true;
+    if (Platform.isAndroid) {
+      isAlarmGranted = await Permission.scheduleExactAlarm.isGranted;
+    }
+
+    if ((!isNotificationGranted || !isAlarmGranted) && mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => PermissionExplanationDialog(
+          onGrant: () async {
+            Navigator.pop(context);
+            await LocalNotificationHelper.requestPermissions();
+            if (Platform.isAndroid) {
+              await Permission.scheduleExactAlarm.request();
+            }
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('timezone_permission_explained_$userId', true);
+          },
+          onDismiss: () async {
+            Navigator.pop(context);
+            final p = await SharedPreferences.getInstance();
+            await p.setBool('timezone_permission_explained_$userId', true);
+          },
+        ),
+      );
     }
   }
 

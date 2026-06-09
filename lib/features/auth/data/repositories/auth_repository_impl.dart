@@ -19,7 +19,8 @@ class AuthRepositoryImpl implements AuthRepository {
   String? _cachedAvatarUrl;
 
   /// Trigger to notify stream listeners that the local avatar cache has been updated.
-  final StreamController<void> _cacheUpdateTrigger = StreamController<void>.broadcast();
+  final StreamController<void> _cacheUpdateTrigger =
+      StreamController<void>.broadcast();
 
   /// Creates an [AuthRepositoryImpl] instance with the required [remoteDatasource].
   AuthRepositoryImpl(this.remoteDatasource);
@@ -51,7 +52,8 @@ class AuthRepositoryImpl implements AuthRepository {
       fullName: userModel.fullName,
       photoUrl: (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty)
           ? _cachedAvatarUrl
-          : (userModel.photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg'),
+          : (userModel.photoUrl ??
+                'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg'),
       level: userModel.level,
       xp: userModel.xp,
       streak: _effectiveStreak(userModel),
@@ -64,7 +66,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   /// Calculates the effective streak of the user based on the current date.
-  /// 
+  ///
   /// If the streak was not updated today or yesterday, it resets to 0.
   int _effectiveStreak(UserModel userModel) {
     final lastStreakDate = userModel.lastStreakDate;
@@ -206,16 +208,46 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> updateUserStreak(int streak, DateTime lastStreakDate, List<String> streakHistory) async {
+  Future<void> updateUserStreak(
+    int streak,
+    DateTime lastStreakDate,
+    List<String> streakHistory,
+  ) async {
     final uid = remoteDatasource.currentUserId;
     if (uid == null) return;
-    
+
     // Update the streak fields in Firestore.
     await remoteDatasource.updateUserFields(uid, {
       'streak': streak,
       'lastStreakDate': lastStreakDate.toIso8601String(),
       'streakHistory': streakHistory,
     });
+
+    try {
+      final user = remoteDatasource.auth.currentUser;
+      if (user == null) return;
+      final token = await user.getIdToken();
+      final response = await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/users/streak'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'streak': streak,
+          'lastStreakDate': lastStreakDate.toIso8601String(),
+          'streakHistory': streakHistory,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint(
+          'Backend streak update returned status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint('Backend streak update failed: $e');
+    }
   }
 
   @override
@@ -285,9 +317,11 @@ class AuthRepositoryImpl implements AuthRepository {
       final url = Uri.parse('${ApiConstants.baseUrl}/users/sync');
 
       // Load current cached avatar to sync to backend if Postgres is missing it
-      final avatarToSync = (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty)
+      final avatarToSync =
+          (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty)
           ? _cachedAvatarUrl
-          : (userModel.photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
+          : (userModel.photoUrl ??
+                'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
 
       final response = await http.post(
         url,
@@ -360,12 +394,16 @@ class AuthRepositoryImpl implements AuthRepository {
           },
           body: jsonEncode({
             'fullName': fullName,
-            'avatarUrl': photoUrl ?? 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
+            'avatarUrl':
+                photoUrl ??
+                'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
           }),
         );
-        
+
         if (response.statusCode != 200) {
-          debugPrint('Backend profile update returned status: ${response.statusCode}');
+          debugPrint(
+            'Backend profile update returned status: ${response.statusCode}',
+          );
         }
       }
     } catch (e) {

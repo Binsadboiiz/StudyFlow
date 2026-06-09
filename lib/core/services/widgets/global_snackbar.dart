@@ -19,8 +19,13 @@ class GlobalSnackbar extends StatefulWidget {
 }
 
 class _GlobalSnackbarState extends State<GlobalSnackbar> {
+  static const double _headerOffset = 88;
+  static const Duration _displayDuration = Duration(seconds: 3);
+
   late final Stream<AppNotification> _stream;
   StreamSubscription<AppNotification>? _subscription;
+  OverlayEntry? _notificationEntry;
+  Timer? _dismissTimer;
 
   @override
   void initState() {
@@ -40,46 +45,102 @@ class _GlobalSnackbarState extends State<GlobalSnackbar> {
   void dispose() {
     // Unsubscribe when the widget is disposed to prevent memory leaks.
     _subscription?.cancel();
+    _dismissTimer?.cancel();
+    _removeCurrentNotification();
     super.dispose();
   }
 
-  /// Function to actually display the SnackBar on the screen based on the notification type.
+  /// Function to display the notification on the root overlay, above modals.
   void _showNotification(AppNotification notification) {
-    Color backgroundColor;
+    final overlay =
+        NotificationService.instance.navigatorKey.currentState?.overlay ??
+        Overlay.maybeOf(context, rootOverlay: true);
+    if (overlay == null) return;
 
-    // Determine the background color based on the notification type.
-    switch (notification.type) {
-      case NotificationType.success:
-        backgroundColor = Colors.green;
-        break;
+    _dismissTimer?.cancel();
+    _removeCurrentNotification();
 
-      case NotificationType.error:
-        backgroundColor = Colors.red;
-        break;
+    _notificationEntry = OverlayEntry(
+      builder: (context) {
+        final mediaQuery = MediaQuery.of(context);
+        final top = mediaQuery.padding.top + _headerOffset;
 
-      case NotificationType.warning:
-        backgroundColor = Colors.orange;
-        break;
-
-      case NotificationType.info:
-        backgroundColor = Colors.blue;
-        break;
-    }
-
-    // Display the SnackBar using the globally accessible scaffoldMessengerKey.
-    NotificationService.instance.scaffoldMessengerKey.currentState
-        ?.showSnackBar(
-          SnackBar(
-            content: Text(notification.message),
-            backgroundColor: backgroundColor,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 3),
+        return Positioned(
+          top: top,
+          left: 16,
+          right: 16,
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: _NotificationBanner(notification: notification),
           ),
         );
+      },
+    );
+
+    overlay.insert(_notificationEntry!);
+    _dismissTimer = Timer(_displayDuration, _removeCurrentNotification);
+  }
+
+  void _removeCurrentNotification() {
+    _notificationEntry?.remove();
+    _notificationEntry = null;
   }
 
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+}
+
+class _NotificationBanner extends StatelessWidget {
+  final AppNotification notification;
+
+  const _NotificationBanner({required this.notification});
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = _backgroundColor(notification.type);
+
+    return Material(
+      color: Colors.transparent,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.22),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Text(
+            notification.message,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _backgroundColor(NotificationType type) {
+    switch (type) {
+      case NotificationType.success:
+        return Colors.green;
+      case NotificationType.error:
+        return Colors.red;
+      case NotificationType.warning:
+        return Colors.orange;
+      case NotificationType.info:
+        return Colors.blue;
+    }
   }
 }

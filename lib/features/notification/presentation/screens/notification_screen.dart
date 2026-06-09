@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/core/services/notification/local_notification_helper.dart';
 import '../viewmodels/notification_viewmodel.dart';
 import '../../domain/entities/user_notification.dart';
 
@@ -16,12 +19,30 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  bool _isNotificationGranted = true;
+  bool _isAlarmGranted = true;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationViewModel>().fetchNotifications();
+      _checkPermissions();
     });
+  }
+
+  void _checkPermissions() async {
+    final notificationStatus = await Permission.notification.isGranted;
+    bool alarmStatus = true;
+    if (Platform.isAndroid) {
+      alarmStatus = await Permission.scheduleExactAlarm.isGranted;
+    }
+    if (mounted) {
+      setState(() {
+        _isNotificationGranted = notificationStatus;
+        _isAlarmGranted = alarmStatus;
+      });
+    }
   }
 
   @override
@@ -62,22 +83,120 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ],
       ),
       body: SafeArea(
-        child: vm.isLoading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
-            : (vm.notifications.isEmpty
-                ? _buildEmptyState(ext)
-                : RefreshIndicator(
-                    onRefresh: () => vm.fetchNotifications(),
-                    color: AppColors.accent,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      itemCount: vm.notifications.length,
-                      itemBuilder: (context, index) {
-                        final notification = vm.notifications[index];
-                        return _buildNotificationCard(context, notification, vm);
-                      },
+        child: Column(
+          children: [
+            if (!_isNotificationGranted || !_isAlarmGranted)
+              _buildPermissionWarningBanner(context),
+            Expanded(
+              child: vm.isLoading
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
+                  : (vm.notifications.isEmpty
+                      ? _buildEmptyState(ext)
+                      : RefreshIndicator(
+                          onRefresh: () => vm.fetchNotifications(),
+                          color: AppColors.accent,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            itemCount: vm.notifications.length,
+                            itemBuilder: (context, index) {
+                              final notification = vm.notifications[index];
+                              return _buildNotificationCard(context, notification, vm);
+                            },
+                          ),
+                        )),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionWarningBanner(BuildContext context) {
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 12.0, bottom: 4.0),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.orange.withValues(alpha: 0.15),
+              Colors.deepOrange.withValues(alpha: 0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.orangeAccent.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () async {
+                await LocalNotificationHelper.requestPermissions();
+                if (Platform.isAndroid) {
+                  await Permission.scheduleExactAlarm.request();
+                }
+                _checkPermissions(); // Recheck status
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.orangeAccent,
+                        size: 20,
+                      ),
                     ),
-                  )),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Lệch giờ lời nhắc / Timezone Offset Warning',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Chưa bật Thông báo/Lời nhắc. Nhấn để bật nhằm tránh lệch múi giờ UTC.',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: ext.subtext,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.orangeAccent,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

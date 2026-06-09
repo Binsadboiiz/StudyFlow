@@ -84,6 +84,13 @@ namespace StudyFlowBackend.Controllers
             if (string.IsNullOrEmpty(userId)) 
                 return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
 
+            var task = await _taskService.GetTaskByIdAsync(id, userId);
+            if (task == null) 
+                return NotFound(ApiResponse<object>.ErrorResponse("Task not found"));
+
+            if (task.IsCompleted)
+                return BadRequest(ApiResponse<object>.ErrorResponse("Completed tasks cannot be deleted."));
+
             var result = await _taskService.DeleteTaskAsync(id, userId);
             
             if (!result) 
