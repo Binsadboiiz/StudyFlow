@@ -323,6 +323,73 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 ),
                 onPressed: () async {
                   if (_titleController.text.trim().isEmpty) return;
+
+                  final now = DateTime.now();
+                  final todayDate = DateTime(now.year, now.month, now.day);
+                  final selectedDateOnly = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+                  final isToday = selectedDateOnly.isAtSameMomentAs(todayDate);
+
+                  if (isToday && _startTime != null) {
+                    final startDateTimeVal = DateTime(
+                      now.year, now.month, now.day,
+                      _startTime!.hour, _startTime!.minute,
+                    );
+                    if (startDateTimeVal.isBefore(now)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Start time cannot be in the past!'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                      return;
+                    }
+                  }
+
+                  if (_endTime != null) {
+                    if (_endTime!.hour == 0 && _endTime!.minute == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('End time cannot be 00:00 (please use up to 23:59)!'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                      return;
+                    }
+                    if (_startTime != null) {
+                      final startMin = _startTime!.hour * 60 + _startTime!.minute;
+                      final endMin = _endTime!.hour * 60 + _endTime!.minute;
+                      if (endMin <= startMin) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('End time must be after start time!'),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                        return;
+                      }
+                    }
+                  }
+
+                  if (isToday && _reminderTime != null) {
+                    final reminderDateTimeVal = DateTime(
+                      now.year, now.month, now.day,
+                      _reminderTime!.hour, _reminderTime!.minute,
+                    );
+                    if (reminderDateTimeVal.isBefore(now)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Reminder time cannot be in the past!'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                      return;
+                    }
+                  }
+
                   final vm = context.read<TaskViewmodel>();
                   final scheduleVm = context.read<ScheduleViewmodel>();
                   final homeVm = context.read<HomeViewModel>();

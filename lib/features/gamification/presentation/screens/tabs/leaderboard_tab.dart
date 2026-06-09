@@ -9,6 +9,8 @@ import 'package:studyflow/features/gamification/data/models/leaderboard_entry_mo
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
 
+import 'package:studyflow/shared/widgets/loading/leaderboard_skeleton.dart';
+
 /// Tab hiển thị bảng xếp hạng học sinh toàn cầu với các bộ lọc xếp hạng nâng cao.
 class LeaderboardTab extends StatelessWidget {
   const LeaderboardTab({super.key});
@@ -21,9 +23,7 @@ class LeaderboardTab extends StatelessWidget {
     final authVm = context.watch<AuthViewmodel>();
 
     if (gamificationVm.isLoadingLeaderboard) {
-      return const Center(
-        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.accent)),
-      );
+      return const LeaderboardSkeleton();
     }
 
     final entries = gamificationVm.leaderboardEntries;

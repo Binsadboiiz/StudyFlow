@@ -54,6 +54,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (username.toLowerCase() == email.toLowerCase()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username and Email cannot be identical')),
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 8 characters long')),
+      );
+      return;
+    }
+
+    final hasUppercase = RegExp(r'[A-Z]').hasMatch(password);
+    final hasSpecialChar = RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password);
+
+    if (!hasUppercase) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must contain at least one uppercase letter')),
+      );
+      return;
+    }
+
+    if (!hasSpecialChar) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must contain at least one special character')),
+      );
+      return;
+    }
+
     final authViewModel = context.read<AuthViewmodel>();
     final error = await authViewModel.register(fullName, username, email, password);
 

@@ -41,7 +41,7 @@ class AppColors {
   /// Main text color for the dark theme.
   static const Color textDark = Color(0xFFF3F4F6);
   /// Subtext color for the dark theme.
-  static const Color subtextDark = Color(0xFF9CA3AF);
+  static const Color subtextDark = Color.fromARGB(255, 208, 210, 213);
   /// Input fill color for the dark theme.
   static const Color inputFillDark = Color(0xFF1F2937);
   /// Divider color for the dark theme.

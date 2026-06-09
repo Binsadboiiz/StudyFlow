@@ -18,6 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyflow/features/home/presentation/widgets/tutorial_overlay.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 
+import 'package:studyflow/core/widgets/initial_loading_screen.dart';
+
 /// `MainScreen` is the root screen containing the bottom navigation bar
 /// and managing navigation between the main screens of the app.
 class MainScreen extends StatefulWidget {
@@ -96,6 +98,7 @@ class _MainScreenState extends State<MainScreen>
   @override
   Widget build(BuildContext context) {
     final currentIndex = _currentIndex.clamp(0, _screens.length - 1);
+    final homeViewModel = context.watch<HomeViewModel>();
 
     return Scaffold(
       extendBody: true, // Content flows behind the floating dock
@@ -117,6 +120,8 @@ class _MainScreenState extends State<MainScreen>
                 }
               },
             ),
+          if (homeViewModel.isLoading)
+            const InitialLoadingScreen(),
         ],
       ),
       bottomNavigationBar: SafeArea(

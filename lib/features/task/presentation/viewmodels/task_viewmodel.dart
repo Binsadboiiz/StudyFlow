@@ -47,7 +47,7 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   Future<void> _init() async {
-    bool isConnected = await NetworkChecker.isServerReachable();
+    bool isConnected = await NetworkChecker.isServerReachable(timeoutSeconds: 30);
     if (!isConnected) {
       _isLoading = false;
       notifyListenersSafely();

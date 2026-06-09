@@ -195,6 +195,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                       borderRadius: BorderRadius.circular(30),
                       color: AppColors.accent,
                     ),
+                    splashBorderRadius: BorderRadius.circular(30),
                     labelColor: Colors.white,
                     unselectedLabelColor: theme.brightness == Brightness.dark
                         ? Colors.white.withValues(alpha: 0.7)

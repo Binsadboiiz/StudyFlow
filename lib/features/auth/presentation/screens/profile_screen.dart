@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
@@ -108,9 +109,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     // Check if signed in with Google
-    final isGoogleUser = user?.email.endsWith('@gmail.com') == true &&
-        (user?.photoUrl?.contains('googleusercontent') == true ||
-            authViewModel.currentUser?.photoUrl == null); 
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final isGoogleUser = firebaseUser?.providerData.any((info) => info.providerId == 'google.com') == true; 
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -261,7 +261,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.accent, width: 3),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.accent.withValues(alpha: 0.2),
@@ -273,6 +272,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: UserAvatar(
                   photoUrl: avatarUrl,
                   radius: 54,
+                  borderColor: AppColors.accent,
+                  borderWidth: 3,
                 ),
               ),
               if (isLoading)
@@ -337,24 +338,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               itemBuilder: (context, index) {
                 final preset = _presetAvatars[index];
                 final isSelected = _selectedAvatarUrl == preset;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedAvatarUrl = preset;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected ? AppColors.accent : Colors.transparent,
-                        width: 2.5,
+                return Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedAvatarUrl = preset;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      child: UserAvatar(
+                        photoUrl: preset,
+                        radius: 28,
+                        borderColor: isSelected ? AppColors.accent : Colors.transparent,
+                        borderWidth: 2.5,
                       ),
-                    ),
-                    child: UserAvatar(
-                      photoUrl: preset,
-                      radius: 28,
                     ),
                   ),
                 );

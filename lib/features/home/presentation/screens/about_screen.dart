@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
@@ -76,13 +77,21 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              'Version 1.0.0 (Build 1)',
-              style: TextStyle(
-                fontSize: 14,
-                color: ext.subtext,
-                fontWeight: FontWeight.w500,
-              ),
+            FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final versionText = snapshot.hasData
+                    ? 'Version ${snapshot.data!.version} (Build ${snapshot.data!.buildNumber})'
+                    : 'Version 1.0.0 (Build 1)';
+                return Text(
+                  versionText,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ext.subtext,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 30),
             

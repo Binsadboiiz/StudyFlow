@@ -7,6 +7,8 @@ import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/gamification/data/models/badge_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 
+import 'package:studyflow/shared/widgets/loading/badge_skeleton.dart';
+
 /// Tab hiển thị danh sách các Huy hiệu / Thành tích của người dùng.
 class BadgesTab extends StatelessWidget {
   const BadgesTab({super.key});
@@ -18,9 +20,7 @@ class BadgesTab extends StatelessWidget {
     final gamificationVm = context.watch<GamificationViewModel>();
 
     if (gamificationVm.isLoadingBadges) {
-      return const Center(
-        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.accent)),
-      );
+      return const BadgeSkeleton();
     }
 
     final badges = gamificationVm.badges;

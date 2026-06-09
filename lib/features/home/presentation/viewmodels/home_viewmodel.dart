@@ -19,7 +19,7 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   Future<void> _init() async {
-    bool isConnected = await NetworkChecker.isServerReachable();
+    bool isConnected = await NetworkChecker.isServerReachable(timeoutSeconds: 45);
     if (!isConnected) {
       _isLoading = false;
       notifyListenersSafely();

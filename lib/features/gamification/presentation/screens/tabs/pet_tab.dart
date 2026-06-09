@@ -9,6 +9,8 @@ import 'package:studyflow/features/gamification/data/models/pet_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
 
+import 'package:studyflow/shared/widgets/loading/pet_skeleton.dart';
+
 /// Tab chăm sóc và nuôi dưỡng Thú cưng học tập (Study Pet).
 class PetTab extends StatefulWidget {
   const PetTab({super.key});
@@ -53,9 +55,7 @@ class _PetTabState extends State<PetTab> {
     final ext = theme.extension<AppThemeExtension>()!;
 
     if (petVm.isLoadingPet) {
-      return const Center(
-        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.accent)),
-      );
+      return const PetSkeleton();
     }
 
     final pet = petVm.pet;
