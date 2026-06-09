@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Chứa các hằng số và helper cho việc gọi API
 class ApiConstants {

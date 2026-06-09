@@ -115,9 +115,7 @@ class AuthRemoteDatasource {
       } else {
         final GoogleSignIn googleSignIn = GoogleSignIn.instance;
         if (!_isGoogleSignInInitialized) {
-          await googleSignIn.initialize(
-            clientId: ApiConstants.googleClientId,
-          );
+          await googleSignIn.initialize();
           _isGoogleSignInInitialized = true;
         }
 

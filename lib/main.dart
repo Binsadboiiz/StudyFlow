@@ -14,10 +14,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:studyflow/core/services/notification/local_notification_helper.dart';
 
 void main() async {
-    await dotenv.load(fileName: ".env");
-
   // Ensure the Flutter framework is initialized before calling native or async code.
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
 
   // Initialize locale data for the intl package (to format dates based on device language).
   await initializeDateFormatting();
