@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// Widget hiển thị danh hiệu nổi bật (Huy hiệu nổi bật) của người dùng bên cạnh tên.
 /// Được thiết kế với viền phát sáng nhẹ, gradient vàng hoàng kim/cam mang lại cảm giác cao cấp.
@@ -81,7 +82,7 @@ class FeaturedBadgeTag extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            badgeName,
+            _getLocalBadgeName(context, badgeName),
             style: TextStyle(
               fontSize: isLarge ? 12 : fontSize,
               fontWeight: FontWeight.bold,
@@ -126,6 +127,44 @@ class FeaturedBadgeTag extends StatelessWidget {
         return Icons.verified_rounded;
       default:
         return Icons.emoji_events_rounded;
+    }
+  }
+
+  /// Dịch tên huy hiệu từ tiếng Anh (DB) sang ngôn ngữ hiện tại của app.
+  String _getLocalBadgeName(BuildContext context, String name) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return name;
+    switch (name) {
+      case 'Noob No More':
+        return l10n.badge_noob_no_more_name;
+      case 'Touching Grass? Never':
+        return l10n.badge_touching_grass_never_name;
+      case 'Certified Brainrot':
+        return l10n.badge_certified_brainrot_name;
+      case 'Main Character Energy':
+        return l10n.badge_main_character_energy_name;
+      case 'Locked In':
+        return l10n.badge_locked_in_name;
+      case 'Distraction Who?':
+        return l10n.badge_distraction_who_name;
+      case 'Sigma Study Grind':
+        return l10n.badge_sigma_study_grind_name;
+      case 'Ultra Instinct':
+        return l10n.badge_ultra_instinct_name;
+      case 'The First W':
+        return l10n.badge_the_first_w_name;
+      case 'Task Destroyer':
+        return l10n.badge_task_destroyer_name;
+      case 'Productivity Monster':
+        return l10n.badge_productivity_monster_name;
+      case 'Day One or One Day?':
+        return l10n.badge_day_one_or_one_day_name;
+      case 'Built Different':
+        return l10n.badge_built_different_name;
+      case 'Grassless Legend':
+        return l10n.badge_grassless_legend_name;
+      default:
+        return name;
     }
   }
 }

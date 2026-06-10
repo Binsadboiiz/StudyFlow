@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// Hộp thoại chúc mừng người dùng thăng cấp (Level Up).
 class LevelUpDialog extends StatelessWidget {
@@ -48,9 +49,9 @@ class LevelUpDialog extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Chữ LEVEL UP!
-            const Text(
-              'LEVEL UP!',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.levelUp,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: Colors.amber,
@@ -64,7 +65,7 @@ class LevelUpDialog extends StatelessWidget {
 
             // Thông điệp chúc mừng
             Text(
-              'Congratulations on your achievement! You have reached a new level.',
+              AppLocalizations.of(context)!.levelUpCongrat,
               style: TextStyle(
                 fontSize: 14,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
@@ -72,7 +73,7 @@ class LevelUpDialog extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Level $newLevel',
+              '${AppLocalizations.of(context)!.level} $newLevel',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class LevelUpDialog extends StatelessWidget {
             const SizedBox(height: 16),
 
             Text(
-              'Keep up the great work! You have earned a level-up reward.',
+              AppLocalizations.of(context)!.keepUpWork,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,
@@ -108,9 +109,9 @@ class LevelUpDialog extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Awesome! 🌟',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocalizations.of(context)!.awesome,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

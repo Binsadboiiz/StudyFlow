@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:studyflow/features/auth/presentation/screens/login_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'dart:ui';
+import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/core/providers/language_provider.dart';
 
 /// `RegisterScreen` is the application's new account registration interface.
 /// Similar to the Login screen, this screen uses an independent Glassmorphism interface 
@@ -33,14 +35,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (fullName.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseFillFields)),
       );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.passwordsDoNotMatch)),
       );
       return;
     }
@@ -49,21 +51,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     if (!emailRegex.hasMatch(email)) {
        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmail)),
       );
       return;
     }
 
     if (username.toLowerCase() == email.toLowerCase()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username and Email cannot be identical')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.usernameEmailIdentical)),
       );
       return;
     }
 
     if (password.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 8 characters long')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.passwordTooShort)),
       );
       return;
     }
@@ -73,14 +75,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!hasUppercase) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must contain at least one uppercase letter')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.passwordUppercase)),
       );
       return;
     }
 
     if (!hasSpecialChar) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must contain at least one special character')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.passwordSpecialChar)),
       );
       return;
     }
@@ -99,8 +101,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registration successful! Please login.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.registrationSuccessLogin),
           backgroundColor: Colors.green,
         ),
       );
@@ -169,6 +171,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
+          // Language switcher at the top right
+          Positioned(
+            top: 16,
+            right: 16,
+            child: SafeArea(
+              child: _buildLanguageSelector(context),
+            ),
+          ),
           // Main Content
           SafeArea(
             child: Center(
@@ -199,18 +209,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Create Account',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.createAccountTitle,
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF203A43),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Join us and start organizing your tasks',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.createAccountSubtitle,
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
@@ -239,26 +249,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           _buildTextField(
                             controller: _fullNameController,
                             icon: Icons.badge_outlined,
-                            hintText: 'Full Name',
+                            hintText: AppLocalizations.of(context)!.fullName,
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _usernameController,
                             icon: Icons.person_outline,
-                            hintText: 'Username',
+                            hintText: AppLocalizations.of(context)!.username,
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _emailController,
                             icon: Icons.email_outlined,
-                            hintText: 'Email Address',
+                            hintText: AppLocalizations.of(context)!.email,
                             keyboardType: TextInputType.emailAddress,
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _passwordController,
                             icon: Icons.lock_outline,
-                            hintText: 'Password',
+                            hintText: AppLocalizations.of(context)!.password,
                             isPassword: true,
                             isPasswordVisible: _isPasswordVisible,
                             onVisibilityToggle: () {
@@ -271,7 +281,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           _buildTextField(
                             controller: _confirmPasswordController,
                             icon: Icons.lock_outline,
-                            hintText: 'Confirm Password',
+                            hintText: AppLocalizations.of(context)!.confirmPassword,
                             isPassword: true,
                             isPasswordVisible: _isConfirmPasswordVisible,
                             onVisibilityToggle: () {
@@ -303,9 +313,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
-                                  : const Text(
-                                      'Sign Up',
-                                      style: TextStyle(
+                                  : Text(
+                                      AppLocalizations.of(context)!.signUp,
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -319,9 +329,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Already have an account?",
-                          style: TextStyle(color: Colors.black54),
+                        Text(
+                          AppLocalizations.of(context)!.alreadyHaveAccount,
+                          style: const TextStyle(color: Colors.black54),
                         ),
                         TextButton(
                           onPressed: () {
@@ -330,9 +340,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               MaterialPageRoute(builder: (context) => const LoginScreen()),
                             );
                           },
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.login,
+                            style: const TextStyle(
                               color: Color(0xFF203A43),
                               fontWeight: FontWeight.bold,
                             ),
@@ -346,6 +356,84 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languageProvider = context.watch<LanguageProvider>();
+    final currentLocale = languageProvider.locale;
+    
+    String currentFlag = '🇬🇧';
+    if (currentLocale.languageCode == 'vi') {
+      currentFlag = '🇻🇳';
+    } else if (currentLocale.languageCode == 'de') {
+      currentFlag = '🇩🇪';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1.0,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: PopupMenuButton<Locale>(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(currentFlag, style: const TextStyle(fontSize: 20)),
+                const Icon(Icons.arrow_drop_down, color: Color(0xFF203A43)),
+              ],
+            ),
+            offset: const Offset(0, 45),
+            color: Colors.white.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            onSelected: (Locale locale) {
+              languageProvider.setLocale(locale);
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: Locale('vi'),
+                child: Row(
+                  children: [
+                    Text('🇻🇳', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('Tiếng Việt', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: Locale('en'),
+                child: Row(
+                  children: [
+                    Text('🇬🇧', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('English', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: Locale('de'),
+                child: Row(
+                  children: [
+                    Text('🇩🇪', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('Deutsch', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

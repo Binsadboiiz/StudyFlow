@@ -21,8 +21,8 @@ import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart'
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyflow/features/home/presentation/widgets/tutorial_overlay.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
-
 import 'package:studyflow/core/widgets/initial_loading_screen.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// `MainScreen` is the root screen containing the bottom navigation bar
 /// and managing navigation between the main screens of the app.
@@ -131,15 +131,7 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 
-  // Labels for bottom navigation items using rounded icons for premium look
-  static const List<_NavItem> _navItems = [
-    _NavItem(icon: Icons.grid_view_rounded, label: 'Home'),
-    _NavItem(icon: Icons.hourglass_empty_rounded, label: 'Focus'),
-    _NavItem(icon: Icons.assignment_rounded, label: 'Tasks'),
-    _NavItem(icon: Icons.event_note_rounded, label: 'Schedule'),
-    _NavItem(icon: Icons.emoji_events_rounded, label: 'Quest'),
-    _NavItem(icon: Icons.settings_rounded, label: 'Settings'),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -185,9 +177,9 @@ class _MainScreenState extends State<MainScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildNavItem(navItem: _navItems[0], index: 0),
-                        _buildNavItem(navItem: _navItems[1], index: 1),
-                        _buildNavItem(navItem: _navItems[2], index: 2),
+                        _buildNavItem(icon: Icons.grid_view_rounded, label: AppLocalizations.of(context)!.home, index: 0),
+                        _buildNavItem(icon: Icons.hourglass_empty_rounded, label: AppLocalizations.of(context)!.focus, index: 1),
+                        _buildNavItem(icon: Icons.assignment_rounded, label: AppLocalizations.of(context)!.tasks, index: 2),
                       ],
                     ),
                   ),
@@ -231,9 +223,9 @@ class _MainScreenState extends State<MainScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildNavItem(navItem: _navItems[3], index: 3),
-                        _buildNavItem(navItem: _navItems[4], index: 4),
-                        _buildNavItem(navItem: _navItems[5], index: 5),
+                        _buildNavItem(icon: Icons.event_note_rounded, label: AppLocalizations.of(context)!.schedule, index: 3),
+                        _buildNavItem(icon: Icons.emoji_events_rounded, label: AppLocalizations.of(context)!.quest, index: 4),
+                        _buildNavItem(icon: Icons.settings_rounded, label: AppLocalizations.of(context)!.settings, index: 5),
                       ],
                     ),
                   ),
@@ -247,7 +239,7 @@ class _MainScreenState extends State<MainScreen>
   }
 
   // Function to create each button in the dock with a modern scale animation
-  Widget _buildNavItem({required _NavItem navItem, required int index}) {
+  Widget _buildNavItem({required IconData icon, required String label, required int index}) {
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -275,7 +267,7 @@ class _MainScreenState extends State<MainScreen>
               curve: Curves.easeOutBack,
               transform: Matrix4.identity()..scaleByDouble(isSelected ? 1.2 : 1.0, isSelected ? 1.2 : 1.0, 1.0, 1.0),
               child: Icon(
-                navItem.icon,
+                icon,
                 color: isSelected ? AppColors.accent : unselectedColor,
                 size: 22,
               ),
@@ -290,7 +282,7 @@ class _MainScreenState extends State<MainScreen>
                 color: isSelected ? AppColors.accent : unselectedColor,
               ),
               child: Text(
-                navItem.label,
+                label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -322,10 +314,4 @@ class _MainScreenState extends State<MainScreen>
   }
 }
 
-/// Model for a navigation item
-class _NavItem {
-  final IconData icon;
-  final String label;
 
-  const _NavItem({required this.icon, required this.label});
-}

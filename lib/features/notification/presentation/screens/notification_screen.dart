@@ -9,6 +9,7 @@ import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/core/services/notification/local_notification_helper.dart';
 import '../viewmodels/notification_viewmodel.dart';
 import '../../domain/entities/user_notification.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// Screen displaying the list of notifications logged in the database for the user.
 class NotificationScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Notifications',
+          AppLocalizations.of(context)!.notifications,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -74,9 +75,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
             TextButton.icon(
               onPressed: () => _showClearAllConfirmDialog(context, vm),
               icon: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent, size: 18),
-              label: const Text(
-                'Clear all',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600, fontSize: 13),
+              label: Text(
+                AppLocalizations.of(context)!.clearAll,
+                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600, fontSize: 13),
               ),
             ),
           const SizedBox(width: 8),
@@ -168,7 +169,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Lệch giờ lời nhắc / Timezone Offset Warning',
+                            AppLocalizations.of(context)!.timezoneWarningTitle,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -177,7 +178,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Chưa bật Thông báo/Lời nhắc. Nhấn để bật nhằm tránh lệch múi giờ UTC.',
+                            AppLocalizations.of(context)!.timezoneWarningSubtitle,
                             style: TextStyle(
                               fontSize: 11,
                               color: ext.subtext,
@@ -213,12 +214,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No notification',
+            AppLocalizations.of(context)!.noNotification,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ext.subtext),
           ),
           const SizedBox(height: 8),
           Text(
-            'Notifications and reminders will appear here',
+            AppLocalizations.of(context)!.notificationsDescription,
             style: TextStyle(fontSize: 14, color: ext.subtext),
           ),
           const SizedBox(height: 80),
@@ -332,16 +333,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Delete all notifications',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.deleteAllNotifications,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: const Text('Are you sure you want to delete all notifications? This action cannot be undone.'),
+        content: Text(AppLocalizations.of(context)!.deleteAllNotificationsConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              AppLocalizations.of(context)!.cancel,
               style: TextStyle(
                 color: Theme.of(context).extension<AppThemeExtension>()!.subtext,
                 fontWeight: FontWeight.w600,
@@ -353,9 +354,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
               vm.clearAllNotifications();
               Navigator.pop(context);
             },
-            child: const Text(
-              'Delete all',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.clearAll,
+              style: const TextStyle(
                 color: Colors.redAccent,
                 fontWeight: FontWeight.bold,
               ),
@@ -375,9 +376,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final timeStr = DateFormat('HH:mm').format(dateTime);
 
     if (checkDate == today) {
-      return 'Today, $timeStr';
+      return '${AppLocalizations.of(context)!.today}, $timeStr';
     } else if (checkDate == yesterday) {
-      return 'Yesterday, $timeStr';
+      return '${AppLocalizations.of(context)!.yesterday}, $timeStr';
     } else {
       return '${DateFormat('dd MMM').format(dateTime)}, $timeStr';
     }

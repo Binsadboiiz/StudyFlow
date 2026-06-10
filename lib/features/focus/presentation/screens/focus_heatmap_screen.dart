@@ -7,6 +7,7 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/data/models/focus_session_model.dart';
 import 'package:studyflow/features/focus/data/repositories/focus_repository.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 class FocusHeatmapScreen extends StatefulWidget {
   const FocusHeatmapScreen({super.key});
@@ -113,8 +114,8 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
     }
   }
 
-  String _formatTotalTime(int minutes) {
-    if (minutes < 60) return '$minutes mins';
+  String _formatTotalTime(BuildContext context, int minutes) {
+    if (minutes < 60) return '$minutes ${AppLocalizations.of(context)!.mins}';
     final hours = minutes ~/ 60;
     final mins = minutes % 60;
     return '${hours}h ${mins}m';
@@ -133,7 +134,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Focus Analytics',
+          AppLocalizations.of(context)!.focusAnalytics,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.onSurface,
@@ -165,7 +166,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
                 
                 // 3. Stats Section Title
                 Text(
-                  'Overview Metrics',
+                  AppLocalizations.of(context)!.overviewMetrics,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -182,7 +183,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
                 
                 // 5. Focus Logs Title
                 Text(
-                  'Focus History Logs',
+                  AppLocalizations.of(context)!.focusHistoryLogs,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -212,7 +213,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
           children: [
             Expanded(
               child: _buildSegmentButton(
-                text: 'Last 7 Days',
+                text: AppLocalizations.of(context)!.last7Days,
                 isActive: !_is30Days,
                 onTap: () {
                   if (_is30Days) {
@@ -227,7 +228,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSegmentButton(
-                text: 'Last 30 Days',
+                text: AppLocalizations.of(context)!.last30Days,
                 isActive: _is30Days,
                 onTap: () {
                   if (!_is30Days) {
@@ -247,7 +248,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Chart Style',
+              AppLocalizations.of(context)!.chartStyle,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -352,7 +353,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
             Icon(Icons.query_stats_rounded, size: 48, color: ext.subtext.withValues(alpha: 0.5)),
             const SizedBox(height: 12),
             Text(
-              'No focus logs found for this range.',
+              AppLocalizations.of(context)!.noFocusLogsFound,
               style: TextStyle(color: ext.subtext, fontSize: 14, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
@@ -373,7 +374,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isAreaChart ? 'Area Focus Trend' : 'Bar Session Distribution',
+                  _isAreaChart ? AppLocalizations.of(context)!.areaFocusTrend : AppLocalizations.of(context)!.barSessionDistribution,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -381,7 +382,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
                   ),
                 ),
                 Text(
-                  'Tap on data points to view details',
+                  AppLocalizations.of(context)!.tapToViewDetails,
                   style: TextStyle(
                     fontSize: 12,
                     color: ext.subtext,
@@ -466,7 +467,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
                 final date = _chartData[spot.x.toInt()].date;
                 final dateStr = DateFormat('EEE, MMM d').format(date);
                 return LineTooltipItem(
-                  '${spot.y.round()} mins\n',
+                  '${spot.y.round()} ${AppLocalizations.of(context)!.mins}\n',
                   const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                   children: [
                     TextSpan(
@@ -558,7 +559,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
               final date = _chartData[group.x.toInt()].date;
               final dateStr = DateFormat('EEE, MMM d').format(date);
               return BarTooltipItem(
-                '${rod.toY.round()} mins\n',
+                '${rod.toY.round()} ${AppLocalizations.of(context)!.mins}\n',
                 const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                 children: [
                   TextSpan(
@@ -663,32 +664,32 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
       childAspectRatio: 2.1,
       children: [
         _buildStatCard(
-          title: 'Total Focused',
-          value: _formatTotalTime(_totalFocusMinutes),
+          title: AppLocalizations.of(context)!.totalFocused,
+          value: _formatTotalTime(context, _totalFocusMinutes),
           icon: Icons.timer_outlined,
           iconColor: Colors.orangeAccent,
           theme: theme,
           ext: ext,
         ),
         _buildStatCard(
-          title: 'Avg / Session',
-          value: '${_avgSessionMinutes.round()} mins',
+          title: AppLocalizations.of(context)!.avgSession,
+          value: '${_avgSessionMinutes.round()} ${AppLocalizations.of(context)!.mins}',
           icon: Icons.hourglass_bottom_rounded,
           iconColor: Colors.blueAccent,
           theme: theme,
           ext: ext,
         ),
         _buildStatCard(
-          title: 'Completed',
-          value: '$_completedSessionsCount sessions',
+          title: AppLocalizations.of(context)!.completed,
+          value: AppLocalizations.of(context)!.sessionsCount(_completedSessionsCount),
           icon: Icons.check_circle_outline_rounded,
           iconColor: AppColors.accent,
           theme: theme,
           ext: ext,
         ),
         _buildStatCard(
-          title: 'Active Days',
-          value: '$_activeDaysCount days ($activeRatio)',
+          title: AppLocalizations.of(context)!.activeDays,
+          value: AppLocalizations.of(context)!.activeDaysValue(_activeDaysCount, activeRatio),
           icon: Icons.calendar_today_rounded,
           iconColor: Colors.purpleAccent,
           theme: theme,
@@ -765,7 +766,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
         padding: const EdgeInsets.all(24),
         child: Center(
           child: Text(
-            'No focus session history available.',
+            AppLocalizations.of(context)!.noFocusHistoryAvailable,
             style: TextStyle(color: ext.subtext, fontSize: 13, fontWeight: FontWeight.w500),
           ),
         ),
@@ -810,7 +811,7 @@ class _FocusHeatmapScreenState extends State<FocusHeatmapScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${session.mode} Session',
+                      AppLocalizations.of(context)!.sessionModeLabel(session.mode),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

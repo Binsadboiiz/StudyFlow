@@ -8,6 +8,7 @@ import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
 import 'package:studyflow/features/gamification/data/models/leaderboard_entry_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 import 'package:studyflow/shared/widgets/loading/leaderboard_skeleton.dart';
 
@@ -41,9 +42,9 @@ class LeaderboardTab extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildSortChip(context, gamificationVm, 'Level', 'Level', Icons.trending_up_rounded),
-              _buildSortChip(context, gamificationVm, 'Achievements', 'Achievements', Icons.emoji_events_rounded),
-              _buildSortChip(context, gamificationVm, 'Pet', 'Pet', Icons.pets_rounded),
+              _buildSortChip(context, gamificationVm, 'Level', AppLocalizations.of(context)!.level, Icons.trending_up_rounded),
+              _buildSortChip(context, gamificationVm, 'Achievements', AppLocalizations.of(context)!.achievements, Icons.emoji_events_rounded),
+              _buildSortChip(context, gamificationVm, 'Pet', AppLocalizations.of(context)!.pet, Icons.pets_rounded),
             ],
           ),
         ),
@@ -59,7 +60,7 @@ class LeaderboardTab extends StatelessWidget {
                   const Icon(Icons.leaderboard_outlined, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
                   Text(
-                    'No leaderboard data available yet. Start studying to climb the ranks!',
+                    AppLocalizations.of(context)!.noLeaderboardData,
                     style: TextStyle(color: ext.subtext, fontSize: 16),
                   ),
                 ],
@@ -145,7 +146,7 @@ class LeaderboardTab extends StatelessWidget {
                           ),
                         ),
                         // Cột chỉ số tương ứng theo tiêu chí sắp xếp
-                        _buildRightMetric(entry, gamificationVm.currentSortBy, isMe, theme, ext),
+                        _buildRightMetric(context, entry, gamificationVm.currentSortBy, isMe, theme, ext),
                       ],
                     ),
                   ),
@@ -195,7 +196,7 @@ class LeaderboardTab extends StatelessWidget {
   }
 
   /// Cột chỉ số bên phải của mỗi dòng trong bảng xếp hạng.
-  Widget _buildRightMetric(LeaderboardEntryModel entry, String sortBy, bool isMe, ThemeData theme, AppThemeExtension ext) {
+  Widget _buildRightMetric(BuildContext context, LeaderboardEntryModel entry, String sortBy, bool isMe, ThemeData theme, AppThemeExtension ext) {
     if (sortBy == 'Achievements') {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -208,7 +209,7 @@ class LeaderboardTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '${entry.achievementsCount} Achievements',
+              AppLocalizations.of(context)!.achievementsCount(entry.achievementsCount),
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -218,7 +219,7 @@ class LeaderboardTab extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Earned',
+            AppLocalizations.of(context)!.earned,
             style: TextStyle(
               fontSize: 11,
               color: ext.subtext,
@@ -239,7 +240,7 @@ class LeaderboardTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              hasPet ? 'Pet LV ${entry.petLevel}' : 'No Pet',
+              hasPet ? '${AppLocalizations.of(context)!.petLv} ${entry.petLevel}' : AppLocalizations.of(context)!.noPet,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -249,7 +250,7 @@ class LeaderboardTab extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            hasPet ? entry.petName : 'Not Adopted',
+            hasPet ? entry.petName : AppLocalizations.of(context)!.notAdopted,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
@@ -271,7 +272,7 @@ class LeaderboardTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'LV ${entry.level}',
+              '${AppLocalizations.of(context)!.level} ${entry.level}',
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -383,7 +384,7 @@ class LeaderboardTab extends StatelessWidget {
         ],
         const SizedBox(height: 6),
         // Cột chỉ số tương ứng theo bộ lọc
-        _buildPodiumMetricTop(entry, sortBy, ext),
+        _buildPodiumMetricTop(context, entry, sortBy, ext),
         const SizedBox(height: 8),
         // Cột bục xếp hạng
         Container(
@@ -432,7 +433,7 @@ class LeaderboardTab extends StatelessWidget {
                         color: isMe ? AppColors.accent : rankColor,
                       ),
                     ),
-                    _buildPodiumMetricBottom(entry, sortBy, theme),
+                    _buildPodiumMetricBottom(context, entry, sortBy, theme),
                   ],
                 ),
               ),
@@ -444,10 +445,10 @@ class LeaderboardTab extends StatelessWidget {
   }
 
   /// Hiển thị nhãn chỉ số ở phần trên của cột bục vinh quang.
-  Widget _buildPodiumMetricTop(LeaderboardEntryModel entry, String sortBy, AppThemeExtension ext) {
+  Widget _buildPodiumMetricTop(BuildContext context, LeaderboardEntryModel entry, String sortBy, AppThemeExtension ext) {
     if (sortBy == 'Achievements') {
       return Text(
-        '${entry.achievementsCount} Achievements',
+        AppLocalizations.of(context)!.achievementsCount(entry.achievementsCount),
         style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -456,7 +457,7 @@ class LeaderboardTab extends StatelessWidget {
       );
     } else if (sortBy == 'Pet') {
       return Text(
-        entry.petLevel > 0 ? 'Pet LV ${entry.petLevel}' : 'No Pet',
+        entry.petLevel > 0 ? '${AppLocalizations.of(context)!.petLv} ${entry.petLevel}' : AppLocalizations.of(context)!.noPet,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -465,7 +466,7 @@ class LeaderboardTab extends StatelessWidget {
       );
     } else {
       return Text(
-        'LV ${entry.level}',
+        '${AppLocalizations.of(context)!.level} ${entry.level}',
         style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -476,10 +477,10 @@ class LeaderboardTab extends StatelessWidget {
   }
 
   /// Hiển thị nhãn chỉ số ở phần dưới của cột bục vinh quang (trong bục).
-  Widget _buildPodiumMetricBottom(LeaderboardEntryModel entry, String sortBy, ThemeData theme) {
+  Widget _buildPodiumMetricBottom(BuildContext context, LeaderboardEntryModel entry, String sortBy, ThemeData theme) {
     if (sortBy == 'Achievements') {
       return Text(
-        'Achievements',
+        AppLocalizations.of(context)!.achievements,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -488,7 +489,7 @@ class LeaderboardTab extends StatelessWidget {
       );
     } else if (sortBy == 'Pet') {
       return Text(
-        entry.petLevel > 0 ? entry.petName : 'No Pet',
+        entry.petLevel > 0 ? entry.petName : AppLocalizations.of(context)!.noPet,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,

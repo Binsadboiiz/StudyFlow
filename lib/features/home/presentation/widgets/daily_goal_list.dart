@@ -11,6 +11,7 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// A widget that displays the list of daily goals (Tasks) as a List (row by row) below the calendar.
 /// It uses a [Column] instead of a [ListView] so that it can be scrolled together with the Calendar in a [CustomScrollView].
@@ -62,7 +63,7 @@ class DailyGoalList extends StatelessWidget {
                       .fade(begin: 0.5, end: 1.0, duration: 1500.ms),
                   const SizedBox(height: 24),
                   Text(
-                    'No goals for this day',
+                    AppLocalizations.of(context)!.noGoalsForDay,
                     style: TextStyle(
                       color: theme.colorScheme.onSurface,
                       fontSize: 18,
@@ -71,7 +72,7 @@ class DailyGoalList extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Take a rest and enjoy your day!',
+                    AppLocalizations.of(context)!.takeARest,
                     style: TextStyle(color: ext.subtext, fontSize: 14),
                   ),
                 ],
@@ -129,13 +130,14 @@ class DailyGoalList extends StatelessWidget {
                                     }
                                     await viewModel.toggleTaskCompletion(task);
                                     if (!task.isCompleted) {
-                                      NotificationService.instance.show(
-                                        AppNotification(
-                                          message:
-                                              'Task completed! +10 XP, +10 coins',
-                                          type: NotificationType.success,
-                                        ),
-                                      );
+                                      if (context.mounted) {
+                                        NotificationService.instance.show(
+                                          AppNotification(
+                                            message: AppLocalizations.of(context)!.taskCompletedReward,
+                                            type: NotificationType.success,
+                                          ),
+                                        );
+                                      }
                                     }
                                   },
                                   child:

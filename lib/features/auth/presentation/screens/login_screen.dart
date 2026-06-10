@@ -4,6 +4,8 @@ import 'package:studyflow/features/auth/presentation/screens/register_screen.dar
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
 import 'dart:ui';
+import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/core/providers/language_provider.dart';
 
 /// `LoginScreen` is the login interface of the application.
 /// This screen is designed independently and does not use the general `AppTheme` 
@@ -27,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (identifier.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseFillFields)),
       );
       return;
     }
@@ -147,6 +149,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+          // Language switcher at the top right
+          Positioned(
+            top: 16,
+            right: 16,
+            child: SafeArea(
+              child: _buildLanguageSelector(context),
+            ),
+          ),
           // Main Content
           SafeArea(
             child: Center(
@@ -177,18 +187,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Welcome Back!',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.welcomeBack,
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF203A43),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Login to continue your study flow',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.welcomeSubtitle,
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
@@ -223,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _buildTextField(
                             controller: _passwordController,
                             icon: Icons.lock_outline,
-                            hintText: 'Password',
+                            hintText: AppLocalizations.of(context)!.password,
                             isPassword: true,
                             isPasswordVisible: _isPasswordVisible,
                             onVisibilityToggle: () {
@@ -255,23 +265,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
-                                  : const Text(
-                                      'Login',
-                                      style: TextStyle(
+                                  : Text(
+                                      AppLocalizations.of(context)!.login,
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          Row(
+                           Row(
                             children: [
                               const Expanded(child: Divider(color: Colors.black12)),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
-                                  'or',
+                                  AppLocalizations.of(context)!.or,
                                   style: TextStyle(
                                     color: Colors.black.withValues(alpha: 0.5),
                                     fontSize: 14,
@@ -301,9 +310,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   errorBuilder: _fallbackGoogleIcon,
                                 ),
                               ),
-                              label: const Text(
-                                'Continue with Google',
-                                style: TextStyle(
+                              label: Text(
+                                AppLocalizations.of(context)!.continueWithGoogle,
+                                style: const TextStyle(
                                   color: Color(0xFF203A43),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -324,9 +333,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Don't have an account?",
-                          style: TextStyle(color: Colors.black54),
+                        Text(
+                          AppLocalizations.of(context)!.dontHaveAccount,
+                          style: const TextStyle(color: Colors.black54),
                         ),
                         TextButton(
                           onPressed: () {
@@ -335,9 +344,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(builder: (context) => const RegisterScreen()),
                             );
                           },
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.signUp,
+                            style: const TextStyle(
                               color: Color(0xFF203A43),
                               fontWeight: FontWeight.bold,
                             ),
@@ -351,6 +360,84 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languageProvider = context.watch<LanguageProvider>();
+    final currentLocale = languageProvider.locale;
+    
+    String currentFlag = '🇬🇧';
+    if (currentLocale.languageCode == 'vi') {
+      currentFlag = '🇻🇳';
+    } else if (currentLocale.languageCode == 'de') {
+      currentFlag = '🇩🇪';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1.0,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: PopupMenuButton<Locale>(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(currentFlag, style: const TextStyle(fontSize: 20)),
+                const Icon(Icons.arrow_drop_down, color: Color(0xFF203A43)),
+              ],
+            ),
+            offset: const Offset(0, 45),
+            color: Colors.white.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            onSelected: (Locale locale) {
+              languageProvider.setLocale(locale);
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: Locale('vi'),
+                child: Row(
+                  children: [
+                    Text('🇻🇳', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('Tiếng Việt', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: Locale('en'),
+                child: Row(
+                  children: [
+                    Text('🇬🇧', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('English', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: Locale('de'),
+                child: Row(
+                  children: [
+                    Text('🇩🇪', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('Deutsch', style: TextStyle(color: Color(0xFF203A43), fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

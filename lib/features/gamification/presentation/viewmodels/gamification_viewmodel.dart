@@ -16,6 +16,9 @@ class GamificationViewModel extends ChangeNotifier {
   // Current leaderboard sorting criterion (default: 'Level')
   String _currentSortBy = 'Level'; 
 
+  // Active sub-tab in GamificationHubScreen (0: Streak, 1: Pet, 2: Badges, 3: Leaderboard)
+  int _activeSubTab = 0;
+
   bool _isLoadingSummary = false;
   bool _isLoadingBadges = false;
   bool _isLoadingLeaderboard = false;
@@ -29,6 +32,13 @@ class GamificationViewModel extends ChangeNotifier {
   List<LeaderboardEntryModel> get leaderboardEntries => _leaderboardEntries;
   int get userRank => _userRank;
   String get currentSortBy => _currentSortBy;
+  int get activeSubTab => _activeSubTab;
+
+  void changeSubTab(int index) {
+    if (_activeSubTab == index) return;
+    _activeSubTab = index;
+    notifyListeners();
+  }
 
   bool get isLoadingSummary => _isLoadingSummary;
   bool get isLoadingBadges => _isLoadingBadges;

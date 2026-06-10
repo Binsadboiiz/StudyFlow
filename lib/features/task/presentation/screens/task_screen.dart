@@ -12,6 +12,7 @@ import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.d
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/shared/widgets/loading/task_skeleton.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// `TaskScreen` is the daily task management screen.
 /// It allows users to view their task list by day, add/edit/delete tasks, and mark them as completed.
@@ -55,7 +56,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'My Tasks',
+                        AppLocalizations.of(context)!.tasks,
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -64,7 +65,7 @@ class _TaskScreenState extends State<TaskScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${vm.tasks.where((t) => !t.isCompleted).length} remaining · ${vm.tasks.where((t) => t.isCompleted).length} completed',
+                        '${AppLocalizations.of(context)!.remainingWithCount(vm.tasks.where((t) => !t.isCompleted).length)} · ${AppLocalizations.of(context)!.completedWithCount(vm.tasks.where((t) => t.isCompleted).length)}',
                         style: TextStyle(
                           fontSize: 14,
                           color: ext.subtext,
@@ -124,7 +125,7 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              isToday ? 'Today' : DateFormat('dd MMM').format(vm.selectedDate),
+              isToday ? AppLocalizations.of(context)!.today : DateFormat('dd MMM').format(vm.selectedDate),
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -234,7 +235,7 @@ class _TaskScreenState extends State<TaskScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Progress',
+                AppLocalizations.of(context)!.progress,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -281,7 +282,7 @@ class _TaskScreenState extends State<TaskScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No tasks for this day',
+            AppLocalizations.of(context)!.noGoalsForDay,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -290,7 +291,7 @@ class _TaskScreenState extends State<TaskScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap + to add a new task',
+            AppLocalizations.of(context)!.tapToAddFirstTask,
             style: TextStyle(fontSize: 14, color: ext.subtext),
           ),
           const SizedBox(height: 80),
@@ -315,7 +316,7 @@ class _TaskScreenState extends State<TaskScreen> {
                 Icon(Icons.check_circle_outline, size: 18, color: ext.subtext),
                 const SizedBox(width: 8),
                 Text(
-                  'Completed (${completedTasks.length})',
+                  AppLocalizations.of(context)!.completedWithCount(completedTasks.length),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -339,10 +340,11 @@ class _TaskScreenState extends State<TaskScreen> {
       key: Key('task_${task.id}'),
       direction: task.isCompleted ? DismissDirection.none : DismissDirection.endToStart,
       onDismissed: (_) async {
+        final message = AppLocalizations.of(context)!.taskDeleted;
         await vm.deleteTask(task.id, task.date);
         NotificationService.instance.show(
           AppNotification(
-            message: 'Task deleted successfully!',
+            message: message,
             type: NotificationType.success,
           ),
         );
@@ -387,8 +389,10 @@ class _TaskScreenState extends State<TaskScreen> {
                   children: [
                     GestureDetector(
                       onTap: () async {
+                        final authVm = context.read<AuthViewmodel>();
+                        final rewardMessage = AppLocalizations.of(context)!.taskCompletedReward;
                         if (!task.isCompleted) {
-                          await context.read<AuthViewmodel>().updateStreak(
+                          await authVm.updateStreak(
                             DateTime.now(),
                           );
                         }
@@ -396,7 +400,7 @@ class _TaskScreenState extends State<TaskScreen> {
                         if (!task.isCompleted) {
                           NotificationService.instance.show(
                             AppNotification(
-                              message: 'Task completed! +10 XP, +10 coins',
+                              message: rewardMessage,
                               type: NotificationType.success,
                             ),
                           );

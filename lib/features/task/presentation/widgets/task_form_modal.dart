@@ -10,6 +10,7 @@ import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// A modal bottom sheet used to create a new task or edit an existing one.
 /// It provides form fields for task title, description, date, and optional start/end times.
@@ -64,20 +65,21 @@ class _TaskFormModalState extends State<TaskFormModal> {
     final scheduleVm = context.read<ScheduleViewmodel>();
     final homeVm = context.read<HomeViewModel>();
     final navigator = Navigator.of(context);
+    final localizations = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Delete Task',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          localizations.deleteTask,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: const Text('Are you sure you want to delete this task?'),
+        content: Text(localizations.deleteTaskConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Cancel',
+              localizations.cancel,
               style: TextStyle(
                 color: Theme.of(
                   context,
@@ -88,9 +90,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(
+            child: Text(
+              localizations.delete,
+              style: const TextStyle(
                 color: Colors.redAccent,
                 fontWeight: FontWeight.bold,
               ),
@@ -106,7 +108,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
       navigator.pop();
       NotificationService.instance.show(
         AppNotification(
-          message: 'Task deleted successfully!',
+          message: localizations.taskDeleted,
           type: NotificationType.success,
         ),
       );
@@ -150,7 +152,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
               children: [
                 const SizedBox(width: 48),
                 Text(
-                  isEditMode ? 'Edit task' : 'Add new task',
+                  isEditMode ? AppLocalizations.of(context)!.editTask : AppLocalizations.of(context)!.addNewTask,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -175,7 +177,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
               autofocus: !isEditMode,
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'What do you want to do...?',
+                hintText: AppLocalizations.of(context)!.taskTitleHint,
                 filled: true,
                 fillColor: ext.inputFill,
                 border: OutlineInputBorder(
@@ -202,7 +204,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
               minLines: 1,
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'Add details / description...',
+                hintText: AppLocalizations.of(context)!.taskDescHint,
                 filled: true,
                 fillColor: ext.inputFill,
                 border: OutlineInputBorder(
@@ -262,7 +264,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Date',
+                          AppLocalizations.of(context)!.date,
                           style: TextStyle(
                             fontSize: 11,
                             color: ext.subtext,
@@ -272,7 +274,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                         const SizedBox(height: 2),
                         Text(
                           _isSameDay(_selectedDate, today)
-                              ? 'Today, ${DateFormat('dd MMM yyyy').format(_selectedDate)}'
+                              ? '${AppLocalizations.of(context)!.today}, ${DateFormat('dd MMM yyyy').format(_selectedDate)}'
                               : DateFormat(
                                   'EEEE, dd MMM yyyy',
                                 ).format(_selectedDate),
@@ -295,11 +297,11 @@ class _TaskFormModalState extends State<TaskFormModal> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTimePicker(context, 'Start', _startTime, true),
+                  child: _buildTimePicker(context, AppLocalizations.of(context)!.start, _startTime, true),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _buildTimePicker(context, 'End', _endTime, false),
+                  child: _buildTimePicker(context, AppLocalizations.of(context)!.end, _endTime, false),
                 ),
               ],
             ),
@@ -322,6 +324,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 onPressed: () async {
                   if (_titleController.text.trim().isEmpty) return;
 
+                  final localizations = AppLocalizations.of(context)!;
                   final now = DateTime.now();
                   final todayDate = DateTime(now.year, now.month, now.day);
                   final selectedDateOnly = DateTime(
@@ -341,8 +344,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     );
                     if (startDateTimeVal.isBefore(now)) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Start time cannot be in the past!'),
+                        SnackBar(
+                          content: Text(localizations.errStartTimePast),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.redAccent,
                         ),
@@ -354,9 +357,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
                   if (_endTime != null) {
                     if (_endTime!.hour == 0 && _endTime!.minute == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text(
-                            'End time cannot be 00:00 (please use up to 23:59)!',
+                            localizations.errEndTimeZero,
                           ),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.redAccent,
@@ -370,8 +373,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       final endMin = _endTime!.hour * 60 + _endTime!.minute;
                       if (endMin <= startMin) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('End time must be after start time!'),
+                          SnackBar(
+                            content: Text(localizations.errEndTimeBeforeStart),
                             behavior: SnackBarBehavior.floating,
                             backgroundColor: Colors.redAccent,
                           ),
@@ -391,8 +394,8 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     );
                     if (reminderDateTimeVal.isBefore(now)) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Reminder time cannot be in the past!'),
+                        SnackBar(
+                          content: Text(localizations.errReminderTimePast),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.redAccent,
                         ),
@@ -471,21 +474,21 @@ class _TaskFormModalState extends State<TaskFormModal> {
                   if (isEditMode) {
                     NotificationService.instance.show(
                       AppNotification(
-                        message: 'Task updated!',
+                        message: localizations.taskUpdated,
                         type: NotificationType.success,
                       ),
                     );
                   } else {
                     NotificationService.instance.show(
                       AppNotification(
-                        message: 'Added new task!',
+                        message: localizations.taskAdded,
                         type: NotificationType.success,
                       ),
                     );
                   }
                 },
                 child: Text(
-                  isEditMode ? 'Save changes' : 'Add now',
+                  isEditMode ? AppLocalizations.of(context)!.saveChanges : AppLocalizations.of(context)!.addNow,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -534,7 +537,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Reminder',
+                  AppLocalizations.of(context)!.reminder,
                   style: TextStyle(
                     fontSize: 11,
                     color: ext.subtext,
@@ -545,7 +548,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 Text(
                   _reminderTime != null
                       ? '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}'
-                      : 'None / No Reminder',
+                      : AppLocalizations.of(context)!.noReminder,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -629,7 +632,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
                 Text(
                   time != null
                       ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
-                      : 'Optional',
+                      : AppLocalizations.of(context)!.optional,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,

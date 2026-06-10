@@ -6,6 +6,7 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/auth/presentation/widgets/user_avatar.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -116,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
-          'Edit Profile',
+          AppLocalizations.of(context)!.editProfile,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.onSurface,
@@ -151,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Personal Info',
+                            AppLocalizations.of(context)!.personalInfo,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -159,24 +160,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          _buildLabel('Full Name'),
+                          _buildLabel(AppLocalizations.of(context)!.fullName),
                           TextFormField(
                             controller: _fullNameController,
                             style: TextStyle(color: theme.colorScheme.onSurface),
                             decoration: _buildInputDecoration(
-                              hintText: 'Enter your full name',
+                              hintText: AppLocalizations.of(context)!.enterFullName,
                               icon: Icons.person_outline,
                               theme: theme,
                             ),
                             validator: (val) {
                               if (val == null || val.trim().isEmpty) {
-                                return 'Full name is required';
+                                return AppLocalizations.of(context)!.fullNameRequired;
                               }
                               return null;
                             },
                           ),
                           const SizedBox(height: 20),
-                          _buildLabel('Email Address (Disabled)'),
+                          _buildLabel(AppLocalizations.of(context)!.emailAddressDisabled),
                           TextFormField(
                             initialValue: user?.email ?? '',
                             enabled: false,
@@ -224,9 +225,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                 ),
                               )
-                            : const Text(
-                                'Save Changes',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            : Text(
+                                AppLocalizations.of(context)!.saveChanges,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                       ),
                     ),
@@ -296,7 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ChoiceChip(
-              label: const Text('Presets'),
+              label: Text(AppLocalizations.of(context)!.presets),
               selected: !_isCustomAvatarMode,
               onSelected: (val) {
                 setState(() {
@@ -311,7 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(width: 12),
             ChoiceChip(
-              label: const Text('Custom URL'),
+              label: Text(AppLocalizations.of(context)!.customUrl),
               selected: _isCustomAvatarMode,
               onSelected: (val) {
                 setState(() {
@@ -366,7 +367,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLabel('Avatar Image URL'),
+                _buildLabel(AppLocalizations.of(context)!.avatarImageUrl),
                 TextFormField(
                   controller: _customUrlController,
                   style: TextStyle(color: theme.colorScheme.onSurface),
@@ -407,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Linked with Google',
+                    AppLocalizations.of(context)!.linkedWithGoogle,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -416,7 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Password management is securely handled by Google.',
+                    AppLocalizations.of(context)!.googlePasswordMgmt,
                     style: TextStyle(
                       fontSize: 12,
                       color: ext.subtext,
@@ -437,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Change Password',
+            AppLocalizations.of(context)!.changePassword,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -445,13 +446,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildLabel('Current Password'),
+          _buildLabel(AppLocalizations.of(context)!.currentPassword),
           TextFormField(
             controller: _currentPasswordController,
             obscureText: !_isPasswordVisible,
             style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: _buildInputDecoration(
-              hintText: 'Required if changing password',
+              hintText: AppLocalizations.of(context)!.requiredIfChanging,
               icon: Icons.lock_outline,
               theme: theme,
             ).copyWith(
@@ -469,19 +470,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             validator: (val) {
               if (_newPasswordController.text.isNotEmpty && (val == null || val.isEmpty)) {
-                return 'Current password is required to set a new password';
+                return AppLocalizations.of(context)!.currPasswordRequired;
               }
               return null;
             },
           ),
           const SizedBox(height: 20),
-          _buildLabel('New Password'),
+          _buildLabel(AppLocalizations.of(context)!.newPassword),
           TextFormField(
             controller: _newPasswordController,
             obscureText: !_isNewPasswordVisible,
             style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: _buildInputDecoration(
-              hintText: 'At least 6 characters',
+              hintText: AppLocalizations.of(context)!.atLeast6Chars,
               icon: Icons.lock_outline,
               theme: theme,
             ).copyWith(
@@ -499,19 +500,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             validator: (val) {
               if (val != null && val.isNotEmpty && val.length < 6) {
-                return 'Password must be at least 6 characters long';
+                return AppLocalizations.of(context)!.passwordTooShort6;
               }
               return null;
             },
           ),
           const SizedBox(height: 20),
-          _buildLabel('Confirm New Password'),
+          _buildLabel(AppLocalizations.of(context)!.confirmNewPassword),
           TextFormField(
             controller: _confirmPasswordController,
             obscureText: !_isConfirmPasswordVisible,
             style: TextStyle(color: theme.colorScheme.onSurface),
             decoration: _buildInputDecoration(
-              hintText: 'Retype new password',
+              hintText: AppLocalizations.of(context)!.retypeNewPassword,
               icon: Icons.lock_outline,
               theme: theme,
             ).copyWith(
@@ -529,7 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             validator: (val) {
               if (_newPasswordController.text.isNotEmpty && val != _newPasswordController.text) {
-                return 'Passwords do not match';
+                return AppLocalizations.of(context)!.passwordsDoNotMatch;
               }
               return null;
             },

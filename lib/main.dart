@@ -7,6 +7,8 @@ import 'package:studyflow/core/services/widgets/auth_gate.dart';
 import 'package:studyflow/core/services/widgets/global_snackbar.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/theme/theme_provider.dart';
+import 'package:studyflow/core/providers/language_provider.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/widgets/animated_background.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -47,9 +49,9 @@ class StudyFlowApp extends StatelessWidget {
     return MultiProvider(
       // Retrieve the list of Providers from DependencyInjection
       providers: DependencyInjection.getProviders(),
-      // Consumer listens to ThemeProvider changes to automatically update the theme (Light/Dark/System)
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
+      // Consumer listens to ThemeProvider and LanguageProvider changes to update theme and language
+      child: Consumer2<ThemeProvider, LanguageProvider>(
+        builder: (context, themeProvider, languageProvider, child) {
           return MaterialApp(
             title: 'StudyFlow',
             // Configure default light theme
@@ -58,6 +60,9 @@ class StudyFlowApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             // The currently selected theme mode (retrieved from ThemeProvider)
             themeMode: themeProvider.themeMode,
+            locale: languageProvider.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             navigatorKey: NotificationService.instance.navigatorKey,
             scaffoldMessengerKey:
                 NotificationService.instance.scaffoldMessengerKey,

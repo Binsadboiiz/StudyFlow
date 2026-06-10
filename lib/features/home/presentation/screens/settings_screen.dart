@@ -17,6 +17,8 @@ import 'package:studyflow/features/gamification/presentation/viewmodels/gamifica
 import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
 import 'package:studyflow/features/home/presentation/screens/about_screen.dart';
 import 'package:studyflow/features/home/presentation/screens/privacy_policy_screen.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/core/providers/language_provider.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -40,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
-          'Settings',
+          AppLocalizations.of(context)!.settings,
           style: TextStyle(
             fontWeight: FontWeight.bold, 
             color: theme.colorScheme.onSurface,
@@ -63,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
             if (user == null) _buildGuestSection(context, theme) else _buildProfileSection(context, user, summary, theme, ext, isDark),
             const SizedBox(height: 40),
             Text(
-              'General Settings',
+              AppLocalizations.of(context)!.generalSettings,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -75,8 +77,8 @@ class SettingsScreen extends StatelessWidget {
               _buildSettingItem(
                 context: context,
                 icon: Icons.person_outline_rounded,
-                title: 'Edit Profile',
-                subtitle: 'Customize name, avatar, and password',
+                title: AppLocalizations.of(context)!.editProfile,
+                subtitle: AppLocalizations.of(context)!.customizeProfileSubtitle,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -87,7 +89,7 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingItem(
               context: context,
               icon: Icons.notifications_none_outlined,
-              title: 'Notifications',
+              title: AppLocalizations.of(context)!.notifications,
               onTap: () {
                 Navigator.push(
                   context,
@@ -98,8 +100,8 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingItem(
               context: context,
               icon: Icons.bar_chart_rounded,
-              title: 'Focus History & Charts',
-              subtitle: 'View charts and statistics of focus mode',
+              title: AppLocalizations.of(context)!.focusHistoryCharts,
+              subtitle: AppLocalizations.of(context)!.focusHistorySubtitle,
               onTap: () {
                 Navigator.push(
                   context,
@@ -109,17 +111,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             _buildThemeSettingItem(context),
             _buildPerformanceSettingItem(context),
-            _buildSettingItem(
-              context: context,
-              icon: Icons.language_outlined,
-              title: 'Language',
-              subtitle: 'English',
-              onTap: () {},
-            ),
+            _buildLanguageSettingItem(context),
             _buildSettingItem(
               context: context,
               icon: Icons.info_outline_rounded,
-              title: 'About',
+              title: AppLocalizations.of(context)!.about,
               onTap: () {
                 Navigator.push(
                   context,
@@ -130,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingItem(
               context: context,
               icon: Icons.policy_outlined,
-              title: 'Privacy Policy',
+              title: AppLocalizations.of(context)!.privacyPolicy,
               onTap: () {
                 Navigator.push(
                   context,
@@ -153,9 +149,9 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.logout, color: Colors.redAccent),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold),
+                  label: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -345,13 +341,13 @@ class SettingsScreen extends StatelessWidget {
     String currentThemeLabel;
     switch (themeProvider.themeMode) {
       case ThemeMode.light:
-        currentThemeLabel = 'Light';
+        currentThemeLabel = AppLocalizations.of(context)!.light;
         break;
       case ThemeMode.dark:
-        currentThemeLabel = 'Dark';
+        currentThemeLabel = AppLocalizations.of(context)!.dark;
         break;
       default:
-        currentThemeLabel = 'System';
+        currentThemeLabel = AppLocalizations.of(context)!.system;
     }
 
     return Padding(
@@ -377,7 +373,7 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         title: Text(
-          'Theme',
+          AppLocalizations.of(context)!.theme,
           style: TextStyle(
             fontWeight: FontWeight.w600, 
             fontSize: 16,
@@ -397,6 +393,230 @@ class SettingsScreen extends StatelessWidget {
       ),
       ),
       );
+  }
+
+  /// Language setting item with current locale display and bottom sheet picker
+  Widget _buildLanguageSettingItem(BuildContext context) {
+    final languageProvider = context.watch<LanguageProvider>();
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    String currentLanguageLabel;
+    switch (languageProvider.locale.languageCode) {
+      case 'vi':
+        currentLanguageLabel = 'Tiếng Việt';
+        break;
+      case 'de':
+        currentLanguageLabel = 'Deutsch';
+        break;
+      default:
+        currentLanguageLabel = 'English';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        borderRadius: 16,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.language_outlined,
+                color: theme.colorScheme.onSurface,
+                size: 24,
+              ),
+            ),
+            title: Text(
+              AppLocalizations.of(context)!.language,
+              style: TextStyle(
+                fontWeight: FontWeight.w600, 
+                fontSize: 16,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            subtitle: Text(
+              currentLanguageLabel,
+              style: TextStyle(fontSize: 13, color: ext.subtext),
+            ),
+            trailing: Icon(Icons.chevron_right, color: ext.subtext),
+            onTap: () => _showLanguagePicker(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Bottom sheet to pick language
+  void _showLanguagePicker(BuildContext context) {
+    final languageProvider = context.read<LanguageProvider>();
+    final theme = Theme.of(context);
+    final ext = theme.extension<AppThemeExtension>()!;
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: ext.cardBackground,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                AppLocalizations.of(context)!.chooseLanguage,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildLanguageOption(
+                context: context,
+                flag: '🇻🇳',
+                title: 'Tiếng Việt',
+                subtitle: 'Vietnamese',
+                locale: const Locale('vi'),
+                currentLocale: languageProvider.locale,
+                onTap: () {
+                  languageProvider.setLocale(const Locale('vi'));
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 8),
+              _buildLanguageOption(
+                context: context,
+                flag: '🇬🇧',
+                title: 'English',
+                subtitle: 'English',
+                locale: const Locale('en'),
+                currentLocale: languageProvider.locale,
+                onTap: () {
+                  languageProvider.setLocale(const Locale('en'));
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 8),
+              _buildLanguageOption(
+                context: context,
+                flag: '🇩🇪',
+                title: 'Deutsch',
+                subtitle: 'German',
+                locale: const Locale('de'),
+                currentLocale: languageProvider.locale,
+                onTap: () {
+                  languageProvider.setLocale(const Locale('de'));
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required BuildContext context,
+    required String flag,
+    required String title,
+    required String subtitle,
+    required Locale locale,
+    required Locale currentLocale,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = locale.languageCode == currentLocale.languageCode;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final ext = theme.extension<AppThemeExtension>()!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.accent.withValues(alpha: 0.1)
+              : isDark ? AppColors.surfaceDark : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.accent.withValues(alpha: 0.15)
+                    : isDark ? AppColors.cardDark : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                flag,
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? AppColors.accent : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ext.subtext,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: AppColors.accent, size: 22),
+          ],
+        ),
+      ),
+    );
   }
 
   /// Bottom sheet to pick theme mode
@@ -430,7 +650,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Choose Theme',
+                AppLocalizations.of(context)!.chooseTheme,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -441,8 +661,8 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context: context,
                 icon: Icons.light_mode_rounded,
-                title: 'Light',
-                subtitle: 'Bright and clean',
+                title: AppLocalizations.of(context)!.light,
+                subtitle: AppLocalizations.of(context)!.lightThemeSubtitle,
                 mode: ThemeMode.light,
                 currentMode: themeProvider.themeMode,
                 onTap: () {
@@ -454,8 +674,8 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context: context,
                 icon: Icons.dark_mode_rounded,
-                title: 'Dark',
-                subtitle: 'Easy on the eyes',
+                title: AppLocalizations.of(context)!.dark,
+                subtitle: AppLocalizations.of(context)!.darkThemeSubtitle,
                 mode: ThemeMode.dark,
                 currentMode: themeProvider.themeMode,
                 onTap: () {
@@ -467,8 +687,8 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context: context,
                 icon: Icons.settings_suggest_rounded,
-                title: 'System',
-                subtitle: 'Follow device settings',
+                title: AppLocalizations.of(context)!.system,
+                subtitle: AppLocalizations.of(context)!.systemThemeSubtitle,
                 mode: ThemeMode.system,
                 currentMode: themeProvider.themeMode,
                 onTap: () {
@@ -644,7 +864,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             title: Text(
-              'Low Performance Mode',
+              AppLocalizations.of(context)!.lowPerformanceMode,
               style: TextStyle(
                 fontWeight: FontWeight.w600, 
                 fontSize: 16,
@@ -652,7 +872,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'Disable blurs/animations for smoother UI',
+              AppLocalizations.of(context)!.lowPerformanceSubtitle,
               style: TextStyle(fontSize: 13, color: ext.subtext),
             ),
             value: perfProvider.isLowPerformance,

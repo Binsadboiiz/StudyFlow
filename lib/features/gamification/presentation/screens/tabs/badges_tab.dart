@@ -6,6 +6,7 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/gamification/data/models/badge_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 import 'package:studyflow/shared/widgets/loading/badge_skeleton.dart';
 
@@ -33,7 +34,7 @@ class BadgesTab extends StatelessWidget {
             const Icon(Icons.emoji_events_outlined, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              'No achievement data available yet. Start studying to earn badges!',
+              AppLocalizations.of(context)!.noAchievementsData,
               style: TextStyle(color: ext.subtext, fontSize: 16),
             ),
           ],
@@ -88,7 +89,7 @@ class BadgesTab extends StatelessWidget {
             const SizedBox(height: 8),
             // Tên huy hiệu
             Text(
-              badge.name,
+              _getBadgeName(context, badge),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -109,7 +110,7 @@ class BadgesTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                badge.isUnlocked ? 'Unlocked' : 'Locked',
+                badge.isUnlocked ? AppLocalizations.of(context)!.unlocked : AppLocalizations.of(context)!.locked,
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
@@ -178,7 +179,7 @@ class BadgesTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  badge.name,
+                  _getBadgeName(context, badge),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -187,7 +188,7 @@ class BadgesTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  badge.description,
+                  _getBadgeDescription(context, badge),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -202,7 +203,7 @@ class BadgesTab extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Reward Earned:',
+                      AppLocalizations.of(context)!.rewardEarned,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -231,7 +232,7 @@ class BadgesTab extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Status:',
+                      AppLocalizations.of(context)!.status,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -240,8 +241,8 @@ class BadgesTab extends StatelessWidget {
                     ),
                     Text(
                       badge.isUnlocked
-                          ? 'Unlocked (${DateFormat('dd/MM/yyyy').format(badge.earnedAt ?? DateTime.now())})'
-                          : 'Locked',
+                          ? AppLocalizations.of(context)!.unlockedWithDate(DateFormat('dd/MM/yyyy').format(badge.earnedAt ?? DateTime.now()))
+                          : AppLocalizations.of(context)!.locked,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -266,8 +267,8 @@ class BadgesTab extends StatelessWidget {
                                   SnackBar(
                                     content: Text(
                                       isFeatured
-                                          ? 'Featured badge removed.'
-                                          : '"${badge.name}" set as featured badge!',
+                                          ? AppLocalizations.of(context)!.featuredBadgeRemoved
+                                          : AppLocalizations.of(context)!.featuredBadgeSet(_getBadgeName(context, badge)),
                                       style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
                                     backgroundColor: AppColors.accent,
@@ -305,8 +306,8 @@ class BadgesTab extends StatelessWidget {
                             ),
                       label: Text(
                         isWorking
-                            ? 'Processing...'
-                            : (isFeatured ? 'Remove Featured Badge' : 'Set as Featured Badge'),
+                            ? AppLocalizations.of(context)!.processing
+                            : (isFeatured ? AppLocalizations.of(context)!.removeFeaturedBadge : AppLocalizations.of(context)!.setAsFeaturedBadge),
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -326,9 +327,9 @@ class BadgesTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Text(
+                      AppLocalizations.of(context)!.close,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -385,6 +386,80 @@ class BadgesTab extends StatelessWidget {
         return Colors.orangeAccent;
       default:
         return Colors.amber;
+    }
+  }
+
+  String _getBadgeName(BuildContext context, BadgeModel badge) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return badge.name;
+    switch (badge.id) {
+      case '11111111-1111-1111-1111-111111111111':
+        return l10n.badge_noob_no_more_name;
+      case '22222222-2222-2222-2222-222222222222':
+        return l10n.badge_touching_grass_never_name;
+      case '33333333-3333-3333-3333-333333333333':
+        return l10n.badge_certified_brainrot_name;
+      case '44444444-4444-4444-4444-444444444444':
+        return l10n.badge_main_character_energy_name;
+      case '55555555-5555-5555-5555-555555555555':
+        return l10n.badge_locked_in_name;
+      case '66666666-6666-6666-6666-666666666666':
+        return l10n.badge_distraction_who_name;
+      case '77777777-7777-7777-7777-777777777777':
+        return l10n.badge_sigma_study_grind_name;
+      case '88888888-8888-8888-8888-888888888888':
+        return l10n.badge_ultra_instinct_name;
+      case '99999999-9999-9999-9999-999999999999':
+        return l10n.badge_the_first_w_name;
+      case 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa':
+        return l10n.badge_task_destroyer_name;
+      case 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb':
+        return l10n.badge_productivity_monster_name;
+      case 'cccccccc-cccc-cccc-cccc-cccccccccccc':
+        return l10n.badge_day_one_or_one_day_name;
+      case 'dddddddd-dddd-dddd-dddd-dddddddddddd':
+        return l10n.badge_built_different_name;
+      case 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee':
+        return l10n.badge_grassless_legend_name;
+      default:
+        return badge.name;
+    }
+  }
+
+  String _getBadgeDescription(BuildContext context, BadgeModel badge) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return badge.description;
+    switch (badge.id) {
+      case '11111111-1111-1111-1111-111111111111':
+        return l10n.badge_noob_no_more_desc;
+      case '22222222-2222-2222-2222-222222222222':
+        return l10n.badge_touching_grass_never_desc;
+      case '33333333-3333-3333-3333-333333333333':
+        return l10n.badge_certified_brainrot_desc;
+      case '44444444-4444-4444-4444-444444444444':
+        return l10n.badge_main_character_energy_desc;
+      case '55555555-5555-5555-5555-555555555555':
+        return l10n.badge_locked_in_desc;
+      case '66666666-6666-6666-6666-666666666666':
+        return l10n.badge_distraction_who_desc;
+      case '77777777-7777-7777-7777-777777777777':
+        return l10n.badge_sigma_study_grind_desc;
+      case '88888888-8888-8888-8888-888888888888':
+        return l10n.badge_ultra_instinct_desc;
+      case '99999999-9999-9999-9999-999999999999':
+        return l10n.badge_the_first_w_desc;
+      case 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa':
+        return l10n.badge_task_destroyer_desc;
+      case 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb':
+        return l10n.badge_productivity_monster_desc;
+      case 'cccccccc-cccc-cccc-cccc-cccccccccccc':
+        return l10n.badge_day_one_or_one_day_desc;
+      case 'dddddddd-dddd-dddd-dddd-dddddddddddd':
+        return l10n.badge_built_different_desc;
+      case 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee':
+        return l10n.badge_grassless_legend_desc;
+      default:
+        return badge.description;
     }
   }
 }

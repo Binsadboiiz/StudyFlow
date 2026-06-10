@@ -6,6 +6,7 @@ import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/focus/data/repositories/focus_repository.dart';
 import 'package:studyflow/features/focus/data/models/focus_session_model.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_heatmap_screen.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 class FocusScreen extends StatefulWidget {
   const FocusScreen({super.key});
@@ -173,12 +174,12 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                   children: [
                     const SizedBox(width: 48), // Balance for centering
                     Text(
-                      'Focus Mode',
+                      AppLocalizations.of(context)!.focusMode,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                     ),
                     IconButton(
                       icon: Icon(Icons.bar_chart_rounded, color: theme.colorScheme.onSurface),
-                      tooltip: 'Focus Analytics',
+                      tooltip: AppLocalizations.of(context)!.focusAnalytics,
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -213,9 +214,9 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                     labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     dividerColor: Colors.transparent,
-                    tabs: const [
-                      Tab(text: 'Custom'),
-                      Tab(text: 'Pomodoro'),
+                    tabs: [
+                      Tab(text: AppLocalizations.of(context)!.custom),
+                      Tab(text: AppLocalizations.of(context)!.pomodoro),
                     ],
                   ),
                 ),
@@ -276,7 +277,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
                       ),
                       if (_tabController.index == 1)
                         Text(
-                          _isResting ? "REST" : "FOCUS",
+                          _isResting ? AppLocalizations.of(context)!.rest : AppLocalizations.of(context)!.focusLabel,
                           style: TextStyle(
                             fontSize: 16,
                             letterSpacing: 2,

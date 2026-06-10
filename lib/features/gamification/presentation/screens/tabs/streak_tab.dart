@@ -6,6 +6,7 @@ import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// Tab hiển thị số ngày streak và Lịch học tập ngọn lửa của người dùng.
 class StreakTab extends StatefulWidget {
@@ -58,7 +59,7 @@ class _StreakTabState extends State<StreakTab> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '$streakCount Days',
+                          AppLocalizations.of(context)!.days(streakCount),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -66,7 +67,7 @@ class _StreakTabState extends State<StreakTab> {
                           ),
                         ),
                         Text(
-                          'Current Streak',
+                          AppLocalizations.of(context)!.currentStreak,
                           style: TextStyle(
                             fontSize: 12,
                             color: ext.subtext,
@@ -98,7 +99,7 @@ class _StreakTabState extends State<StreakTab> {
                           ),
                         ),
                         Text(
-                          'Minutes focused today',
+                          AppLocalizations.of(context)!.minutesFocusedToday,
                           style: TextStyle(
                             fontSize: 12,
                             color: ext.subtext,
@@ -117,7 +118,7 @@ class _StreakTabState extends State<StreakTab> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Daily Goal Progress',
+                          AppLocalizations.of(context)!.dailyGoalProgress,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -160,7 +161,7 @@ class _StreakTabState extends State<StreakTab> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
                   child: Text(
-                    'Study History',
+                    AppLocalizations.of(context)!.studyHistory,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

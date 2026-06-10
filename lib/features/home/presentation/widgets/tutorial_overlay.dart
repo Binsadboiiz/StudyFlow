@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 class TutorialOverlay extends StatefulWidget {
   final VoidCallback onComplete;
@@ -22,85 +25,123 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
   int _currentStep = 0;
 
   // Total steps in the tutorial
-  static const int _totalSteps = 8;
+  static const int _totalSteps = 11;
 
-  // Content for each tutorial step
-  final List<TutorialStepData> _steps = [
-    const TutorialStepData(
-      tabIndex: 0,
-      title: 'Welcome to StudyFlow! 🚀',
-      description: 'Your ultimate companion for smart time management, habits tracking, and learning analytics. Let us take a quick 1-minute tour of your new workspace.',
-      icon: Icons.school_rounded,
-      highlightMessage: 'Press Next to begin the tour',
-    ),
-    const TutorialStepData(
-      tabIndex: 0,
-      title: 'Smart Dashboard 📊',
-      description: 'Keep track of your learning streak (fire icon), check notifications, plan daily goals, and view calendar tasks all in one unified visual space.',
-      icon: Icons.dashboard_rounded,
-      highlightMessage: 'Daily targets are shown at the bottom of Home',
-    ),
-    const TutorialStepData(
-      tabIndex: 1,
-      title: 'Focus Pomodoro Timer ⏱️',
-      description: 'Block out distractions using customized Pomodoro countdown timers. Run focus sessions to level up your habits and generate detailed productivity heatmaps.',
-      icon: Icons.hourglass_empty_rounded,
-      highlightMessage: 'Start a session to block notifications',
-    ),
-    const TutorialStepData(
-      tabIndex: 2,
-      title: 'Task Manager 📝',
-      description: 'Create, edit, and organize study tasks, class assignments, and personal checklists. Check off items as you complete them to sync with our database.',
-      icon: Icons.assignment_rounded,
-      highlightMessage: 'Click the "+" button in the dock to add tasks instantly',
-    ),
-    const TutorialStepData(
-      tabIndex: 3,
-      title: 'Weekly Schedule 📅',
-      description: 'View your weekly classes and deadlines in a structured timeline. Stay ahead of your curriculum with clear scheduling and auto-syncing calendar routes.',
-      icon: Icons.event_note_rounded,
-      highlightMessage: 'Drag or swipe to view different dates of the week',
-    ),
-    const TutorialStepData(
-      tabIndex: 4,
-      title: 'Quest Hub & Study Pet 🏆',
-      description: 'Earn Experience Points (XP) for completing tasks, grow your cute Study Pet, level up, and unlock prestigious achievement badges as milestones.',
-      icon: Icons.emoji_events_rounded,
-      highlightMessage: 'Check daily and weekly quests for bonus XP!',
-    ),
-    const TutorialStepData(
-      tabIndex: 5,
-      title: 'Settings & Customization ⚙️',
-      description: 'Customize light/dark visual themes, toggle Low Performance mode (smoother for older devices), review the About page, and access our Privacy Policy documents.',
-      icon: Icons.settings_rounded,
-      highlightMessage: 'Find the new About and Privacy Policy screens here',
-    ),
-    const TutorialStepData(
-      tabIndex: 0,
-      title: 'All Set & Ready! 🎉',
-      description: 'You are completely set to establish your learning flow! Complete tasks, maintain your streak, and see your productivity soar with StudyFlow.',
-      icon: Icons.auto_awesome_rounded,
-      highlightMessage: 'Tap Let\'s Go! to begin your journey',
-    ),
-  ];
+  // Content for each tutorial step, built dynamically to support localization
+  List<TutorialStepData> _buildSteps(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return [
+      TutorialStepData(
+        tabIndex: 0,
+        title: localizations.tutorialWelcomeTitle,
+        description: localizations.tutorialWelcomeDesc,
+        icon: Icons.school_rounded,
+        highlightMessage: localizations.tutorialWelcomeHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 0,
+        title: localizations.tutorialDashboardTitle,
+        description: localizations.tutorialDashboardDesc,
+        icon: Icons.dashboard_rounded,
+        highlightMessage: localizations.tutorialDashboardHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 1,
+        title: localizations.tutorialTimerTitle,
+        description: localizations.tutorialTimerDesc,
+        icon: Icons.hourglass_empty_rounded,
+        highlightMessage: localizations.tutorialTimerHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 2,
+        title: localizations.tutorialTaskManagerTitle,
+        description: localizations.tutorialTaskManagerDesc,
+        icon: Icons.assignment_rounded,
+        highlightMessage: localizations.tutorialTaskManagerHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 3,
+        title: localizations.tutorialScheduleTitle,
+        description: localizations.tutorialScheduleDesc,
+        icon: Icons.event_note_rounded,
+        highlightMessage: localizations.tutorialScheduleHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 4,
+        subTabIndex: 0, // Streak Tab
+        title: localizations.tutorialQuestsTitle,
+        description: localizations.tutorialQuestsDesc,
+        icon: Icons.emoji_events_rounded,
+        highlightMessage: localizations.tutorialQuestsHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 4,
+        subTabIndex: 1, // Pet Tab
+        title: localizations.tutorialPetTitle,
+        description: localizations.tutorialPetDesc,
+        icon: Icons.pets_rounded,
+        highlightMessage: localizations.tutorialPetHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 4,
+        subTabIndex: 2, // Badges Tab
+        title: localizations.tutorialBadgesGetTitle,
+        description: localizations.tutorialBadgesGetDesc,
+        icon: Icons.emoji_events_rounded,
+        highlightMessage: localizations.tutorialBadgesGetHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 4,
+        subTabIndex: 2, // Badges Tab
+        title: localizations.tutorialBadgesSetTitle,
+        description: localizations.tutorialBadgesSetDesc,
+        icon: Icons.auto_awesome_rounded,
+        highlightMessage: localizations.tutorialBadgesSetHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 5,
+        title: localizations.tutorialSettingsTitle,
+        description: localizations.tutorialSettingsDesc,
+        icon: Icons.settings_rounded,
+        highlightMessage: localizations.tutorialSettingsHighlight,
+      ),
+      TutorialStepData(
+        tabIndex: 0,
+        title: localizations.tutorialReadyTitle,
+        description: localizations.tutorialReadyDesc,
+        icon: Icons.auto_awesome_rounded,
+        highlightMessage: localizations.tutorialReadyHighlight,
+      ),
+    ];
+  }
 
   void _nextStep() {
+    final steps = _buildSteps(context);
     if (_currentStep < _totalSteps - 1) {
       setState(() {
         _currentStep++;
       });
-      widget.onStepChanged(_steps[_currentStep].tabIndex);
+      final nextStepData = steps[_currentStep];
+      widget.onStepChanged(nextStepData.tabIndex);
+      if (nextStepData.subTabIndex != null) {
+        context.read<GamificationViewModel>().changeSubTab(nextStepData.subTabIndex!);
+      }
     } else {
       widget.onComplete();
     }
   }
 
   void _prevStep() {
+    final steps = _buildSteps(context);
     if (_currentStep > 0) {
       setState(() {
         _currentStep--;
       });
-      widget.onStepChanged(_steps[_currentStep].tabIndex);
+      final prevStepData = steps[_currentStep];
+      widget.onStepChanged(prevStepData.tabIndex);
+      if (prevStepData.subTabIndex != null) {
+        context.read<GamificationViewModel>().changeSubTab(prevStepData.subTabIndex!);
+      }
     }
   }
 
@@ -109,7 +150,9 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
     final isDark = theme.brightness == Brightness.dark;
-    final currentData = _steps[_currentStep];
+    final steps = _buildSteps(context);
+    final currentData = steps[_currentStep];
+    final localizations = AppLocalizations.of(context)!;
 
     return Material(
       color: Colors.black.withValues(alpha: 0.65), // Dark overlay backdrop
@@ -254,7 +297,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                               TextButton(
                                 onPressed: widget.onComplete,
                                 child: Text(
-                                  'Skip',
+                                  localizations.tutorialSkip,
                                   style: TextStyle(
                                     color: ext.subtext,
                                     fontWeight: FontWeight.bold,
@@ -275,7 +318,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                                   side: BorderSide(color: ext.subtext.withValues(alpha: 0.5)),
                                 ),
                                 child: Text(
-                                  'Back',
+                                  localizations.tutorialBack,
                                   style: TextStyle(
                                     color: theme.colorScheme.onSurface,
                                     fontWeight: FontWeight.w600,
@@ -297,7 +340,9 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                                 elevation: 0,
                               ),
                               child: Text(
-                                _currentStep == _totalSteps - 1 ? 'Let\'s Go!' : 'Next',
+                                _currentStep == _totalSteps - 1
+                                    ? localizations.tutorialStart
+                                    : localizations.tutorialNext,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -325,7 +370,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                         border: Border.all(color: Colors.white12),
                       ),
                       child: Text(
-                        'Dock switches to relevant section automatically 🪄',
+                        localizations.tutorialDockTip,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 11,
@@ -347,6 +392,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
 
 class TutorialStepData {
   final int tabIndex;
+  final int? subTabIndex;
   final String title;
   final String description;
   final IconData icon;
@@ -354,6 +400,7 @@ class TutorialStepData {
 
   const TutorialStepData({
     required this.tabIndex,
+    this.subTabIndex,
     required this.title,
     required this.description,
     required this.icon,

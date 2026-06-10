@@ -8,6 +8,7 @@ import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/gamification/data/models/pet_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 import 'package:studyflow/shared/widgets/loading/pet_skeleton.dart';
 
@@ -96,7 +97,7 @@ class _PetTabState extends State<PetTab> {
                           const Icon(Icons.pets_rounded, color: Colors.purpleAccent, size: 16),
                           const SizedBox(width: 4),
                           Text(
-                            'LV ${pet.level}',
+                            '${AppLocalizations.of(context)!.level} ${pet.level}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.purpleAccent,
@@ -112,7 +113,7 @@ class _PetTabState extends State<PetTab> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        _getStageLabel(pet.evolutionStage),
+                        _getStageLabel(context, pet.evolutionStage),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.accent,
@@ -156,7 +157,7 @@ class _PetTabState extends State<PetTab> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Your learning pet companion',
+                  AppLocalizations.of(context)!.petCompanion,
                   style: TextStyle(
                     fontSize: 12,
                     color: ext.subtext,
@@ -175,7 +176,7 @@ class _PetTabState extends State<PetTab> {
               children: [
                 // Chỉ số đói (Hunger)
                 _buildStatProgress(
-                  label: 'Hunger',
+                  label: AppLocalizations.of(context)!.hunger,
                   valueStr: '${pet.hunger}/100',
                   progress: hungerProgress,
                   color: _getHungerColor(pet.hunger),
@@ -184,7 +185,7 @@ class _PetTabState extends State<PetTab> {
                 const SizedBox(height: 20),
                 // Chỉ số EXP Pet
                 _buildStatProgress(
-                  label: 'Pet Experience',
+                  label: AppLocalizations.of(context)!.petRequiredXp,
                   valueStr: '${pet.exp.toInt()}/$requiredXp',
                   progress: expProgress,
                   color: Colors.purpleAccent,
@@ -208,12 +209,12 @@ class _PetTabState extends State<PetTab> {
                     label: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Feed',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        Text(
+                          AppLocalizations.of(context)!.feed,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         Text(
-                          'Costs 10 Coins (You have: $coins)',
+                          AppLocalizations.of(context)!.feedCost(coins),
                           style: const TextStyle(fontSize: 9, color: Colors.white70),
                         ),
                       ],
@@ -236,9 +237,9 @@ class _PetTabState extends State<PetTab> {
                   child: ElevatedButton.icon(
                     onPressed: petVm.isActionInProgress ? null : () => _handlePlay(petVm),
                     icon: const Icon(Icons.sports_esports_rounded, color: Colors.white),
-                    label: const Text(
-                      'Play',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    label: Text(
+                      AppLocalizations.of(context)!.play,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.accent,
@@ -342,12 +343,13 @@ class _PetTabState extends State<PetTab> {
   }
 
   /// Đọc nhãn giai đoạn tiến hóa tiếng Việt
-  String _getStageLabel(String stage) {
+  /// Đọc nhãn giai đoạn tiến hóa
+  String _getStageLabel(BuildContext context, String stage) {
     switch (stage) {
-      case 'Egg': return 'Egg 🥚';
-      case 'Baby': return 'Baby 🍼';
-      case 'Teen': return 'Teen ⚡';
-      case 'Adult': return 'Adult 👑';
+      case 'Egg': return AppLocalizations.of(context)!.eggEvolution;
+      case 'Baby': return AppLocalizations.of(context)!.babyEvolution;
+      case 'Teen': return AppLocalizations.of(context)!.teenEvolution;
+      case 'Adult': return AppLocalizations.of(context)!.adultEvolution;
       default: return stage;
     }
   }
@@ -417,12 +419,12 @@ class _PetTabState extends State<PetTab> {
               .scale(duration: 1.5.seconds, curve: Curves.bounceOut),
           const SizedBox(height: 20),
           Text(
-            'You don\'t have a Study Pet yet!',
+            AppLocalizations.of(context)!.dontHavePet,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
           ),
           const SizedBox(height: 8),
           Text(
-            'Adopt a learning pet to join you on your study journey.',
+            AppLocalizations.of(context)!.adoptPetDesc,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: ext.subtext),
           ),
@@ -436,7 +438,7 @@ class _PetTabState extends State<PetTab> {
               children: [
                 // 1. Nhập tên
                 Text(
-                  'Name your Pet:',
+                  AppLocalizations.of(context)!.nameYourPet,
                   style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                 ),
                 const SizedBox(height: 8),
@@ -444,7 +446,7 @@ class _PetTabState extends State<PetTab> {
                   controller: _nameController,
                   style: TextStyle(color: theme.colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Enter pet name (e.g., Meow meow)...',
+                    hintText: AppLocalizations.of(context)!.enterPetNameHint,
                     hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                     filled: true,
                     fillColor: theme.brightness == Brightness.dark ? Colors.white12 : Colors.black12,
@@ -455,16 +457,16 @@ class _PetTabState extends State<PetTab> {
 
                 // 2. Chọn loại Pet
                 Text(
-                  'Choose a pet egg:',
+                  AppLocalizations.of(context)!.choosePetEgg,
                   style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildPetOption('Cat', '🐱 Cat', theme),
-                    _buildPetOption('Dog', '🐶 Dog', theme),
-                    _buildPetOption('Panda', '🐼 Panda', theme),
+                    _buildPetOption('Cat', '🐱 ${AppLocalizations.of(context)!.cat}', theme),
+                    _buildPetOption('Dog', '🐶 ${AppLocalizations.of(context)!.dog}', theme),
+                    _buildPetOption('Panda', '🐼 ${AppLocalizations.of(context)!.panda}', theme),
                   ],
                 ),
               ],
@@ -483,9 +485,9 @@ class _PetTabState extends State<PetTab> {
               ),
               child: petVm.isActionInProgress
                   ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
-                  : const Text(
-                      'Adopt Now 🥚',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  : Text(
+                      AppLocalizations.of(context)!.adoptNowBtn,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
             ),
           ),
@@ -527,7 +529,7 @@ class _PetTabState extends State<PetTab> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please give your pet a name!'), backgroundColor: Colors.redAccent),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseGivePetName), backgroundColor: Colors.redAccent),
       );
       return;
     }

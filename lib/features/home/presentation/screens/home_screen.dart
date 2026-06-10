@@ -11,6 +11,7 @@ import 'package:studyflow/features/notification/presentation/screens/notificatio
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// The main screen of the application (View in MVVM).
 /// Its only responsibility is to compose smaller widgets together
@@ -76,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Have a good day,',
+                    AppLocalizations.of(context)!.haveAGoodDay,
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
