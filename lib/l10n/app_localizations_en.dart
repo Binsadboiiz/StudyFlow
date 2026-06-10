@@ -830,4 +830,136 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tutorialDockTip =>
       'Dock switches to relevant section automatically 🪄';
+
+  @override
+  String get scanTitle => 'Documents';
+
+  @override
+  String get scanSearchHint => 'Search documents...';
+
+  @override
+  String get scanNoDocumentsTitle => 'No documents yet';
+
+  @override
+  String get scanNoDocumentsSubtitle =>
+      'Tap the button below to scan your first document';
+
+  @override
+  String get scanNoSearchResults => 'No documents found';
+
+  @override
+  String get scanNoSearchResultsSubtitle =>
+      'Try searching with a different keyword';
+
+  @override
+  String get scanSave => 'Save';
+
+  @override
+  String get scanSaving => 'Saving...';
+
+  @override
+  String get scanReviewTitle => 'Review Results';
+
+  @override
+  String get scanConfidence => 'Confidence';
+
+  @override
+  String get scanLanguage => 'Language';
+
+  @override
+  String get scanSize => 'Size';
+
+  @override
+  String get scanTitleHint => 'Enter document title...';
+
+  @override
+  String get scanSaveButton => 'Save Document';
+
+  @override
+  String get scanSavingUpload => 'Uploading and saving...';
+
+  @override
+  String get scanEmptyTitleError => 'Please enter a document title';
+
+  @override
+  String get scanEmptyTextError => 'Text content cannot be empty';
+
+  @override
+  String get scanSaveSuccess => 'Document saved successfully!';
+
+  @override
+  String get scanSaveFailed => 'Could not save document';
+
+  @override
+  String get scanDetailTitle => 'Document Detail';
+
+  @override
+  String get scanNotFound => 'Document not found';
+
+  @override
+  String get scanLoadImageFailed => 'Could not load image';
+
+  @override
+  String get scanInfoTitle => 'Document Information';
+
+  @override
+  String get scanCreatedAt => 'Created At';
+
+  @override
+  String get scanUpdatedAt => 'Updated At';
+
+  @override
+  String get scanTextContentTitle => 'Text Content';
+
+  @override
+  String get scanCopyAll => 'Copy All';
+
+  @override
+  String get scanCopySuccess => 'Text content copied';
+
+  @override
+  String get scanEmptyText => 'No text content';
+
+  @override
+  String get scanDeleteConfirmTitle => 'Delete Document?';
+
+  @override
+  String scanDeleteConfirmDesc(Object title) {
+    return 'Are you sure you want to delete \"$title\"?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get scanDeleteCancel => 'Cancel';
+
+  @override
+  String get scanDeleteConfirm => 'Delete';
+
+  @override
+  String get scanDeleteSuccess => 'Document deleted';
+
+  @override
+  String get scanCameraOptionsTitle => 'Select Image';
+
+  @override
+  String get scanCamera => 'Camera';
+
+  @override
+  String get scanGallery => 'Gallery';
+
+  @override
+  String get scanProcessingText => 'Processing image...';
+
+  @override
+  String get scanProcessFailed => 'Image processing failed or cancelled';
+
+  @override
+  String scanStorageUsage(Object total, Object used) {
+    return 'Storage: $used / $total MB';
+  }
+
+  @override
+  String get scanQuotaExceeded => 'Storage quota exceeded';
+
+  @override
+  String get scanFeatureDesc => 'Scan physical documents using OCR';
 }

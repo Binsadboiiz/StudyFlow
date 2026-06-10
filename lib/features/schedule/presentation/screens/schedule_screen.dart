@@ -16,7 +16,8 @@ import 'package:studyflow/core/widgets/glass_card.dart';
 /// It provides users with an overview of tasks throughout the 7 days,
 /// supports navigating between weeks, and displays tasks in a Timeline format.
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
+  final bool isNested;
+  const ScheduleScreen({super.key, this.isNested = false});
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
@@ -33,24 +34,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Schedule', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
-                  GestureDetector(
-                    onTap: () => _showAddDialog(context, vm),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.add_rounded, color: AppColors.accent, size: 22),
+            if (!widget.isNested) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Schedule', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+                    GestureDetector(
+                      onTap: () => _showAddDialog(context, vm),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                        child: const Icon(Icons.add_rounded, color: AppColors.accent, size: 22),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 12),
             DayTabBar(
               weekDays: vm.weekDays,
@@ -90,6 +93,22 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ],
         ),
       ),
+      floatingActionButton: widget.isNested
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 80.0),
+              child: FloatingActionButton(
+                heroTag: 'schedule_add_fab',
+                onPressed: () => _showAddDialog(context, vm),
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.add_rounded, size: 26),
+              ),
+            )
+          : null,
     );
   }
 

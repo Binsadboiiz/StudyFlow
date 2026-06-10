@@ -846,4 +846,137 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tutorialDockTip =>
       'Dock wechselt automatisch in den relevanten Bereich 🪄';
+
+  @override
+  String get scanTitle => 'Dokumente';
+
+  @override
+  String get scanSearchHint => 'Dokumente suchen...';
+
+  @override
+  String get scanNoDocumentsTitle => 'Noch keine Dokumente';
+
+  @override
+  String get scanNoDocumentsSubtitle =>
+      'Tippen Sie auf die Schaltfläche unten, um Ihr erstes Dokument zu scannen';
+
+  @override
+  String get scanNoSearchResults => 'Keine Dokumente gefunden';
+
+  @override
+  String get scanNoSearchResultsSubtitle =>
+      'Versuchen Sie die Suche mit einem anderen Schlüsselwort';
+
+  @override
+  String get scanSave => 'Speichern';
+
+  @override
+  String get scanSaving => 'Wird gespeichert...';
+
+  @override
+  String get scanReviewTitle => 'Ergebnisse überprüfen';
+
+  @override
+  String get scanConfidence => 'Zuverlässigkeit';
+
+  @override
+  String get scanLanguage => 'Sprache';
+
+  @override
+  String get scanSize => 'Größe';
+
+  @override
+  String get scanTitleHint => 'Dokumententitel eingeben...';
+
+  @override
+  String get scanSaveButton => 'Dokument speichern';
+
+  @override
+  String get scanSavingUpload => 'Hochladen und speichern...';
+
+  @override
+  String get scanEmptyTitleError => 'Bitte geben Sie einen Dokumententitel ein';
+
+  @override
+  String get scanEmptyTextError => 'Textinhalt darf nicht leer sein';
+
+  @override
+  String get scanSaveSuccess => 'Dokument erfolgreich gespeichert!';
+
+  @override
+  String get scanSaveFailed => 'Dokument konnte nicht gespeichert werden';
+
+  @override
+  String get scanDetailTitle => 'Dokumentdetails';
+
+  @override
+  String get scanNotFound => 'Dokument nicht gefunden';
+
+  @override
+  String get scanLoadImageFailed => 'Bild konnte nicht geladen werden';
+
+  @override
+  String get scanInfoTitle => 'Dokumenteninformation';
+
+  @override
+  String get scanCreatedAt => 'Erstellt am';
+
+  @override
+  String get scanUpdatedAt => 'Aktualisiert am';
+
+  @override
+  String get scanTextContentTitle => 'Textinhalt';
+
+  @override
+  String get scanCopyAll => 'Alles kopieren';
+
+  @override
+  String get scanCopySuccess => 'Textinhalt kopiert';
+
+  @override
+  String get scanEmptyText => 'Kein Textinhalt';
+
+  @override
+  String get scanDeleteConfirmTitle => 'Dokument löschen?';
+
+  @override
+  String scanDeleteConfirmDesc(Object title) {
+    return 'Möchten Sie \"$title\" wirklich löschen?\nDies kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get scanDeleteCancel => 'Abbrechen';
+
+  @override
+  String get scanDeleteConfirm => 'Löschen';
+
+  @override
+  String get scanDeleteSuccess => 'Dokument gelöscht';
+
+  @override
+  String get scanCameraOptionsTitle => 'Bild auswählen';
+
+  @override
+  String get scanCamera => 'Kamera';
+
+  @override
+  String get scanGallery => 'Galerie';
+
+  @override
+  String get scanProcessingText => 'Bild wird verarbeitet...';
+
+  @override
+  String get scanProcessFailed =>
+      'Bildverarbeitung fehlgeschlagen oder abgebrochen';
+
+  @override
+  String scanStorageUsage(Object total, Object used) {
+    return 'Speicher: $used / $total MB';
+  }
+
+  @override
+  String get scanQuotaExceeded => 'Speicherkontingent überschritten';
+
+  @override
+  String get scanFeatureDesc => 'Physische Dokumente mit OCR scannen';
 }

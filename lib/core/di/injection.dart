@@ -34,6 +34,16 @@ import 'package:studyflow/features/gamification/data/repositories/pet_repository
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
 
+// Scan feature (OCR Document Scanning)
+import 'package:studyflow/features/scan/data/datasource/scan_remote_datasource.dart';
+import 'package:studyflow/features/scan/data/repositories/scan_repository_impl.dart';
+import 'package:studyflow/features/scan/presentation/viewmodels/scan_viewmodel.dart';
+import 'package:studyflow/features/scan/domain/usecase/get_scanned_documents_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/scan_document_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/delete_scanned_document_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/get_storage_usage_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/search_documents_usecase.dart';
+
 /// A utility class for setting up dependency injection across the application.
 /// It initializes repositories and provides a list of Providers for state management.
 class DependencyInjection {
@@ -47,6 +57,8 @@ class DependencyInjection {
   static late final GamificationRepository gamificationRepository;
   /// The globally available study pet repository instance.
   static late final PetRepository petRepository;
+  /// The globally available scan repository instance (OCR Document Scanning).
+  static late final ScanRepositoryImpl scanRepository;
 
   /// Initializes all the dependencies needed for the application.
   /// This should be called before `runApp()` in `main.dart`.
@@ -70,6 +82,10 @@ class DependencyInjection {
     // Set up gamification and pet repositories
     gamificationRepository = GamificationRepository();
     petRepository = PetRepository();
+
+    // Set up data sources and repositories for scan (OCR)
+    final scanRemoteDatasource = ScanRemoteDatasource(auth: auth);
+    scanRepository = ScanRepositoryImpl(scanRemoteDatasource);
   }
 
   /// Returns a list of all state management providers used in the application.
@@ -130,6 +146,16 @@ class DependencyInjection {
       ChangeNotifierProvider(
         create: (_) => PetViewModel(
           petRepository: petRepository,
+        ),
+      ),
+      // Provider cho tính năng quét tài liệu OCR
+      ChangeNotifierProvider(
+        create: (_) => ScanViewModel(
+          getDocumentsUseCase: GetScannedDocuments(scanRepository),
+          scanDocumentUseCase: ScanDocument(scanRepository),
+          deleteDocumentUseCase: DeleteScannedDocument(scanRepository),
+          getStorageUsageUseCase: GetStorageUsage(scanRepository),
+          searchDocumentsUseCase: SearchDocuments(scanRepository),
         ),
       ),
     ];

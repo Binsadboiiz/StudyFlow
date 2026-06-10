@@ -17,7 +17,8 @@ import 'package:studyflow/l10n/app_localizations.dart';
 /// `TaskScreen` is the daily task management screen.
 /// It allows users to view their task list by day, add/edit/delete tasks, and mark them as completed.
 class TaskScreen extends StatefulWidget {
-  const TaskScreen({super.key});
+  final bool isNested;
+  const TaskScreen({super.key, this.isNested = false});
   @override
   State<TaskScreen> createState() => _TaskScreenState();
 }
@@ -46,7 +47,7 @@ class _TaskScreenState extends State<TaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
+            if (!widget.isNested) const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -55,15 +56,17 @@ class _TaskScreenState extends State<TaskScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        AppLocalizations.of(context)!.tasks,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
+                      if (!widget.isNested) ...[
+                        Text(
+                          AppLocalizations.of(context)!.tasks,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
+                        const SizedBox(height: 4),
+                      ],
                       Text(
                         '${AppLocalizations.of(context)!.remainingWithCount(vm.tasks.where((t) => !t.isCompleted).length)} · ${AppLocalizations.of(context)!.completedWithCount(vm.tasks.where((t) => t.isCompleted).length)}',
                         style: TextStyle(

@@ -839,4 +839,135 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get tutorialDockTip =>
       'Thanh điều hướng tự động chuyển mục phù hợp 🪄';
+
+  @override
+  String get scanTitle => 'Tài liệu';
+
+  @override
+  String get scanSearchHint => 'Tìm kiếm tài liệu...';
+
+  @override
+  String get scanNoDocumentsTitle => 'Chưa có tài liệu nào';
+
+  @override
+  String get scanNoDocumentsSubtitle =>
+      'Nhấn nút bên dưới để quét tài liệu đầu tiên';
+
+  @override
+  String get scanNoSearchResults => 'Không tìm thấy tài liệu';
+
+  @override
+  String get scanNoSearchResultsSubtitle => 'Thử tìm kiếm với từ khóa khác';
+
+  @override
+  String get scanSave => 'Lưu';
+
+  @override
+  String get scanSaving => 'Đang lưu...';
+
+  @override
+  String get scanReviewTitle => 'Xem lại kết quả';
+
+  @override
+  String get scanConfidence => 'Tin cậy';
+
+  @override
+  String get scanLanguage => 'Ngôn ngữ';
+
+  @override
+  String get scanSize => 'Kích thước';
+
+  @override
+  String get scanTitleHint => 'Nhập tiêu đề tài liệu...';
+
+  @override
+  String get scanSaveButton => 'Lưu tài liệu';
+
+  @override
+  String get scanSavingUpload => 'Đang tải lên và lưu...';
+
+  @override
+  String get scanEmptyTitleError => 'Vui lòng nhập tiêu đề tài liệu';
+
+  @override
+  String get scanEmptyTextError => 'Nội dung văn bản không được để trống';
+
+  @override
+  String get scanSaveSuccess => 'Đã lưu tài liệu thành công!';
+
+  @override
+  String get scanSaveFailed => 'Không thể lưu tài liệu';
+
+  @override
+  String get scanDetailTitle => 'Chi tiết tài liệu';
+
+  @override
+  String get scanNotFound => 'Không tìm thấy tài liệu';
+
+  @override
+  String get scanLoadImageFailed => 'Không thể tải ảnh';
+
+  @override
+  String get scanInfoTitle => 'Thông tin tài liệu';
+
+  @override
+  String get scanCreatedAt => 'Ngày tạo';
+
+  @override
+  String get scanUpdatedAt => 'Cập nhật';
+
+  @override
+  String get scanTextContentTitle => 'Nội dung văn bản';
+
+  @override
+  String get scanCopyAll => 'Sao chép toàn bộ';
+
+  @override
+  String get scanCopySuccess => 'Đã sao chép nội dung văn bản';
+
+  @override
+  String get scanEmptyText => 'Không có nội dung văn bản';
+
+  @override
+  String get scanDeleteConfirmTitle => 'Xóa tài liệu?';
+
+  @override
+  String scanDeleteConfirmDesc(Object title) {
+    return 'Bạn có chắc chắn muốn xóa \"$title\"?\nHành động này không thể hoàn tác.';
+  }
+
+  @override
+  String get scanDeleteCancel => 'Hủy';
+
+  @override
+  String get scanDeleteConfirm => 'Xóa';
+
+  @override
+  String get scanDeleteSuccess => 'Đã xóa tài liệu';
+
+  @override
+  String get scanCameraOptionsTitle => 'Chọn ảnh';
+
+  @override
+  String get scanCamera => 'Máy ảnh';
+
+  @override
+  String get scanGallery => 'Thư viện';
+
+  @override
+  String get scanProcessingText => 'Đang xử lý ảnh...';
+
+  @override
+  String get scanProcessFailed => 'Xử lý ảnh thất bại hoặc bị hủy';
+
+  @override
+  String scanStorageUsage(Object total, Object used) {
+    return 'Lưu trữ: $used / $total MB';
+  }
+
+  @override
+  String get scanQuotaExceeded => 'Đã vượt quá giới hạn lưu trữ';
+
+  @override
+  String get scanFeatureDesc => 'Quét tài liệu vật lý sử dụng OCR';
 }

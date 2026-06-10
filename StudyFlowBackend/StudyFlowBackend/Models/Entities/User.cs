@@ -32,6 +32,16 @@ namespace StudyFlowBackend.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         
         /// <summary>
+        /// Tổng dung lượng storage đã sử dụng (bytes) cho OCR documents
+        /// </summary>
+        public long StorageUsedBytes { get; set; } = 0;
+
+        /// <summary>
+        /// Giới hạn storage (bytes) - mặc định 200MB = 209715200 bytes
+        /// </summary>
+        public long StorageQuotaBytes { get; set; } = 209715200;
+
+        /// <summary>
         /// EF Core 8 hỗ trợ map trực tiếp List<string> xuống PostgreSQL Array type.
         /// </summary>
         public List<string> StreakHistory { get; set; } = new List<string>();
@@ -47,5 +57,9 @@ namespace StudyFlowBackend.Models
 
         // Navigation Property: 1 User có nhiều FocusSessions
         public ICollection<FocusSession> FocusSessions { get; set; } = new List<FocusSession>();
+
+        // Navigation Property: 1 User có nhiều ScannedDocuments
+        public ICollection<ScannedDocument> ScannedDocuments { get; set; } = new List<ScannedDocument>();
     }
 }
+

@@ -6,18 +6,19 @@ import 'package:studyflow/core/services/notification/local_notification_helper.d
 import 'package:studyflow/core/widgets/permission_explanation_dialog.dart';
 import 'package:studyflow/features/home/presentation/screens/home_screen.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
-import 'package:studyflow/features/task/presentation/screens/task_screen.dart';
-import 'package:studyflow/features/schedule/presentation/screens/schedule_screen.dart';
 import 'package:studyflow/features/gamification/presentation/screens/gamification_hub_screen.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/features/home/presentation/screens/task_schedule_hub_screen.dart';
 import 'package:studyflow/features/home/presentation/screens/settings_screen.dart';
 import 'package:studyflow/features/task/presentation/widgets/task_form_modal.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
 import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
+import 'package:studyflow/features/scan/presentation/screens/scan_home_screen.dart';
+import 'package:studyflow/features/scan/presentation/viewmodels/scan_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyflow/features/home/presentation/widgets/tutorial_overlay.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
@@ -47,8 +48,8 @@ class _MainScreenState extends State<MainScreen>
     _screens = const [
       HomeScreen(),
       FocusScreen(),
-      TaskScreen(),
-      ScheduleScreen(),
+      ScanHomeScreen(),
+      TaskScheduleHubScreen(),
       GamificationHubScreen(),
       SettingsScreen(),
     ];
@@ -179,7 +180,7 @@ class _MainScreenState extends State<MainScreen>
                       children: [
                         _buildNavItem(icon: Icons.grid_view_rounded, label: AppLocalizations.of(context)!.home, index: 0),
                         _buildNavItem(icon: Icons.hourglass_empty_rounded, label: AppLocalizations.of(context)!.focus, index: 1),
-                        _buildNavItem(icon: Icons.assignment_rounded, label: AppLocalizations.of(context)!.tasks, index: 2),
+                        _buildNavItem(icon: Icons.document_scanner_rounded, label: AppLocalizations.of(context)!.scanTitle, index: 2),
                       ],
                     ),
                   ),
@@ -223,7 +224,7 @@ class _MainScreenState extends State<MainScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildNavItem(icon: Icons.event_note_rounded, label: AppLocalizations.of(context)!.schedule, index: 3),
+                        _buildNavItem(icon: Icons.assignment_rounded, label: AppLocalizations.of(context)!.tasks, index: 3),
                         _buildNavItem(icon: Icons.emoji_events_rounded, label: AppLocalizations.of(context)!.quest, index: 4),
                         _buildNavItem(icon: Icons.settings_rounded, label: AppLocalizations.of(context)!.settings, index: 5),
                       ],
@@ -299,16 +300,19 @@ class _MainScreenState extends State<MainScreen>
       case 0: // Home
         context.read<HomeViewModel>().refreshTasks();
         break;
-      case 2: // Tasks
+      case 2: // Scan
+        context.read<ScanViewModel>().loadDocuments();
+        break;
+      case 3: // Tasks & Schedule Hub
         context.read<TaskViewmodel>().loadTask(
           context.read<TaskViewmodel>().selectedDate,
         );
-        break;
-      case 3: // Schedule
         context.read<ScheduleViewmodel>().loadWeekTasks();
         break;
       case 4: // Quest Hub
         context.read<GamificationViewModel>().refreshAll();
+        break;
+      case 5: // Settings
         break;
     }
   }

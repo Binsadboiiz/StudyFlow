@@ -17,6 +17,7 @@ namespace StudyFlowBackend.Data
         public DbSet<Badge> Badges { get; set; }
         public DbSet<UserBadge> UserBadges { get; set; }
         public DbSet<StudyPet> StudyPets { get; set; }
+        public DbSet<ScannedDocument> ScannedDocuments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -84,6 +85,21 @@ namespace StudyFlowBackend.Data
                 .WithMany()
                 .HasForeignKey(un => un.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Cấu hình khoá chính cho ScannedDocument
+            modelBuilder.Entity<ScannedDocument>()
+                .HasKey(sd => sd.Id);
+
+            // Cấu hình mối quan hệ 1-N (1 User có nhiều ScannedDocuments)
+            modelBuilder.Entity<ScannedDocument>()
+                .HasOne(sd => sd.User)
+                .WithMany(u => u.ScannedDocuments)
+                .HasForeignKey(sd => sd.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Nếu xóa User thì xóa luôn các ScannedDocuments
+
+            // Index cho performance khi query ScannedDocuments theo UserId
+            modelBuilder.Entity<ScannedDocument>()
+                .HasIndex(sd => sd.UserId);
 
             // Cấu hình mối quan hệ User - FeaturedBadge (1 Badge được gán nổi bật bởi nhiều Users)
             modelBuilder.Entity<User>()

@@ -1635,6 +1635,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dock switches to relevant section automatically 🪄'**
   String get tutorialDockTip;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get scanTitle;
+
+  /// No description provided for @scanSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search documents...'**
+  String get scanSearchHint;
+
+  /// No description provided for @scanNoDocumentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents yet'**
+  String get scanNoDocumentsTitle;
+
+  /// No description provided for @scanNoDocumentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button below to scan your first document'**
+  String get scanNoDocumentsSubtitle;
+
+  /// No description provided for @scanNoSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents found'**
+  String get scanNoSearchResults;
+
+  /// No description provided for @scanNoSearchResultsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching with a different keyword'**
+  String get scanNoSearchResultsSubtitle;
+
+  /// No description provided for @scanSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get scanSave;
+
+  /// No description provided for @scanSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get scanSaving;
+
+  /// No description provided for @scanReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Results'**
+  String get scanReviewTitle;
+
+  /// No description provided for @scanConfidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get scanConfidence;
+
+  /// No description provided for @scanLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get scanLanguage;
+
+  /// No description provided for @scanSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get scanSize;
+
+  /// No description provided for @scanTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter document title...'**
+  String get scanTitleHint;
+
+  /// No description provided for @scanSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Document'**
+  String get scanSaveButton;
+
+  /// No description provided for @scanSavingUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading and saving...'**
+  String get scanSavingUpload;
+
+  /// No description provided for @scanEmptyTitleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a document title'**
+  String get scanEmptyTitleError;
+
+  /// No description provided for @scanEmptyTextError.
+  ///
+  /// In en, this message translates to:
+  /// **'Text content cannot be empty'**
+  String get scanEmptyTextError;
+
+  /// No description provided for @scanSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document saved successfully!'**
+  String get scanSaveSuccess;
+
+  /// No description provided for @scanSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save document'**
+  String get scanSaveFailed;
+
+  /// No description provided for @scanDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Detail'**
+  String get scanDetailTitle;
+
+  /// No description provided for @scanNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Document not found'**
+  String get scanNotFound;
+
+  /// No description provided for @scanLoadImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load image'**
+  String get scanLoadImageFailed;
+
+  /// No description provided for @scanInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Information'**
+  String get scanInfoTitle;
+
+  /// No description provided for @scanCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created At'**
+  String get scanCreatedAt;
+
+  /// No description provided for @scanUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated At'**
+  String get scanUpdatedAt;
+
+  /// No description provided for @scanTextContentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Content'**
+  String get scanTextContentTitle;
+
+  /// No description provided for @scanCopyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy All'**
+  String get scanCopyAll;
+
+  /// No description provided for @scanCopySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Text content copied'**
+  String get scanCopySuccess;
+
+  /// No description provided for @scanEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No text content'**
+  String get scanEmptyText;
+
+  /// No description provided for @scanDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Document?'**
+  String get scanDeleteConfirmTitle;
+
+  /// No description provided for @scanDeleteConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{title}\"?\nThis action cannot be undone.'**
+  String scanDeleteConfirmDesc(Object title);
+
+  /// No description provided for @scanDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get scanDeleteCancel;
+
+  /// No description provided for @scanDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get scanDeleteConfirm;
+
+  /// No description provided for @scanDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document deleted'**
+  String get scanDeleteSuccess;
+
+  /// No description provided for @scanCameraOptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Image'**
+  String get scanCameraOptionsTitle;
+
+  /// No description provided for @scanCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get scanCamera;
+
+  /// No description provided for @scanGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get scanGallery;
+
+  /// No description provided for @scanProcessingText.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing image...'**
+  String get scanProcessingText;
+
+  /// No description provided for @scanProcessFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Image processing failed or cancelled'**
+  String get scanProcessFailed;
+
+  /// No description provided for @scanStorageUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage: {used} / {total} MB'**
+  String scanStorageUsage(Object total, Object used);
+
+  /// No description provided for @scanQuotaExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage quota exceeded'**
+  String get scanQuotaExceeded;
+
+  /// No description provided for @scanFeatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan physical documents using OCR'**
+  String get scanFeatureDesc;
 }
 
 class _AppLocalizationsDelegate

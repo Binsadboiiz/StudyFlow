@@ -58,6 +58,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IGamificationService, GamificationService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+builder.Services.AddScoped<IScannedDocumentService, ScannedDocumentService>();
+builder.Services.AddScoped<IStorageQuotaService, StorageQuotaService>();
 builder.Services.AddHostedService<ReminderWorker>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
