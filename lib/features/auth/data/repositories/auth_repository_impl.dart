@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:studyflow/core/network/api_constants.dart';
 import 'package:studyflow/features/auth/data/datasource/auth_remote_datasource.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
@@ -40,6 +41,38 @@ class AuthRepositoryImpl implements AuthRepository {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_avatar_$userId', avatarUrl);
       _cacheUpdateTrigger.add(null);
+    } catch (_) {}
+  }
+
+  /// Saves the user profile to local cache (SharedPreferences) as JSON.
+  Future<void> _saveUserToCache(UserModel userModel) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final map = userModel.toMap();
+      map['id'] = userModel.id; // Map doesn't include ID, manually write it
+      await prefs.setString('cached_user_profile', jsonEncode(map));
+    } catch (_) {}
+  }
+
+  /// Loads the user profile from local cache (SharedPreferences).
+  Future<UserModel?> _loadUserFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedStr = prefs.getString('cached_user_profile');
+      if (cachedStr != null && cachedStr.isNotEmpty) {
+        final Map<String, dynamic> map = jsonDecode(cachedStr);
+        final String docId = map['id'] ?? '';
+        return UserModel.fromMap(map, docId);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Clears the cached user profile from SharedPreferences.
+  Future<void> _clearUserCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cached_user_profile');
     } catch (_) {}
   }
 
@@ -166,12 +199,23 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     controller.onListen = () {
+      // Fetch and emit cached user profile if available, for instant startup response
+      _loadUserFromCache().then((cachedModel) async {
+        if (cachedModel != null && lastModel == null) {
+          lastModel = cachedModel;
+          await emitLatest();
+        }
+      });
+
       userChangesSub = remoteDatasource.userChanges.listen((userModel) async {
         lastModel = userModel;
         await emitLatest();
         if (userModel != null) {
+          await _saveUserToCache(userModel);
           // Asynchronously sync in background when Firestore model changes to load cache from Postgres.
           _syncUserToBackend(userModel);
+        } else {
+          await _clearUserCache();
         }
       });
 
@@ -197,9 +241,19 @@ class AuthRepositoryImpl implements AuthRepository {
     // Load actual avatar from cache
     await _loadAvatarCache(uid);
 
+    // Try loading cached profile first to avoid initial UI freeze/block
+    final cached = await _loadUserFromCache();
+    if (cached != null && cached.id == uid) {
+      // Return cached user immediately, sync backend in background
+      _syncUserToBackend(cached);
+      return _toEntity(cached);
+    }
+
     // Fetch and return the corresponding user entity.
     final userModel = await remoteDatasource.getUserFromFirestore(uid);
     if (userModel == null) return null;
+
+    await _saveUserToCache(userModel);
 
     // Sync with backend to heal database state and fetch the latest avatar URL from Postgres.
     await _syncUserToBackend(userModel);
@@ -323,6 +377,14 @@ class AuthRepositoryImpl implements AuthRepository {
           : (userModel.photoUrl ??
                 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg');
 
+      // Fetch the actual local timezone dynamically
+      String timezone = "Asia/Ho_Chi_Minh";
+      try {
+        timezone = await FlutterTimezone.getLocalTimezone();
+      } catch (e) {
+        debugPrint('Failed to dynamically fetch local timezone: $e');
+      }
+
       final response = await http.post(
         url,
         headers: {
@@ -334,6 +396,7 @@ class AuthRepositoryImpl implements AuthRepository {
           'username': userModel.username,
           'fullName': userModel.fullName,
           'avatarUrl': avatarToSync,
+          'timezone': timezone,
         }),
       );
 
@@ -386,6 +449,15 @@ class AuthRepositoryImpl implements AuthRepository {
       if (user != null) {
         final token = await user.getIdToken();
         final url = Uri.parse('${ApiConstants.baseUrl}/users/profile');
+        
+        // Fetch the actual local timezone dynamically
+        String timezone = "Asia/Ho_Chi_Minh";
+        try {
+          timezone = await FlutterTimezone.getLocalTimezone();
+        } catch (e) {
+          debugPrint('Failed to dynamically fetch local timezone: $e');
+        }
+
         final response = await http.put(
           url,
           headers: {
@@ -397,6 +469,7 @@ class AuthRepositoryImpl implements AuthRepository {
             'avatarUrl':
                 photoUrl ??
                 'assets/images/3c67757cef723535a7484a6c7bfbfc43.jpg',
+            'timezone': timezone,
           }),
         );
 

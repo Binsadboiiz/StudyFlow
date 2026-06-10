@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studyflow/core/providers/performance_provider.dart';
@@ -101,19 +102,28 @@ class _AnimatedBackgroundState extends State<AnimatedBackground> with SingleTick
           height: double.infinity,
           color: theme.scaffoldBackgroundColor,
         ),
-        // Animated liquid mesh blobs wrapped in RepaintBoundary to prevent constant app-wide repaints
+        // Animated liquid mesh blobs wrapped in RepaintBoundary to prevent constant app-wide repaints.
+        // We use ImageFiltered to perform the blur on the GPU backing texture instead of calculating blurs
+        // on individual vector paths using MaskFilter.blur inside the painter loop.
         RepaintBoundary(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return CustomPaint(
-                size: Size.infinite,
-                painter: LiquidMeshPainter(
-                  progress: _controller.value,
-                  colors: blobColors,
-                ),
-              );
-            },
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: 90.0,
+              sigmaY: 90.0,
+              tileMode: TileMode.decal,
+            ),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return CustomPaint(
+                  size: Size.infinite,
+                  painter: LiquidMeshPainter(
+                    progress: _controller.value,
+                    colors: blobColors,
+                  ),
+                );
+              },
+            ),
           ),
         ),
         // Content overlay
@@ -134,16 +144,12 @@ class LiquidMeshPainter extends CustomPainter {
     final angle = progress * 2 * pi;
     final paint = Paint()..style = PaintingStyle.fill;
     
-    // Scale blur relative to size to look perfect on both mobile & tablets
-    final blurSigma = size.width * 0.25;
-
     // Blob 1: Top-Left region, rotates clockwise
     final offset1 = Offset(
       size.width * (0.25 + 0.15 * sin(angle)),
       size.height * (0.25 + 0.10 * cos(angle)),
     );
     paint.color = colors[0];
-    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
     canvas.drawCircle(offset1, size.width * 0.35, paint);
 
     // Blob 2: Bottom-Right region, rotates counter-clockwise
@@ -152,7 +158,6 @@ class LiquidMeshPainter extends CustomPainter {
       size.height * (0.70 + 0.15 * sin(angle + pi / 2)),
     );
     paint.color = colors[1];
-    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma * 1.2);
     canvas.drawCircle(offset2, size.width * 0.40, paint);
 
     // Blob 3: Center-Left region, moves in a slow figure-8
@@ -161,7 +166,6 @@ class LiquidMeshPainter extends CustomPainter {
       size.height * (0.60 + 0.12 * cos(angle)),
     );
     paint.color = colors[2];
-    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
     canvas.drawCircle(offset3, size.width * 0.33, paint);
 
     // Blob 4: Center-Right region, moves diagonally
@@ -170,7 +174,6 @@ class LiquidMeshPainter extends CustomPainter {
       size.height * (0.30 + 0.15 * cos(angle + pi)),
     );
     paint.color = colors[3];
-    paint.maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma * 0.9);
     canvas.drawCircle(offset4, size.width * 0.30, paint);
   }
 

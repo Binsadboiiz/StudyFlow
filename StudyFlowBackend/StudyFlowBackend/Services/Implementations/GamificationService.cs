@@ -10,7 +10,7 @@ using StudyFlowBackend.Constants;
 namespace StudyFlowBackend.Services
 {
     /// <summary>
-    /// Triển khai dịch vụ quản lý Gamification cho người dùng.
+    /// Implementation of the gamification service for managing user experience (XP), coins, streaks, and badges.
     /// </summary>
     public class GamificationService : IGamificationService
     {
@@ -24,7 +24,7 @@ namespace StudyFlowBackend.Services
         }
 
         /// <summary>
-        /// Công thức tính XP yêu cầu để thăng cấp: Required XP = Base * L^Exponent
+        /// Formula to calculate the XP required to level up: Required XP = Base * Level^Exponent
         /// </summary>
         private static double GetXpRequiredForLevel(int level)
         {
@@ -32,7 +32,7 @@ namespace StudyFlowBackend.Services
         }
 
         /// <summary>
-        /// Cộng điểm kinh nghiệm (XP) và tiền xu (Coins) cho người dùng.
+        /// Adds Experience Points (XP) and Coins to the specified user.
         /// </summary>
         public async Task<bool> AddXpAndCoinsAsync(string userId, double xpAmount, int coinsAmount, string reason)
         {
@@ -43,7 +43,7 @@ namespace StudyFlowBackend.Services
             user.ExpPoints += xpAmount;
             user.Coins += coinsAmount;
 
-            // Xử lý logic thăng cấp nếu vượt ngưỡng yêu cầu
+            // Handle level up logic if the user's XP exceeds the required threshold
             double requiredXp = GetXpRequiredForLevel(user.Level);
             while (user.ExpPoints >= requiredXp)
             {
@@ -63,7 +63,7 @@ namespace StudyFlowBackend.Services
                 "Reward"
             );
 
-            // Gửi thông báo thăng cấp nếu có
+            // Send notification on leveling up
             if (leveledUp)
             {
                 await _notificationService.CreateNotificationAsync(
@@ -74,14 +74,14 @@ namespace StudyFlowBackend.Services
                 );
             }
 
-            // Kiểm tra mở khóa huy hiệu sau khi cộng điểm
+            // Check and unlock achievements after rewarding points
             await CheckAndAwardBadgesAsync(userId);
 
             return leveledUp;
         }
 
         /// <summary>
-        /// Kiểm tra và tự động trao các huy hiệu (Badges) cho người dùng dựa trên thành tích.
+        /// Checks and automatically awards badges to the user based on their statistics.
         /// </summary>
         public async Task CheckAndAwardBadgesAsync(string userId)
         {
@@ -91,16 +91,16 @@ namespace StudyFlowBackend.Services
             
             if (user == null) return;
 
-            // Lấy tất cả các huy hiệu hiện có trong DB
+            // Fetch all available badges from the database
             var allBadges = await _context.Badges.ToListAsync();
             
-            // Lọc ra danh sách huy hiệu mà người dùng chưa đạt được
+            // Filter badges that the user has not yet unlocked
             var earnedBadgeIds = user.UserBadges.Select(ub => ub.BadgeId).ToHashSet();
             var unearnedBadges = allBadges.Where(b => !earnedBadgeIds.Contains(b.Id)).ToList();
 
             if (!unearnedBadges.Any()) return;
 
-            // Truy vấn các chỉ số học tập để đánh giá điều kiện
+            // Query learning statistics to evaluate unlock criteria
             var totalFocusMinutes = await _context.FocusSessions
                 .Where(f => f.UserId == userId)
                 .SumAsync(f => (int?)f.DurationMinutes) ?? 0;
@@ -116,7 +116,7 @@ namespace StudyFlowBackend.Services
             {
                 bool isEligible = false;
 
-                // Kiểm tra điều kiện mở khóa dựa trên loại chỉ số
+                // Evaluate unlock criteria based on metric type
                 switch (badge.MetricType)
                 {
                     case "Level":
@@ -135,7 +135,7 @@ namespace StudyFlowBackend.Services
 
                 if (isEligible)
                 {
-                    // Thêm huy hiệu mới đã đạt được cho user
+                    // Add new earned badge connection to user
                     var userBadge = new UserBadge
                     {
                         UserId = userId,
@@ -146,11 +146,11 @@ namespace StudyFlowBackend.Services
                     _context.UserBadges.Add(userBadge);
                     databaseChanged = true;
 
-                    // Tặng quà thưởng trực tiếp cho mỗi huy hiệu mở khóa (lấy từ Constants)
+                    // Reward bonus coins and XP for unlocking a badge (configured in constants)
                     user.Coins += GamificationConstants.BadgeUnlockedCoinsBonus;
                     user.ExpPoints += GamificationConstants.BadgeUnlockedXpBonus;
 
-                    // Gửi thông báo chúc mừng
+                    // Send congratulatory notification
                     await _notificationService.CreateNotificationAsync(
                         userId,
                         $"🏆 New Achievement: {badge.Name}!",
@@ -162,7 +162,7 @@ namespace StudyFlowBackend.Services
 
             if (databaseChanged)
             {
-                // Xử lý lại thăng cấp nếu XP từ quà tặng huy hiệu làm thăng cấp
+                // Re-evaluate level up logic in case the badge reward XP triggers a level up
                 double requiredXp = GetXpRequiredForLevel(user.Level);
                 bool secondaryLevelUp = false;
                 while (user.ExpPoints >= requiredXp)
@@ -189,33 +189,33 @@ namespace StudyFlowBackend.Services
         }
 
         /// <summary>
-        /// Cập nhật tiến trình thời gian học tập trong ngày để cộng chuỗi Streak.
+        /// Updates the daily study duration progress and increments streak count if threshold is met.
         /// </summary>
         public async Task UpdateDailyTargetProgressAsync(string userId, int focusedMinutesToday)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) return;
 
-            // Lấy ngày hiện tại (không lấy phần giờ)
+            // Get current date representation (excluding timezone hours)
             var todayStr = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
-            // Nếu hôm nay chưa có trong lịch sử streak và đã đạt chỉ tiêu
+            // If today is not in streak history yet and daily focus minutes targets are reached
             if (!user.StreakHistory.Contains(todayStr) && focusedMinutesToday >= user.DailyTargetMinutes)
             {
                 var yesterdayStr = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
                 
-                // Cập nhật ngọn lửa Streak
+                // Update streak chain
                 if (user.LastStreakDate.HasValue && user.LastStreakDate.Value.ToString("yyyy-MM-dd") == yesterdayStr)
                 {
                     user.Streak += 1;
                 }
                 else if (user.LastStreakDate.HasValue && user.LastStreakDate.Value.ToString("yyyy-MM-dd") == todayStr)
                 {
-                    // Hôm nay đã cập nhật rồi thì không làm gì thêm
+                    // Already processed for today, do nothing
                 }
                 else
                 {
-                    user.Streak = 1; // Bắt đầu chuỗi mới
+                    user.Streak = 1; // Reset or start new streak chain
                 }
 
                 user.LastStreakDate = DateTime.UtcNow;
@@ -224,7 +224,7 @@ namespace StudyFlowBackend.Services
 
                 await _context.SaveChangesAsync();
 
-                // Cộng bonus đặc biệt cho việc hoàn thành Daily Target (lấy từ Constants)
+                // Add special reward bonus for completing Daily Target
                 await AddXpAndCoinsAsync(
                     userId, 
                     GamificationConstants.DailyTargetXpBonus, 
@@ -242,7 +242,7 @@ namespace StudyFlowBackend.Services
         }
 
         /// <summary>
-        /// Thiết lập huy hiệu nổi bật (danh hiệu hiển thị bên cạnh tên).
+        /// Sets a specific badge as the user's featured title (displayed alongside their name).
         /// </summary>
         public async Task<bool> SetFeaturedBadgeAsync(string userId, Guid? badgeId)
         {
@@ -257,7 +257,7 @@ namespace StudyFlowBackend.Services
                 return true;
             }
 
-            // Kiểm tra xem người dùng đã thực sự mở khóa huy hiệu này chưa
+            // Verify if the user has unlocked this badge first
             var hasBadge = await _context.UserBadges.AnyAsync(ub => ub.UserId == userId && ub.BadgeId == badgeId.Value);
             if (!hasBadge) return false;
 

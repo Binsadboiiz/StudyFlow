@@ -40,6 +40,8 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     _secondsRemaining = _customMinutes * 60;
   }
 
+  /// Triggers when the user switches between "Custom" and "Pomodoro" timer tabs.
+  /// Sets initial remaining seconds depending on the selected tab.
   void _onTabChanged() {
     if (_isRunning) return; // Prevent changing tab while running
     setState(() {
@@ -52,6 +54,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     });
   }
 
+  /// Toggles the timer state between running and stopped.
   void _toggleTimer() {
     if (_isRunning) {
       _stopTimer();
@@ -60,6 +63,8 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     }
   }
 
+  /// Starts the focus session timer. 
+  /// Spawns a periodic 1-second interval Timer that decrements remaining seconds.
   void _startTimer() {
     setState(() {
       _isRunning = true;
@@ -78,6 +83,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     });
   }
 
+  /// Stops the active timer and cancels the periodic tick task.
   void _stopTimer() {
     _timer?.cancel();
     setState(() {
@@ -86,6 +92,9 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     // In a real app, you might want to log this interrupted session to the backend here
   }
 
+  /// Triggers when the timer successfully runs down to zero.
+  /// If it was a work/focus session (not rest), it saves the completed focus session metadata to the backend.
+  /// For Pomodoro tab, it switches state between Focus and Rest; for Custom tab, it resets to original custom duration.
   void _onTimerComplete() async {
     setState(() {
       _isRunning = false;
@@ -123,6 +132,7 @@ class _FocusScreenState extends State<FocusScreen> with SingleTickerProviderStat
     }
   }
 
+  /// Format seconds remaining to standard MM:SS string representation.
   String get _formattedTime {
     int minutes = _secondsRemaining ~/ 60;
     int seconds = _secondsRemaining % 60;

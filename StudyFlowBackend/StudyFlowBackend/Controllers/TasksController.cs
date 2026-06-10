@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace StudyFlowBackend.Controllers
 {
+    /// <summary>
+    /// API Controller for handling Study Task management (CRUD operations).
+    /// Requires Firebase authentication.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -23,6 +27,10 @@ namespace StudyFlowBackend.Controllers
             _userUtils = userUtils;
         }
 
+        /// <summary>
+        /// Retrieves all tasks created by the currently authenticated user.
+        /// </summary>
+        /// <returns>A list of TaskDto objects.</returns>
         [HttpGet]
         public async Task<IActionResult> GetTasks()
         {
@@ -34,6 +42,11 @@ namespace StudyFlowBackend.Controllers
             return Ok(ApiResponse<IEnumerable<TaskDto>>.SuccessResponse(tasks));
         }
 
+        /// <summary>
+        /// Retrieves a specific task by its ID, ensuring it belongs to the authenticated user.
+        /// </summary>
+        /// <param name="id">The Guid identifier of the task.</param>
+        /// <returns>A TaskDto object if found, or NotFound status.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTask(Guid id)
         {
@@ -49,6 +62,11 @@ namespace StudyFlowBackend.Controllers
             return Ok(ApiResponse<TaskDto>.SuccessResponse(task));
         }
 
+        /// <summary>
+        /// Creates a new study task for the authenticated user.
+        /// </summary>
+        /// <param name="dto">The data transfer object containing task details.</param>
+        /// <returns>The created TaskDto.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto dto)
         {
@@ -62,6 +80,12 @@ namespace StudyFlowBackend.Controllers
                 ApiResponse<TaskDto>.SuccessResponse(createdTask, "Task created successfully"));
         }
 
+        /// <summary>
+        /// Updates an existing task with new values.
+        /// </summary>
+        /// <param name="id">The Guid identifier of the task to update.</param>
+        /// <param name="dto">The data containing updated properties.</param>
+        /// <returns>The updated TaskDto.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTaskDto dto)
         {
@@ -77,6 +101,11 @@ namespace StudyFlowBackend.Controllers
             return Ok(ApiResponse<TaskDto>.SuccessResponse(updatedTask, "Task updated successfully"));
         }
 
+        /// <summary>
+        /// Deletes a task by ID. Note that completed tasks are blocked from deletion to preserve stats.
+        /// </summary>
+        /// <param name="id">The Guid identifier of the task to delete.</param>
+        /// <returns>A status response signifying success or failure.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask(Guid id)
         {
@@ -88,6 +117,7 @@ namespace StudyFlowBackend.Controllers
             if (task == null) 
                 return NotFound(ApiResponse<object>.ErrorResponse("Task not found"));
 
+            // Prevent deletion of already completed tasks to avoid database state sync conflicts
             if (task.IsCompleted)
                 return BadRequest(ApiResponse<object>.ErrorResponse("Completed tasks cannot be deleted."));
 

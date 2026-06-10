@@ -9,6 +9,9 @@ using StudyFlowBackend.Models;
 
 namespace StudyFlowBackend.Services
 {
+    /// <summary>
+    /// Service class implementing ITaskService interface to execute business rules for managing Study Tasks.
+    /// </summary>
     public class TaskService : ITaskService
     {
         private readonly AppDbContext _context;
@@ -20,6 +23,9 @@ namespace StudyFlowBackend.Services
             _gamificationService = gamificationService;
         }
 
+        /// <summary>
+        /// Retrieves all study tasks for a specific user ID, ordered by date descending.
+        /// </summary>
         public async Task<IEnumerable<TaskDto>> GetTasksByUserIdAsync(string userId)
         {
             var tasks = await _context.Tasks
@@ -30,6 +36,9 @@ namespace StudyFlowBackend.Services
             return tasks.Select(MapToDto);
         }
 
+        /// <summary>
+        /// Retrieves a specific task for a user.
+        /// </summary>
         public async Task<TaskDto?> GetTaskByIdAsync(Guid id, string userId)
         {
             var task = await _context.Tasks
@@ -39,6 +48,9 @@ namespace StudyFlowBackend.Services
             return MapToDto(task);
         }
 
+        /// <summary>
+        /// Creates a new study task and saves it to the database.
+        /// </summary>
         public async Task<TaskDto> CreateTaskAsync(string userId, CreateTaskDto dto)
         {
             var task = new StudyTask
@@ -61,6 +73,9 @@ namespace StudyFlowBackend.Services
             return MapToDto(task);
         }
 
+        /// <summary>
+        /// Updates a study task. If the status transitions to Completed, rewards XP and Coins to the user.
+        /// </summary>
         public async Task<TaskDto?> UpdateTaskAsync(Guid id, string userId, UpdateTaskDto dto)
         {
             var task = await _context.Tasks
@@ -86,7 +101,7 @@ namespace StudyFlowBackend.Services
 
             await _context.SaveChangesAsync();
 
-            // Nếu nhiệm vụ được chuyển trạng thái sang Hoàn thành (từ chưa hoàn thành)
+            // If the task transitions to Completed status (from not completed)
             if (task.IsCompleted && !wasCompleted)
             {
                 await _gamificationService.AddXpAndCoinsAsync(userId, 10, 10, $"Task completed: {task.Title}");
@@ -95,6 +110,9 @@ namespace StudyFlowBackend.Services
             return MapToDto(task);
         }
 
+        /// <summary>
+        /// Deletes a study task from the database.
+        /// </summary>
         public async Task<bool> DeleteTaskAsync(Guid id, string userId)
         {
             var task = await _context.Tasks
@@ -107,6 +125,9 @@ namespace StudyFlowBackend.Services
             return true;
         }
 
+        /// <summary>
+        /// Maps a StudyTask entity to its corresponding TaskDto object.
+        /// </summary>
         private static TaskDto MapToDto(StudyTask task)
         {
             return new TaskDto

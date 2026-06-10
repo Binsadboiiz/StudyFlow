@@ -11,6 +11,10 @@ using StudyFlowBackend.Models;
 
 namespace StudyFlowBackend.Services
 {
+    /// <summary>
+    /// Background Hosted Service that runs periodically (every 1 minute) to check and trigger reminders.
+    /// It covers both custom task reminders and the 20:00 daily summary reminder.
+    /// </summary>
     public class ReminderWorker : BackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -23,6 +27,9 @@ namespace StudyFlowBackend.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Main background processing loop executed when the application starts.
+        /// </summary>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Reminder Worker started.");
@@ -48,6 +55,9 @@ namespace StudyFlowBackend.Services
             _logger.LogInformation("Reminder Worker stopped.");
         }
 
+        /// <summary>
+        /// Scans user schedules and tasks to send pending custom reminders and daily incomplete task reminders.
+        /// </summary>
         private async Task CheckRemindersAsync(AppDbContext context)
         {
             var users = await context.Users.ToListAsync();
@@ -92,7 +102,7 @@ namespace StudyFlowBackend.Services
                             UserId = user.Id,
                             Title = "Task Reminder",
                             Message = $"It's time to complete the task: {task.Title}",
-                            CreatedAt = userNow,
+                            CreatedAt = DateTime.UtcNow,
                             IsRead = false,
                             Type = "CustomTask"
                         };
@@ -111,7 +121,7 @@ namespace StudyFlowBackend.Services
                         !t.IsCompleted);
 
                     if (hasIncompleteTasks)
-                      {
+                    {
                         var alreadySentToday = await context.UserNotifications.AnyAsync(un =>
                             un.UserId == user.Id &&
                             un.Type == "Daily" &&
@@ -127,7 +137,7 @@ namespace StudyFlowBackend.Services
                                 UserId = user.Id,
                                 Title = "Daily Reminder",
                                 Message = "You still have some unfinished tasks for today. Try to complete them as soon as possible!",
-                                CreatedAt = userNow,
+                                CreatedAt = DateTime.UtcNow,
                                 IsRead = false,
                                 Type = "Daily"
                             };

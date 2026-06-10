@@ -6,7 +6,7 @@ using StudyFlowBackend.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-// Fix PostgreSQL DateTime Unspecified Kind error
+// Fix PostgreSQL DateTime Unspecified Kind error to avoid timestamp zone mismatch issues in Npgsql
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,14 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Đăng ký DbContext với PostgreSQL
+// Register DbContext with PostgreSQL configuration, supporting pgvector extensions
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); // Hỗ trợ pgvector
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddHttpContextAccessor();
 
+// Configure CORS to allow frontend origin connections
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -34,6 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure JWT Bearer Authentication using Firebase Auth secure token issuer
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -48,7 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Đăng ký Services
+// Register custom services and dependency injections
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IFocusSessionService, FocusSessionService>();
 builder.Services.AddScoped<IUserUtils, UserUtils>();
@@ -72,7 +74,6 @@ if (app.Environment.IsDevelopment())
 }
 else 
 {
-
     // app.UseHttpsRedirection();
 }
 
@@ -83,6 +84,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Automatically apply database migrations and health check during startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -91,14 +93,14 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<AppDbContext>();
 
-        // Tự động áp dụng Migration khi deploy lên Render/Production
+        // Apply any pending migrations automatically (e.g. when deploying to Render or production)
         Console.WriteLine(" - Checking and applying database migrations...");
         dbContext.Database.Migrate();
         Console.WriteLine(" - Database migrations checked successfully.");
 
         var canConnect = dbContext.Database.CanConnect();
 
-        var urls = app.Urls.Any() ? string.Join(", ", app.Urls) : "Unknow URL";
+        var urls = app.Urls.Any() ? string.Join(", ", app.Urls) : "Unknown URL";
 
         Console.WriteLine("=======================================");
         Console.WriteLine($" -Server is running at: {urls}");

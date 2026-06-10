@@ -4,7 +4,7 @@ import 'package:studyflow/features/gamification/data/models/gamification_summary
 import 'package:studyflow/features/gamification/data/models/leaderboard_entry_model.dart';
 import 'package:studyflow/features/gamification/data/repositories/gamification_repository.dart';
 
-/// ViewModel quản lý dữ liệu và trạng thái UI cho các tính năng điểm số, huy hiệu, bảng xếp hạng.
+/// ViewModel managing data and UI state for gamification features such as points, badges, and leaderboards.
 class GamificationViewModel extends ChangeNotifier {
   final GamificationRepository gamificationRepository;
 
@@ -13,7 +13,7 @@ class GamificationViewModel extends ChangeNotifier {
   List<LeaderboardEntryModel> _leaderboardEntries = [];
   int _userRank = 0;
 
-  // Tiêu chí xếp hạng hiện tại của Leaderboard (mặc định: Cấp độ 'Level')
+  // Current leaderboard sorting criterion (default: 'Level')
   String _currentSortBy = 'Level'; 
 
   bool _isLoadingSummary = false;
@@ -37,7 +37,7 @@ class GamificationViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoadingSummary || _isLoadingBadges || _isLoadingLeaderboard;
 
-  /// Tải thông tin tóm tắt điểm (Level, XP, Coins, Streak, Huy hiệu nổi bật).
+  /// Fetches the gamification summary (Level, XP, Coins, Streak, Featured Badge).
   Future<void> fetchSummary() async {
     _isLoadingSummary = true;
     notifyListeners();
@@ -51,7 +51,7 @@ class GamificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tải danh sách huy hiệu thành tích.
+  /// Fetches the list of achievement badges.
   Future<void> fetchBadges() async {
     _isLoadingBadges = true;
     notifyListeners();
@@ -63,7 +63,7 @@ class GamificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tải bảng xếp hạng người dùng toàn cầu dựa trên tiêu chí sắp xếp hiện tại.
+  /// Fetches the global leaderboard entries sorted by the current sort criterion.
   Future<void> fetchLeaderboard() async {
     _isLoadingLeaderboard = true;
     notifyListeners();
@@ -81,7 +81,7 @@ class GamificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Thay đổi tiêu chí xếp hạng và tải lại dữ liệu.
+  /// Changes the leaderboard sorting criterion and reloads the data.
   Future<void> changeSortBy(String newSortBy) async {
     if (_currentSortBy == newSortBy) return;
     _currentSortBy = newSortBy;
@@ -89,7 +89,7 @@ class GamificationViewModel extends ChangeNotifier {
     await fetchLeaderboard();
   }
 
-  /// Thiết lập danh hiệu nổi bật (Huy hiệu nổi bật).
+  /// Sets the user's featured badge.
   Future<bool> setFeaturedBadge(String? badgeId) async {
     _isActionInProgress = true;
     notifyListeners();
@@ -107,7 +107,7 @@ class GamificationViewModel extends ChangeNotifier {
     return false;
   }
 
-  /// Làm mới toàn bộ dữ liệu trong Gamification Hub.
+  /// Refreshes all gamification data in the hub.
   Future<void> refreshAll() async {
     await Future.wait([
       fetchSummary(),

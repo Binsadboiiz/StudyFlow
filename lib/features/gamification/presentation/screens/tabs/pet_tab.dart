@@ -444,7 +444,7 @@ class _PetTabState extends State<PetTab> {
                   controller: _nameController,
                   style: TextStyle(color: theme.colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Enter pet name (e.g., Mập Mạp)...',
+                    hintText: 'Enter pet name (e.g., Meow meow)...',
                     hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                     filled: true,
                     fillColor: theme.brightness == Brightness.dark ? Colors.white12 : Colors.black12,
