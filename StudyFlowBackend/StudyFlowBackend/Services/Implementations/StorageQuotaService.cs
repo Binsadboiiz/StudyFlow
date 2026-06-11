@@ -34,8 +34,9 @@ namespace StudyFlowBackend.Services
                 .Where(d => d.UserId == userId)
                 .SumAsync(d => d.ImageSizeBytes + d.TextSizeBytes);
 
+            var quotaBytes = (user.StorageQuotaBytes > 0) ? user.StorageQuotaBytes : 209715200; // Mặc định 200MB
             // Kiểm tra nếu thêm additionalBytes có vượt quota không
-            return (currentUsage + additionalBytes) <= user.StorageQuotaBytes;
+            return (currentUsage + additionalBytes) <= quotaBytes;
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace StudyFlowBackend.Services
                 .Where(d => d.UserId == userId)
                 .SumAsync(d => d.ImageSizeBytes + d.TextSizeBytes);
 
-            var quotaBytes = user?.StorageQuotaBytes ?? 209715200; // Mặc định 200MB
+            var quotaBytes = (user != null && user.StorageQuotaBytes > 0) ? user.StorageQuotaBytes : 209715200; // Mặc định 200MB
 
             return new StorageUsageResponseDto
             {
