@@ -83,8 +83,8 @@ class ScanViewModel extends ChangeNotifier with SafeChangeNotifier {
       _documents = await getDocumentsUseCase();
       await refreshStorageUsage();
     } catch (e) {
-      _errorMessage = 'Không thể tải danh sách tài liệu: $e';
-      debugPrint(_errorMessage);
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('Load documents error: $_errorMessage');
     } finally {
       _isLoading = false;
       notifyListenersSafely();

@@ -20,10 +20,17 @@ class ScanRemoteDatasource {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseBody = json.decode(response.body);
-      final List<dynamic> jsonList = responseBody['data'] ?? [];
+      final data = responseBody['data'];
+      List<dynamic> jsonList = [];
+      if (data is Map<String, dynamic>) {
+        // Backend returns pagination object { items, totalCount, ... }
+        jsonList = data['items'] ?? data['Items'] ?? [];
+      } else if (data is List) {
+        jsonList = data;
+      }
       return jsonList.map((json) => ScannedDocumentModel.fromJson(json)).toList();
     } else {
-      throw Exception('Không thể tải danh sách tài liệu từ API');
+      throw Exception('Could not load document list from API');
     }
   }
 

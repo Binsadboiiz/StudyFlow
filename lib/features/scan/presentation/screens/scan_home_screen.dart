@@ -258,7 +258,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Đã xảy ra lỗi',
+              AppLocalizations.of(context)!.scanErrorOccurred,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -267,7 +267,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              scanVm.errorMessage ?? '',
+              AppLocalizations.of(context)!.scanLoadListFailed(scanVm.errorMessage ?? ''),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -280,7 +280,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
             ElevatedButton.icon(
               onPressed: () => scanVm.loadDocuments(),
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Thử lại'),
+              label: Text(AppLocalizations.of(context)!.scanRetry),
             ),
           ],
         ),

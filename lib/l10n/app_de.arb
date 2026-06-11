@@ -318,5 +318,16 @@
   "scanProcessFailed": "Bildverarbeitung fehlgeschlagen oder abgebrochen",
   "scanStorageUsage": "Speicher: {used} / {total} MB",
   "scanQuotaExceeded": "Speicherkontingent überschritten",
-  "scanFeatureDesc": "Physische Dokumente mit OCR scannen"
+  "scanFeatureDesc": "Physische Dokumente mit OCR scannen",
+  "scanLoadingStorage": "Speicher wird geladen...",
+  "scanErrorOccurred": "Ein Fehler ist aufgetreten",
+  "scanLoadListFailed": "Dokumentenliste konnte nicht geladen werden: {error}",
+  "@scanLoadListFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanRetry": "Wiederholen"
 }

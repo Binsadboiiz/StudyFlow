@@ -962,4 +962,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanFeatureDesc => 'Scan physical documents using OCR';
+
+  @override
+  String get scanLoadingStorage => 'Loading storage...';
+
+  @override
+  String get scanErrorOccurred => 'An error occurred';
+
+  @override
+  String scanLoadListFailed(String error) {
+    return 'Could not load document list: $error';
+  }
+
+  @override
+  String get scanRetry => 'Retry';
 }

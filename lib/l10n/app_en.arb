@@ -318,5 +318,16 @@
   "scanProcessFailed": "Image processing failed or cancelled",
   "scanStorageUsage": "Storage: {used} / {total} MB",
   "scanQuotaExceeded": "Storage quota exceeded",
-  "scanFeatureDesc": "Scan physical documents using OCR"
+  "scanFeatureDesc": "Scan physical documents using OCR",
+  "scanLoadingStorage": "Loading storage...",
+  "scanErrorOccurred": "An error occurred",
+  "scanLoadListFailed": "Could not load document list: {error}",
+  "@scanLoadListFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanRetry": "Retry"
 }

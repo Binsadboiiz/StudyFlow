@@ -1887,6 +1887,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan physical documents using OCR'**
   String get scanFeatureDesc;
+
+  /// No description provided for @scanLoadingStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading storage...'**
+  String get scanLoadingStorage;
+
+  /// No description provided for @scanErrorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred'**
+  String get scanErrorOccurred;
+
+  /// No description provided for @scanLoadListFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load document list: {error}'**
+  String scanLoadListFailed(String error);
+
+  /// No description provided for @scanRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get scanRetry;
 }
 
 class _AppLocalizationsDelegate

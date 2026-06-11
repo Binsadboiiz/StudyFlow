@@ -3,6 +3,7 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/features/scan/domain/entities/storage_usage_entity.dart';
+import 'package:studyflow/l10n/app_localizations.dart';
 
 /// Widget hiển thị thanh tiến trình dung lượng lưu trữ.
 /// Màu thay đổi theo mức sử dụng: Xanh (< 70%), Vàng (70-90%), Đỏ (> 90%).
@@ -34,9 +35,9 @@ class StorageIndicator extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              'Đang tải dung lượng...',
+              AppLocalizations.of(context)!.scanLoadingStorage,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: ext.subtext,
               ),
             ),

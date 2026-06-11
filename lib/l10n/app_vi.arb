@@ -318,5 +318,16 @@
   "scanProcessFailed": "Xử lý ảnh thất bại hoặc bị hủy",
   "scanStorageUsage": "Lưu trữ: {used} / {total} MB",
   "scanQuotaExceeded": "Đã vượt quá giới hạn lưu trữ",
-  "scanFeatureDesc": "Quét tài liệu vật lý sử dụng OCR"
+  "scanFeatureDesc": "Quét tài liệu vật lý bằng OCR",
+  "scanLoadingStorage": "Đang tải dung lượng...",
+  "scanErrorOccurred": "Đã xảy ra lỗi",
+  "scanLoadListFailed": "Không thể tải danh sách tài liệu: {error}",
+  "@scanLoadListFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanRetry": "Thử lại"
 }

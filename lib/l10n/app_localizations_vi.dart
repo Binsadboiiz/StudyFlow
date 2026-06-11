@@ -969,5 +969,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scanQuotaExceeded => 'Đã vượt quá giới hạn lưu trữ';
 
   @override
-  String get scanFeatureDesc => 'Quét tài liệu vật lý sử dụng OCR';
+  String get scanFeatureDesc => 'Quét tài liệu vật lý bằng OCR';
+
+  @override
+  String get scanLoadingStorage => 'Đang tải dung lượng...';
+
+  @override
+  String get scanErrorOccurred => 'Đã xảy ra lỗi';
+
+  @override
+  String scanLoadListFailed(String error) {
+    return 'Không thể tải danh sách tài liệu: $error';
+  }
+
+  @override
+  String get scanRetry => 'Thử lại';
 }
