@@ -993,4 +993,76 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scanRetry => 'Wiederholen';
+
+  @override
+  String scanDocumentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dokumente',
+      one: '1 Dokument',
+      zero: '0 Dokumente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanTrash => 'Papierkorb';
+
+  @override
+  String get scanRestore => 'Wiederherstellen';
+
+  @override
+  String get scanHardDelete => 'Endgültig löschen';
+
+  @override
+  String get scanEmptyTrash => 'Papierkorb leeren';
+
+  @override
+  String get scanFilter => 'Filter';
+
+  @override
+  String get scanBatchDelete => 'Auswahl löschen';
+
+  @override
+  String get scanSelect => 'Auswählen';
+
+  @override
+  String get scanSelectAll => 'Alle auswählen';
+
+  @override
+  String scanSelectedCount(int count) {
+    return '$count ausgewählt';
+  }
+
+  @override
+  String get scanRestoreSuccess => 'Dokument wiederhergestellt';
+
+  @override
+  String get scanHardDeleteSuccess => 'Dokument endgültig gelöscht';
+
+  @override
+  String scanBatchDeleteConfirm(int count) {
+    return '$count Dokumente in den Papierkorb verschieben?';
+  }
+
+  @override
+  String get scanTrashEmpty => 'Papierkorb ist leer';
+
+  @override
+  String get scanTrashEmptySubtitle =>
+      'Gelöschte Dokumente werden hier angezeigt';
+
+  @override
+  String get scanHardDeleteConfirmDesc =>
+      'Dadurch wird das Dokument endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get scanFilterAllTime => 'Gesamte Zeit';
+
+  @override
+  String get scanFilterLast7Days => 'Letzte 7 Tage';
+
+  @override
+  String get scanFilterLast30Days => 'Letzte 30 Tage';
 }

@@ -84,7 +84,7 @@ class StorageIndicator extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '${usage.documentCount} tài liệu',
+                  AppLocalizations.of(context)!.scanDocumentCount(usage.documentCount),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,

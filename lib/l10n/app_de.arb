@@ -329,5 +329,45 @@
       }
     }
   },
-  "scanRetry": "Wiederholen"
+  "scanRetry": "Wiederholen",
+  "scanDocumentCount": "{count, plural, =0{0 Dokumente} =1{1 Dokument} other{{count} Dokumente}}",
+  "@scanDocumentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrash": "Papierkorb",
+  "scanRestore": "Wiederherstellen",
+  "scanHardDelete": "Endgültig löschen",
+  "scanEmptyTrash": "Papierkorb leeren",
+  "scanFilter": "Filter",
+  "scanBatchDelete": "Auswahl löschen",
+  "scanSelect": "Auswählen",
+  "scanSelectAll": "Alle auswählen",
+  "scanSelectedCount": "{count} ausgewählt",
+  "@scanSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanRestoreSuccess": "Dokument wiederhergestellt",
+  "scanHardDeleteSuccess": "Dokument endgültig gelöscht",
+  "scanBatchDeleteConfirm": "{count} Dokumente in den Papierkorb verschieben?",
+  "@scanBatchDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrashEmpty": "Papierkorb ist leer",
+  "scanTrashEmptySubtitle": "Gelöschte Dokumente werden hier angezeigt",
+  "scanHardDeleteConfirmDesc": "Dadurch wird das Dokument endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
+  "scanFilterAllTime": "Gesamte Zeit",
+  "scanFilterLast7Days": "Letzte 7 Tage",
+  "scanFilterLast30Days": "Letzte 30 Tage"
 }

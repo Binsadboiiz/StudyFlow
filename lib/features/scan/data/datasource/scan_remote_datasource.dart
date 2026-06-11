@@ -96,6 +96,60 @@ class ScanRemoteDatasource {
     }
   }
 
+  /// Xóa vĩnh viễn tài liệu qua API.
+  Future<void> hardDeleteDocument(String id) async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.delete(
+      Uri.parse('$scanEndpoint/hard-delete/$id'),
+      headers: headers,
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Không thể xóa vĩnh viễn tài liệu');
+    }
+  }
+
+  /// Xóa hàng loạt tài liệu qua API.
+  Future<void> batchDeleteDocuments(List<String> ids) async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.post(
+      Uri.parse('$scanEndpoint/batch-delete'),
+      headers: headers,
+      body: json.encode(ids),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Không thể xóa hàng loạt tài liệu');
+    }
+  }
+
+  /// Lấy danh sách tài liệu trong thùng rác từ API.
+  Future<List<ScannedDocumentModel>> getTrashDocuments() async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.get(Uri.parse('$scanEndpoint/trash'), headers: headers);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      final List<dynamic> jsonList = responseBody['data'] ?? [];
+      return jsonList.map((json) => ScannedDocumentModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Could not load trash documents from API');
+    }
+  }
+
+  /// Phục hồi tài liệu từ thùng rác qua API.
+  Future<void> restoreDocument(String id) async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.post(
+      Uri.parse('$scanEndpoint/restore/$id'),
+      headers: headers,
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Không thể phục hồi tài liệu');
+    }
+  }
+
   /// Tìm kiếm tài liệu theo từ khóa.
   Future<List<ScannedDocumentModel>> searchDocuments(String query) async {
     final headers = await ApiConstants.getAuthHeaders(auth);

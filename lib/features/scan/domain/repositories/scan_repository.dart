@@ -12,8 +12,7 @@ abstract class ScanRepository {
   Future<ScannedDocumentEntity> createDocument({
     required String title,
     required String extractedText,
-    String? originalImageUrl,
-    String? storagePath,
+    String? imageBase64,
     required int imageSizeBytes,
     required int textSizeBytes,
     required String detectedLanguage,
@@ -34,4 +33,16 @@ abstract class ScanRepository {
 
   /// Lấy thông tin sử dụng dung lượng lưu trữ.
   Future<StorageUsageEntity> getStorageUsage();
+
+  /// Lấy danh sách tài liệu trong thùng rác.
+  Future<List<ScannedDocumentEntity>> getTrashDocuments();
+
+  /// Phục hồi tài liệu từ thùng rác.
+  Future<void> restoreDocument(String id);
+
+  /// Xóa vĩnh viễn tài liệu.
+  Future<void> hardDeleteDocument(String id);
+
+  /// Xóa hàng loạt tài liệu.
+  Future<void> batchDeleteDocuments(List<String> ids);
 }

@@ -21,14 +21,14 @@ namespace StudyFlowBackend.Models
         public string ExtractedText { get; set; } = string.Empty;
         
         /// <summary>
-        /// URL ảnh gốc đã compress trên Firebase Storage
+        /// URL ảnh gốc (trỏ về endpoint của Backend)
         /// </summary>
         public string? OriginalImageUrl { get; set; }
         
         /// <summary>
-        /// Đường dẫn file trên Firebase Storage (dùng để xóa khi cần)
+        /// Dữ liệu ảnh thô lưu trong DB
         /// </summary>
-        public string? StoragePath { get; set; }
+        public byte[]? ImageData { get; set; }
         
         /// <summary>
         /// Kích thước ảnh gốc (bytes) - dùng tính storage quota
@@ -52,6 +52,16 @@ namespace StudyFlowBackend.Models
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// Indicates if the document is soft-deleted (in Trash)
+        /// </summary>
+        public bool IsDeleted { get; set; } = false;
+
+        /// <summary>
+        /// When the document was soft-deleted. Null if not deleted.
+        /// </summary>
+        public DateTime? DeletedAt { get; set; }
         
         // --- Foreign Key ---
         public string UserId { get; set; } = string.Empty;

@@ -8,20 +8,28 @@ import 'package:intl/intl.dart';
 /// Widget hiển thị thẻ tài liệu đã quét trong danh sách.
 /// Bao gồm: thumbnail, tiêu đề, preview nội dung, ngày tạo, kích thước file.
 class DocumentCard extends StatelessWidget {
-  /// Entity chứa dữ liệu tài liệu.
+  /// Entity containing document data.
   final ScannedDocumentEntity document;
 
-  /// Callback khi người dùng nhấn vào thẻ.
+  /// Callback when user taps the card.
   final VoidCallback? onTap;
 
-  /// Callback khi người dùng nhấn giữ (long press).
+  /// Callback when user long presses the card.
   final VoidCallback? onLongPress;
+
+  /// Flag indicating if the list is in selection mode.
+  final bool isSelectionMode;
+
+  /// Flag indicating if this specific card is selected.
+  final bool isSelected;
 
   const DocumentCard({
     super.key,
     required this.document,
     this.onTap,
     this.onLongPress,
+    this.isSelectionMode = false,
+    this.isSelected = false,
   });
 
   @override
@@ -36,15 +44,28 @@ class DocumentCard extends StatelessWidget {
       child: GlassCard(
         borderRadius: 20,
         padding: EdgeInsets.zero,
+        border: isSelected 
+          ? Border.all(color: AppColors.accent, width: 2)
+          : null,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              // Thumbnail ảnh hoặc icon mặc định
+              // Selection Checkbox
+              if (isSelectionMode) ...[
+                Icon(
+                  isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                  color: isSelected ? AppColors.accent : ext.subtext.withValues(alpha: 0.5),
+                  size: 24,
+                ),
+                const SizedBox(width: 14),
+              ],
+              
+              // Thumbnail image or default icon
               _buildThumbnail(isDark),
               const SizedBox(width: 14),
 
-              // Nội dung chính: tiêu đề, preview, metadata
+              // Main content: title, preview, metadata
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +159,7 @@ class DocumentCard extends StatelessWidget {
     );
   }
 
-  /// Xây dựng thumbnail ảnh hoặc icon mặc định.
+  /// Build thumbnail image or default icon.
   Widget _buildThumbnail(bool isDark) {
     if (document.originalImageUrl != null && document.originalImageUrl!.isNotEmpty) {
       return ClipRRect(
@@ -155,7 +176,7 @@ class DocumentCard extends StatelessWidget {
     return _buildDefaultIcon(isDark);
   }
 
-  /// Icon mặc định khi không có ảnh.
+  /// Default icon when there is no image.
   Widget _buildDefaultIcon(bool isDark) {
     return Container(
       width: 56,
@@ -172,7 +193,7 @@ class DocumentCard extends StatelessWidget {
     );
   }
 
-  /// Lấy màu dựa trên độ tin cậy OCR.
+  /// Get color based on OCR confidence.
   Color _getConfidenceColor(double score) {
     if (score >= 0.8) return Colors.green;
     if (score >= 0.5) return Colors.orange;

@@ -1,5 +1,5 @@
 import 'package:studyflow/features/scan/data/datasource/scan_remote_datasource.dart';
-import 'package:studyflow/features/scan/data/models/scanned_document_model.dart';
+
 import 'package:studyflow/features/scan/domain/entities/scanned_document_entity.dart';
 import 'package:studyflow/features/scan/domain/entities/storage_usage_entity.dart';
 import 'package:studyflow/features/scan/domain/repositories/scan_repository.dart';
@@ -20,27 +20,22 @@ class ScanRepositoryImpl implements ScanRepository {
   Future<ScannedDocumentEntity> createDocument({
     required String title,
     required String extractedText,
-    String? originalImageUrl,
-    String? storagePath,
+    String? imageBase64,
     required int imageSizeBytes,
     required int textSizeBytes,
     required String detectedLanguage,
     required double confidenceScore,
   }) async {
-    // Tạo model để gửi JSON lên API
-    final data = ScannedDocumentModel(
-      id: '', // ID sẽ được API tự động tạo
-      title: title,
-      extractedText: extractedText,
-      originalImageUrl: originalImageUrl,
-      storagePath: storagePath,
-      imageSizeBytes: imageSizeBytes,
-      textSizeBytes: textSizeBytes,
-      detectedLanguage: detectedLanguage,
-      confidenceScore: confidenceScore,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ).toJson();
+    // Tạo data để gửi JSON lên API
+    final data = <String, dynamic>{
+      'title': title,
+      'extractedText': extractedText,
+      'imageBase64': imageBase64,
+      'imageSizeBytes': imageSizeBytes,
+      'textSizeBytes': textSizeBytes,
+      'detectedLanguage': detectedLanguage,
+      'confidenceScore': confidenceScore,
+    };
 
     return await remoteDatasource.createDocument(data);
   }
@@ -71,5 +66,25 @@ class ScanRepositoryImpl implements ScanRepository {
   @override
   Future<StorageUsageEntity> getStorageUsage() async {
     return await remoteDatasource.getStorageUsage();
+  }
+
+  @override
+  Future<List<ScannedDocumentEntity>> getTrashDocuments() async {
+    return await remoteDatasource.getTrashDocuments();
+  }
+
+  @override
+  Future<void> restoreDocument(String id) async {
+    await remoteDatasource.restoreDocument(id);
+  }
+
+  @override
+  Future<void> hardDeleteDocument(String id) async {
+    await remoteDatasource.hardDeleteDocument(id);
+  }
+
+  @override
+  Future<void> batchDeleteDocuments(List<String> ids) async {
+    await remoteDatasource.batchDeleteDocuments(ids);
   }
 }

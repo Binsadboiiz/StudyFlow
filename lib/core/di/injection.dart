@@ -43,6 +43,10 @@ import 'package:studyflow/features/scan/domain/usecase/scan_document_usecase.dar
 import 'package:studyflow/features/scan/domain/usecase/delete_scanned_document_usecase.dart';
 import 'package:studyflow/features/scan/domain/usecase/get_storage_usage_usecase.dart';
 import 'package:studyflow/features/scan/domain/usecase/search_documents_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/get_trash_documents_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/restore_document_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/hard_delete_document_usecase.dart';
+import 'package:studyflow/features/scan/domain/usecase/batch_delete_documents_usecase.dart';
 
 /// A utility class for setting up dependency injection across the application.
 /// It initializes repositories and provides a list of Providers for state management.
@@ -156,6 +160,10 @@ class DependencyInjection {
           deleteDocumentUseCase: DeleteScannedDocument(scanRepository),
           getStorageUsageUseCase: GetStorageUsage(scanRepository),
           searchDocumentsUseCase: SearchDocuments(scanRepository),
+          getTrashDocumentsUseCase: GetTrashDocuments(scanRepository),
+          restoreDocumentUseCase: RestoreDocument(scanRepository),
+          hardDeleteDocumentUseCase: HardDeleteDocument(scanRepository),
+          batchDeleteDocumentsUseCase: BatchDeleteDocuments(scanRepository),
         ),
       ),
     ];

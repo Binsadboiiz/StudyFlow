@@ -1,5 +1,5 @@
 import 'package:studyflow/features/scan/domain/entities/scanned_document_entity.dart';
-
+import 'package:studyflow/core/network/api_constants.dart';
 /// Model dữ liệu cho tài liệu quét, extends từ [ScannedDocumentEntity].
 /// Chịu trách nhiệm chuyển đổi giữa JSON (từ .NET API) và Entity.
 class ScannedDocumentModel extends ScannedDocumentEntity {
@@ -15,6 +15,8 @@ class ScannedDocumentModel extends ScannedDocumentEntity {
     super.confidenceScore,
     required super.createdAt,
     required super.updatedAt,
+    super.isDeleted,
+    super.deletedAt,
   });
 
   /// Factory constructor tạo [ScannedDocumentModel] từ JSON (trả về từ .NET API).
@@ -23,7 +25,9 @@ class ScannedDocumentModel extends ScannedDocumentEntity {
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       extractedText: json['extractedText'] ?? '',
-      originalImageUrl: json['originalImageUrl'],
+      originalImageUrl: json['originalImageUrl'] != null 
+          ? '${ApiConstants.baseUrl}${json['originalImageUrl']}' 
+          : null,
       storagePath: json['storagePath'],
       imageSizeBytes: json['imageSizeBytes'] ?? 0,
       textSizeBytes: json['textSizeBytes'] ?? 0,
@@ -35,6 +39,10 @@ class ScannedDocumentModel extends ScannedDocumentEntity {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
+      isDeleted: json['isDeleted'] ?? false,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'])
+          : null,
     );
   }
 
@@ -49,6 +57,8 @@ class ScannedDocumentModel extends ScannedDocumentEntity {
       'textSizeBytes': textSizeBytes,
       'detectedLanguage': detectedLanguage,
       'confidenceScore': confidenceScore,
+      'isDeleted': isDeleted,
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
@@ -66,6 +76,8 @@ class ScannedDocumentModel extends ScannedDocumentEntity {
       confidenceScore: entity.confidenceScore,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      isDeleted: entity.isDeleted,
+      deletedAt: entity.deletedAt,
     );
   }
 }

@@ -39,5 +39,25 @@ namespace StudyFlowBackend.Services
         /// Tìm kiếm tài liệu OCR theo keyword (ILIKE trên Title và ExtractedText).
         /// </summary>
         Task<List<ScannedDocumentResponseDto>> SearchAsync(string userId, string query);
+
+        /// <summary>
+        /// Lấy tất cả tài liệu OCR trong thùng rác của user.
+        /// </summary>
+        Task<List<ScannedDocumentResponseDto>> GetTrashAsync(string userId);
+
+        /// <summary>
+        /// Phục hồi tài liệu từ thùng rác.
+        /// </summary>
+        Task<bool> RestoreAsync(string userId, Guid id);
+
+        /// <summary>
+        /// Xóa vĩnh viễn tài liệu OCR.
+        /// </summary>
+        Task<bool> HardDeleteAsync(string userId, Guid id);
+
+        /// <summary>
+        /// Xóa mềm (hoặc vĩnh viễn) nhiều tài liệu cùng lúc.
+        /// </summary>
+        Task<bool> BatchDeleteAsync(string userId, List<Guid> ids);
     }
 }

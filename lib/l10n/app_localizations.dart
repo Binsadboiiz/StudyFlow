@@ -1911,6 +1911,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get scanRetry;
+
+  /// No description provided for @scanDocumentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 documents} =1{1 document} other{{count} documents}}'**
+  String scanDocumentCount(int count);
+
+  /// No description provided for @scanTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash'**
+  String get scanTrash;
+
+  /// No description provided for @scanRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get scanRestore;
+
+  /// No description provided for @scanHardDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Permanently'**
+  String get scanHardDelete;
+
+  /// No description provided for @scanEmptyTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty Trash'**
+  String get scanEmptyTrash;
+
+  /// No description provided for @scanFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get scanFilter;
+
+  /// No description provided for @scanBatchDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Selected'**
+  String get scanBatchDelete;
+
+  /// No description provided for @scanSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get scanSelect;
+
+  /// No description provided for @scanSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get scanSelectAll;
+
+  /// No description provided for @scanSelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String scanSelectedCount(int count);
+
+  /// No description provided for @scanRestoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document restored'**
+  String get scanRestoreSuccess;
+
+  /// No description provided for @scanHardDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document permanently deleted'**
+  String get scanHardDeleteSuccess;
+
+  /// No description provided for @scanBatchDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Move {count} documents to trash?'**
+  String scanBatchDeleteConfirm(int count);
+
+  /// No description provided for @scanTrashEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash is empty'**
+  String get scanTrashEmpty;
+
+  /// No description provided for @scanTrashEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted documents will appear here'**
+  String get scanTrashEmptySubtitle;
+
+  /// No description provided for @scanHardDeleteConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the document. This action cannot be undone.'**
+  String get scanHardDeleteConfirmDesc;
+
+  /// No description provided for @scanFilterAllTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get scanFilterAllTime;
+
+  /// No description provided for @scanFilterLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get scanFilterLast7Days;
+
+  /// No description provided for @scanFilterLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get scanFilterLast30Days;
 }
 
 class _AppLocalizationsDelegate

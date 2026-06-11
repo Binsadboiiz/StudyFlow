@@ -14,8 +14,7 @@ class ScanDocument {
   Future<ScannedDocumentEntity> call({
     required String title,
     required String extractedText,
-    String? originalImageUrl,
-    String? storagePath,
+    String? imageBase64,
     required int imageSizeBytes,
     required int textSizeBytes,
     required String detectedLanguage,
@@ -24,8 +23,7 @@ class ScanDocument {
     return await repository.createDocument(
       title: title,
       extractedText: extractedText,
-      originalImageUrl: originalImageUrl,
-      storagePath: storagePath,
+      imageBase64: imageBase64,
       imageSizeBytes: imageSizeBytes,
       textSizeBytes: textSizeBytes,
       detectedLanguage: detectedLanguage,

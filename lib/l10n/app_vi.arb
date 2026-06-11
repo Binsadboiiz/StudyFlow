@@ -329,5 +329,45 @@
       }
     }
   },
-  "scanRetry": "Thử lại"
+  "scanRetry": "Thử lại",
+  "scanDocumentCount": "{count, plural, =0{0 tài liệu} =1{1 tài liệu} other{{count} tài liệu}}",
+  "@scanDocumentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrash": "Thùng rác",
+  "scanRestore": "Khôi phục",
+  "scanHardDelete": "Xóa vĩnh viễn",
+  "scanEmptyTrash": "Dọn sạch",
+  "scanFilter": "Bộ lọc",
+  "scanBatchDelete": "Xóa mục đã chọn",
+  "scanSelect": "Chọn",
+  "scanSelectAll": "Chọn tất cả",
+  "scanSelectedCount": "Đã chọn {count}",
+  "@scanSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanRestoreSuccess": "Đã khôi phục tài liệu",
+  "scanHardDeleteSuccess": "Đã xóa vĩnh viễn tài liệu",
+  "scanBatchDeleteConfirm": "Chuyển {count} tài liệu vào thùng rác?",
+  "@scanBatchDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrashEmpty": "Thùng rác trống",
+  "scanTrashEmptySubtitle": "Các tài liệu đã xóa sẽ xuất hiện ở đây",
+  "scanHardDeleteConfirmDesc": "Hành động này sẽ xóa vĩnh viễn tài liệu và không thể hoàn tác.",
+  "scanFilterAllTime": "Tất cả thời gian",
+  "scanFilterLast7Days": "7 ngày qua",
+  "scanFilterLast30Days": "30 ngày qua"
 }

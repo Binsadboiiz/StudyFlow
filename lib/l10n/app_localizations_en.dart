@@ -976,4 +976,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanRetry => 'Retry';
+
+  @override
+  String scanDocumentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '1 document',
+      zero: '0 documents',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanTrash => 'Trash';
+
+  @override
+  String get scanRestore => 'Restore';
+
+  @override
+  String get scanHardDelete => 'Delete Permanently';
+
+  @override
+  String get scanEmptyTrash => 'Empty Trash';
+
+  @override
+  String get scanFilter => 'Filter';
+
+  @override
+  String get scanBatchDelete => 'Delete Selected';
+
+  @override
+  String get scanSelect => 'Select';
+
+  @override
+  String get scanSelectAll => 'Select All';
+
+  @override
+  String scanSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get scanRestoreSuccess => 'Document restored';
+
+  @override
+  String get scanHardDeleteSuccess => 'Document permanently deleted';
+
+  @override
+  String scanBatchDeleteConfirm(int count) {
+    return 'Move $count documents to trash?';
+  }
+
+  @override
+  String get scanTrashEmpty => 'Trash is empty';
+
+  @override
+  String get scanTrashEmptySubtitle => 'Deleted documents will appear here';
+
+  @override
+  String get scanHardDeleteConfirmDesc =>
+      'This will permanently delete the document. This action cannot be undone.';
+
+  @override
+  String get scanFilterAllTime => 'All Time';
+
+  @override
+  String get scanFilterLast7Days => 'Last 7 Days';
+
+  @override
+  String get scanFilterLast30Days => 'Last 30 Days';
 }

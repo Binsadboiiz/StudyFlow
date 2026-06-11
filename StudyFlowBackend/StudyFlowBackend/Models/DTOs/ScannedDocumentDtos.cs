@@ -14,8 +14,7 @@ namespace StudyFlowBackend.DTOs
         public double ConfidenceScore { get; set; } = 0;
         public long ImageSizeBytes { get; set; } = 0;
         public long TextSizeBytes { get; set; } = 0;
-        public string? OriginalImageUrl { get; set; }
-        public string? StoragePath { get; set; }
+        public string? ImageBase64 { get; set; }
     }
 
     /// <summary>
@@ -36,7 +35,6 @@ namespace StudyFlowBackend.DTOs
         public string Title { get; set; } = string.Empty;
         public string ExtractedText { get; set; } = string.Empty;
         public string? OriginalImageUrl { get; set; }
-        public string? StoragePath { get; set; }
         public long ImageSizeBytes { get; set; }
         public long TextSizeBytes { get; set; }
         public string DetectedLanguage { get; set; } = "vi";

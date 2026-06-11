@@ -984,4 +984,75 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get scanRetry => 'Thử lại';
+
+  @override
+  String scanDocumentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tài liệu',
+      one: '1 tài liệu',
+      zero: '0 tài liệu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanTrash => 'Thùng rác';
+
+  @override
+  String get scanRestore => 'Khôi phục';
+
+  @override
+  String get scanHardDelete => 'Xóa vĩnh viễn';
+
+  @override
+  String get scanEmptyTrash => 'Dọn sạch';
+
+  @override
+  String get scanFilter => 'Bộ lọc';
+
+  @override
+  String get scanBatchDelete => 'Xóa mục đã chọn';
+
+  @override
+  String get scanSelect => 'Chọn';
+
+  @override
+  String get scanSelectAll => 'Chọn tất cả';
+
+  @override
+  String scanSelectedCount(int count) {
+    return 'Đã chọn $count';
+  }
+
+  @override
+  String get scanRestoreSuccess => 'Đã khôi phục tài liệu';
+
+  @override
+  String get scanHardDeleteSuccess => 'Đã xóa vĩnh viễn tài liệu';
+
+  @override
+  String scanBatchDeleteConfirm(int count) {
+    return 'Chuyển $count tài liệu vào thùng rác?';
+  }
+
+  @override
+  String get scanTrashEmpty => 'Thùng rác trống';
+
+  @override
+  String get scanTrashEmptySubtitle => 'Các tài liệu đã xóa sẽ xuất hiện ở đây';
+
+  @override
+  String get scanHardDeleteConfirmDesc =>
+      'Hành động này sẽ xóa vĩnh viễn tài liệu và không thể hoàn tác.';
+
+  @override
+  String get scanFilterAllTime => 'Tất cả thời gian';
+
+  @override
+  String get scanFilterLast7Days => '7 ngày qua';
+
+  @override
+  String get scanFilterLast30Days => '30 ngày qua';
 }

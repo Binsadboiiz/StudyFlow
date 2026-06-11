@@ -34,6 +34,12 @@ class ScannedDocumentEntity {
   /// Thời gian cập nhật tài liệu lần cuối.
   final DateTime updatedAt;
 
+  /// Đánh dấu tài liệu đã bị xóa tạm thời (nằm trong thùng rác).
+  final bool isDeleted;
+
+  /// Thời gian tài liệu bị xóa tạm thời (null nếu chưa xóa).
+  final DateTime? deletedAt;
+
   /// Constructor yêu cầu các thông tin cơ bản của tài liệu.
   const ScannedDocumentEntity({
     required this.id,
@@ -47,6 +53,8 @@ class ScannedDocumentEntity {
     this.confidenceScore = 0.0,
     required this.createdAt,
     required this.updatedAt,
+    this.isDeleted = false,
+    this.deletedAt,
   });
 
   /// Tạo bản sao của tài liệu hiện tại với một số thuộc tính được cập nhật.
@@ -63,6 +71,8 @@ class ScannedDocumentEntity {
     double? confidenceScore,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isDeleted,
+    DateTime? deletedAt,
   }) {
     return ScannedDocumentEntity(
       id: id ?? this.id,
@@ -76,6 +86,8 @@ class ScannedDocumentEntity {
       confidenceScore: confidenceScore ?? this.confidenceScore,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 

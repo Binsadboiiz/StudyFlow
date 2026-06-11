@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using StudyFlowBackend.DTOs;
 using StudyFlowBackend.Services;
 using StudyFlowBackend.Utils;
+using StudyFlowBackend.Data;
 
 namespace StudyFlowBackend.Controllers
 {
@@ -107,6 +108,27 @@ namespace StudyFlowBackend.Controllers
         }
 
         /// <summary>
+        /// Lấy file ảnh của tài liệu OCR.
+        /// </summary>
+        [HttpGet("{id}/image")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetImage(Guid id)
+        {
+            // Note: In production, you might want to authenticate this endpoint.
+            // Using AllowAnonymous to simplify Flutter integration without needing custom headers for CachedNetworkImage.
+            var dbContext = HttpContext.RequestServices.GetService(typeof(AppDbContext)) as AppDbContext;
+            if (dbContext == null) return StatusCode(500);
+
+            var document = await dbContext.ScannedDocuments.FindAsync(id);
+            if (document == null || document.ImageData == null || document.ImageData.Length == 0)
+            {
+                return NotFound("Image not found");
+            }
+
+            return File(document.ImageData, "image/jpeg");
+        }
+
+        /// <summary>
         /// Cập nhật tài liệu OCR (Title, ExtractedText).
         /// </summary>
         [HttpPut("{id}")]
@@ -125,8 +147,7 @@ namespace StudyFlowBackend.Controllers
         }
 
         /// <summary>
-        /// Xóa tài liệu OCR. Storage usage sẽ được cập nhật tự động.
-        /// Client cần tự xóa file trên Firebase Storage bằng StoragePath trả về trước đó.
+        /// Xóa mềm tài liệu OCR.
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
@@ -140,7 +161,76 @@ namespace StudyFlowBackend.Controllers
             if (!result)
                 return NotFound(ApiResponse<object>.ErrorResponse("Document not found"));
 
-            return Ok(ApiResponse<object>.SuccessResponse(null, "Document deleted successfully"));
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Document moved to trash"));
+        }
+
+        /// <summary>
+        /// Lấy tất cả tài liệu OCR trong thùng rác.
+        /// </summary>
+        [HttpGet("trash")]
+        public async Task<IActionResult> GetTrash()
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
+
+            var trashDocuments = await _scannedDocumentService.GetTrashAsync(userId);
+            return Ok(ApiResponse<List<ScannedDocumentResponseDto>>.SuccessResponse(trashDocuments));
+        }
+
+        /// <summary>
+        /// Phục hồi tài liệu OCR từ thùng rác.
+        /// </summary>
+        [HttpPost("restore/{id}")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
+
+            var result = await _scannedDocumentService.RestoreAsync(userId, id);
+            if (!result)
+                return NotFound(ApiResponse<object>.ErrorResponse("Document not found in trash"));
+
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Document restored successfully"));
+        }
+
+        /// <summary>
+        /// Xóa vĩnh viễn tài liệu OCR. Storage usage sẽ được cập nhật tự động.
+        /// Client cần tự xóa file trên Firebase Storage bằng StoragePath trả về trước đó.
+        /// </summary>
+        [HttpDelete("hard-delete/{id}")]
+        public async Task<IActionResult> HardDelete(Guid id)
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
+
+            var result = await _scannedDocumentService.HardDeleteAsync(userId, id);
+            if (!result)
+                return NotFound(ApiResponse<object>.ErrorResponse("Document not found in trash"));
+
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Document permanently deleted"));
+        }
+
+        /// <summary>
+        /// Xóa mềm nhiều tài liệu OCR.
+        /// </summary>
+        [HttpPost("batch-delete")]
+        public async Task<IActionResult> BatchDelete([FromBody] List<Guid> ids)
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse<object>.ErrorResponse("Unauthorized"));
+
+            if (ids == null || !ids.Any())
+                return BadRequest(ApiResponse<object>.ErrorResponse("List of IDs cannot be empty"));
+
+            var result = await _scannedDocumentService.BatchDeleteAsync(userId, ids);
+            if (!result)
+                return NotFound(ApiResponse<object>.ErrorResponse("Documents not found"));
+
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Documents moved to trash"));
         }
 
         /// <summary>

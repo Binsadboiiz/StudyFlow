@@ -101,6 +101,10 @@ namespace StudyFlowBackend.Data
             modelBuilder.Entity<ScannedDocument>()
                 .HasIndex(sd => sd.UserId);
 
+            // Global query filter to ignore soft-deleted documents by default
+            modelBuilder.Entity<ScannedDocument>()
+                .HasQueryFilter(sd => !sd.IsDeleted);
+
             // Cấu hình mối quan hệ User - FeaturedBadge (1 Badge được gán nổi bật bởi nhiều Users)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.FeaturedBadge)

@@ -329,5 +329,45 @@
       }
     }
   },
-  "scanRetry": "Retry"
+  "scanRetry": "Retry",
+  "scanDocumentCount": "{count, plural, =0{0 documents} =1{1 document} other{{count} documents}}",
+  "@scanDocumentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrash": "Trash",
+  "scanRestore": "Restore",
+  "scanHardDelete": "Delete Permanently",
+  "scanEmptyTrash": "Empty Trash",
+  "scanFilter": "Filter",
+  "scanBatchDelete": "Delete Selected",
+  "scanSelect": "Select",
+  "scanSelectAll": "Select All",
+  "scanSelectedCount": "{count} selected",
+  "@scanSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanRestoreSuccess": "Document restored",
+  "scanHardDeleteSuccess": "Document permanently deleted",
+  "scanBatchDeleteConfirm": "Move {count} documents to trash?",
+  "@scanBatchDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTrashEmpty": "Trash is empty",
+  "scanTrashEmptySubtitle": "Deleted documents will appear here",
+  "scanHardDeleteConfirmDesc": "This will permanently delete the document. This action cannot be undone.",
+  "scanFilterAllTime": "All Time",
+  "scanFilterLast7Days": "Last 7 Days",
+  "scanFilterLast30Days": "Last 30 Days"
 }

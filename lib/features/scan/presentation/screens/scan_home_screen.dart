@@ -8,10 +8,11 @@ import 'package:studyflow/features/scan/presentation/widgets/document_card.dart'
 import 'package:studyflow/features/scan/presentation/widgets/storage_indicator.dart';
 import 'package:studyflow/features/scan/presentation/screens/camera_scan_screen.dart';
 import 'package:studyflow/features/scan/presentation/screens/document_detail_screen.dart';
+import 'package:studyflow/features/scan/presentation/screens/trash_screen.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 
-/// Màn hình chính của tính năng quét tài liệu OCR.
-/// Hiển thị danh sách tài liệu, thanh dung lượng, chức năng tìm kiếm.
+/// Main screen for the OCR scanning feature.
+/// Displays document list, storage indicator, search, and selection mode.
 class ScanHomeScreen extends StatefulWidget {
   const ScanHomeScreen({super.key});
 
@@ -20,10 +21,10 @@ class ScanHomeScreen extends StatefulWidget {
 }
 
 class _ScanHomeScreenState extends State<ScanHomeScreen> {
-  /// Controller cho ô tìm kiếm.
+  /// Controller for search field.
   final TextEditingController _searchController = TextEditingController();
 
-  /// Cờ hiển thị ô tìm kiếm.
+  /// Flag to show search field.
   bool _showSearch = false;
 
   @override
@@ -42,7 +43,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      // AppBar với Glassmorphism effect giống HomeScreen
+      // AppBar with Glassmorphism effect
       appBar: AppBar(
         backgroundColor: isDark
             ? Colors.black.withValues(alpha: 0.3)
@@ -55,34 +56,104 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
             child: Container(color: Colors.transparent),
           ),
         ),
-        title: _showSearch
-            ? _buildSearchField(ext)
-            : Text(
-                AppLocalizations.of(context)!.scanTitle,
+        leading: scanVm.isSelectionMode
+            ? IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () => scanVm.clearSelection(),
+              )
+            : null,
+        title: scanVm.isSelectionMode
+            ? Text(
+                AppLocalizations.of(context)!.scanSelectedCount(scanVm.selectedIds.length),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
-              ),
-        actions: [
-          // Nút tìm kiếm / đóng tìm kiếm
-          IconButton(
-            icon: Icon(_showSearch ? Icons.close_rounded : Icons.search_rounded),
-            onPressed: () {
-              setState(() {
-                _showSearch = !_showSearch;
-                if (!_showSearch) {
-                  _searchController.clear();
-                  scanVm.clearSearch();
-                }
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+              )
+            : (_showSearch
+                ? _buildSearchField(ext)
+                : Text(
+                    AppLocalizations.of(context)!.scanTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+        actions: scanVm.isSelectionMode
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.select_all_rounded),
+                  onPressed: () => scanVm.selectAll(),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_rounded, color: Colors.redAccent),
+                  onPressed: () => _confirmBatchDelete(context, scanVm),
+                ),
+                const SizedBox(width: 8),
+              ]
+            : [
+                // Search toggle button
+                IconButton(
+                  icon: Icon(_showSearch ? Icons.close_rounded : Icons.search_rounded),
+                  onPressed: () {
+                    setState(() {
+                      _showSearch = !_showSearch;
+                      if (!_showSearch) {
+                        _searchController.clear();
+                        scanVm.clearSearch();
+                      }
+                    });
+                  },
+                ),
+                // Popup menu for Filter, Select, and Trash
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'filter') {
+                      _showFilterBottomSheet(context, scanVm);
+                    } else if (value == 'select') {
+                      scanVm.toggleSelectionMode();
+                    } else if (value == 'trash') {
+                      _openTrashScreen(context);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'filter',
+                      child: Row(
+                        children: [
+                          Icon(Icons.filter_list_rounded, color: ext.subtext, size: 20),
+                          const SizedBox(width: 12),
+                          Text(AppLocalizations.of(context)!.scanFilter),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'select',
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_box_outlined, color: ext.subtext, size: 20),
+                          const SizedBox(width: 12),
+                          Text(AppLocalizations.of(context)!.scanSelect),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'trash',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline_rounded, color: ext.subtext, size: 20),
+                          const SizedBox(width: 12),
+                          Text(AppLocalizations.of(context)!.scanTrash),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8),
+              ],
       ),
 
-      // Nội dung chính: danh sách tài liệu
+      // Main content: document list
       body: Container(
         color: Colors.transparent,
         child: SafeArea(
@@ -131,7 +202,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
                     child: _buildEmptyState(ext),
                   )
 
-                // Danh sách tài liệu
+                // Document List
                 else
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -139,11 +210,27 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final doc = scanVm.documents[index];
+                          final isSelected = scanVm.selectedIds.contains(doc.id);
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: DocumentCard(
                               document: doc,
-                              onTap: () => _openDocumentDetail(context, doc.id),
+                              isSelectionMode: scanVm.isSelectionMode,
+                              isSelected: isSelected,
+                              onTap: () {
+                                if (scanVm.isSelectionMode) {
+                                  scanVm.toggleSelection(doc.id);
+                                } else {
+                                  _openDocumentDetail(context, doc.id);
+                                }
+                              },
+                              onLongPress: () {
+                                if (!scanVm.isSelectionMode) {
+                                  scanVm.toggleSelectionMode();
+                                  scanVm.toggleSelection(doc.id);
+                                }
+                              },
                             ),
                           );
                         },
@@ -152,7 +239,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
                     ),
                   ),
 
-                // Padding dưới cùng cho bottom nav
+                // Bottom padding for nav bar
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
             ),
@@ -160,24 +247,26 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
         ),
       ),
 
-      // FAB để quét tài liệu mới
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: FloatingActionButton(
-          onPressed: () => _openCameraScan(context),
-          backgroundColor: AppColors.accent,
-          foregroundColor: Colors.white,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(Icons.document_scanner_rounded, size: 26),
-        ),
-      ),
+      // FAB to scan new document (hidden in selection mode)
+      floatingActionButton: scanVm.isSelectionMode
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: FloatingActionButton(
+                onPressed: () => _openCameraScan(context),
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.document_scanner_rounded, size: 26),
+              ),
+            ),
     );
   }
 
-  /// Xây dựng ô tìm kiếm.
+  /// Build search field.
   Widget _buildSearchField(AppThemeExtension ext) {
     return TextField(
       controller: _searchController,
@@ -198,7 +287,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     );
   }
 
-  /// Trạng thái trống: chưa có tài liệu nào.
+  /// Empty state: no documents.
   Widget _buildEmptyState(AppThemeExtension ext) {
     final isSearching = context.read<ScanViewModel>().isSearching;
 
@@ -243,7 +332,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     );
   }
 
-  /// Trạng thái lỗi.
+  /// Error state.
   Widget _buildErrorState(ScanViewModel scanVm, AppThemeExtension ext) {
     return Center(
       child: Padding(
@@ -288,7 +377,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     );
   }
 
-  /// Mở màn hình chi tiết tài liệu.
+  /// Open document detail screen.
   void _openDocumentDetail(BuildContext context, String documentId) {
     Navigator.push(
       context,
@@ -298,12 +387,114 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     );
   }
 
-  /// Mở màn hình quét tài liệu mới.
+  /// Open camera scan screen.
   void _openCameraScan(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const CameraScanScreen(),
+      ),
+    );
+  }
+
+  /// Open trash screen.
+  void _openTrashScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TrashScreen(),
+      ),
+    );
+  }
+
+  /// Show batch delete confirmation dialog.
+  void _confirmBatchDelete(BuildContext context, ScanViewModel scanVm) {
+    final count = scanVm.selectedIds.length;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.scanDeleteConfirmTitle),
+        content: Text(AppLocalizations.of(context)!.scanBatchDeleteConfirm(count)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(AppLocalizations.of(context)!.scanDeleteCancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await scanVm.batchDeleteSelected();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(AppLocalizations.of(context)!.scanDeleteSuccess)),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: Text(AppLocalizations.of(context)!.scanDeleteConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show filter bottom sheet.
+  void _showFilterBottomSheet(BuildContext context, ScanViewModel scanVm) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.scanFilter,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            // Filter Options
+            ListTile(
+              leading: const Icon(Icons.all_inclusive_rounded),
+              title: Text(AppLocalizations.of(context)!.scanFilterAllTime),
+              trailing: scanVm.currentFilterDays == null
+                  ? const Icon(Icons.check_rounded, color: AppColors.accent)
+                  : null,
+              onTap: () {
+                scanVm.filterDocuments(daysAgo: null);
+                Navigator.pop(ctx);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.view_week_rounded),
+              title: Text(AppLocalizations.of(context)!.scanFilterLast7Days),
+              trailing: scanVm.currentFilterDays == 7
+                  ? const Icon(Icons.check_rounded, color: AppColors.accent)
+                  : null,
+              onTap: () {
+                scanVm.filterDocuments(daysAgo: 7);
+                Navigator.pop(ctx);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_month_rounded),
+              title: Text(AppLocalizations.of(context)!.scanFilterLast30Days),
+              trailing: scanVm.currentFilterDays == 30
+                  ? const Icon(Icons.check_rounded, color: AppColors.accent)
+                  : null,
+              onTap: () {
+                scanVm.filterDocuments(daysAgo: 30);
+                Navigator.pop(ctx);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

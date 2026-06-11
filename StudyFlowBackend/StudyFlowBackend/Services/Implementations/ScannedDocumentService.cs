@@ -38,14 +38,30 @@ namespace StudyFlowBackend.Services
                 throw new InvalidOperationException("Storage quota exceeded. Please delete old documents to free up space.");
             }
 
+            // Parse ImageBase64 to byte array
+            byte[]? imageData = null;
+            if (!string.IsNullOrEmpty(dto.ImageBase64))
+            {
+                try
+                {
+                    imageData = Convert.FromBase64String(dto.ImageBase64);
+                }
+                catch (FormatException)
+                {
+                    // Ignore or handle invalid base64
+                }
+            }
+
+            var documentId = Guid.NewGuid();
+
             var document = new ScannedDocument
             {
-                Id = Guid.NewGuid(),
+                Id = documentId,
                 UserId = userId,
                 Title = dto.Title,
                 ExtractedText = dto.ExtractedText,
-                OriginalImageUrl = dto.OriginalImageUrl,
-                StoragePath = dto.StoragePath,
+                ImageData = imageData,
+                OriginalImageUrl = $"/scanned-documents/{documentId}/image",
                 ImageSizeBytes = dto.ImageSizeBytes,
                 TextSizeBytes = dto.TextSizeBytes,
                 DetectedLanguage = dto.DetectedLanguage,
@@ -110,8 +126,8 @@ namespace StudyFlowBackend.Services
         }
 
         /// <summary>
-        /// Xóa tài liệu OCR và cập nhật lại storage usage.
-        /// Lưu ý: Client cần tự xóa file trên Firebase Storage bằng StoragePath.
+        /// Xóa mềm tài liệu OCR (đưa vào thùng rác).
+        /// Storage usage không bị giảm đi (vẫn tính dung lượng của thùng rác).
         /// </summary>
         public async Task<bool> DeleteAsync(string userId, Guid id)
         {
@@ -120,11 +136,9 @@ namespace StudyFlowBackend.Services
 
             if (document == null) return false;
 
-            _context.ScannedDocuments.Remove(document);
+            document.IsDeleted = true;
+            document.DeletedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-
-            // Cập nhật lại storage usage sau khi xóa document
-            await _storageQuotaService.UpdateUsageAsync(userId);
 
             return true;
         }
@@ -159,7 +173,6 @@ namespace StudyFlowBackend.Services
                 Title = document.Title,
                 ExtractedText = document.ExtractedText,
                 OriginalImageUrl = document.OriginalImageUrl,
-                StoragePath = document.StoragePath,
                 ImageSizeBytes = document.ImageSizeBytes,
                 TextSizeBytes = document.TextSizeBytes,
                 DetectedLanguage = document.DetectedLanguage,
@@ -167,7 +180,82 @@ namespace StudyFlowBackend.Services
                 CreatedAt = document.CreatedAt,
                 UpdatedAt = document.UpdatedAt,
                 UserId = document.UserId
+                // Note: DTO should ideally have IsDeleted and DeletedAt added, but keeping it as is to avoid breaking changes if not needed. We'll add it if required.
             };
+        }
+
+        /// <summary>
+        /// Lấy tất cả tài liệu OCR trong thùng rác của user.
+        /// </summary>
+        public async Task<List<ScannedDocumentResponseDto>> GetTrashAsync(string userId)
+        {
+            var documents = await _context.ScannedDocuments
+                .IgnoreQueryFilters()
+                .Where(d => d.UserId == userId && d.IsDeleted)
+                .OrderByDescending(d => d.DeletedAt)
+                .ToListAsync();
+
+            return documents.Select(MapToDto).ToList();
+        }
+
+        /// <summary>
+        /// Phục hồi tài liệu từ thùng rác.
+        /// </summary>
+        public async Task<bool> RestoreAsync(string userId, Guid id)
+        {
+            var document = await _context.ScannedDocuments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId && d.IsDeleted);
+
+            if (document == null) return false;
+
+            document.IsDeleted = false;
+            document.DeletedAt = null;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Xóa vĩnh viễn tài liệu OCR.
+        /// </summary>
+        public async Task<bool> HardDeleteAsync(string userId, Guid id)
+        {
+            var document = await _context.ScannedDocuments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId && d.IsDeleted);
+
+            if (document == null) return false;
+
+            _context.ScannedDocuments.Remove(document);
+            await _context.SaveChangesAsync();
+
+            // Cập nhật lại storage usage sau khi xóa vĩnh viễn
+            await _storageQuotaService.UpdateUsageAsync(userId);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Xóa mềm nhiều tài liệu cùng lúc.
+        /// </summary>
+        public async Task<bool> BatchDeleteAsync(string userId, List<Guid> ids)
+        {
+            var documents = await _context.ScannedDocuments
+                .Where(d => ids.Contains(d.Id) && d.UserId == userId && !d.IsDeleted)
+                .ToListAsync();
+
+            if (!documents.Any()) return false;
+
+            var now = DateTime.UtcNow;
+            foreach (var doc in documents)
+            {
+                doc.IsDeleted = true;
+                doc.DeletedAt = now;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
