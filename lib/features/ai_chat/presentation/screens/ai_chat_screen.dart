@@ -5,6 +5,8 @@ import 'package:studyflow/features/ai_chat/presentation/providers/ai_chat_provid
 import 'package:studyflow/features/ai_chat/data/models/ai_chat_model.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
+import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
+import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
@@ -628,6 +630,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
       await taskVm.addTask(newTask);
       
       if (mounted) {
+        context.read<ScheduleViewmodel>().loadWeekTasks();
+        context.read<HomeViewModel>().refreshTasks();
+        
         NotificationService.instance.show(
           AppNotification(
             message: AppLocalizations.of(context)!.aiChatAddedSuccess(action.title),

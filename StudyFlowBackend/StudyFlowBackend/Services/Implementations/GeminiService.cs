@@ -60,13 +60,13 @@ namespace StudyFlowBackend.Services.Implementations
                                     "2. If the user wants to create a new task or plan a new schedule event, provide the structural details in the `suggestedActions` array:\n" +
                                     "   - actionType: 'CREATE_TASK' or 'CREATE_SCHEDULE'.\n" +
                                     "   - Each action must contain a `title`, and optional `description`.\n" +
-                                    "   - For 'CREATE_TASK', fill `dueDate` (format: YYYY-MM-DD).\n" +
-                                    "   - For 'CREATE_SCHEDULE', fill `date` (YYYY-MM-DD), `startTime` (HH:mm), and `endTime` (HH:mm).\n" +
+                                    "   - For 'CREATE_TASK', fill `dueDate` (format: YYYY-MM-DD), and optionally `startTime` (format: HH:mm) and `endTime` (format: HH:mm) if specified by the user or relevant.\n" +
+                                    "   - For 'CREATE_SCHEDULE', fill `date` (format: YYYY-MM-DD), `startTime` (format: HH:mm), and `endTime` (format: HH:mm).\n" +
                                     "3. Always respond strictly in the following JSON format:\n" +
                                     "{\n" +
                                     "  \"reply\": \"Friendly response message to the user, formatted beautifully with markdown\",\n" +
                                     "  \"suggestedActions\": [\n" +
-                                    "     { \"actionType\": \"CREATE_TASK\", \"title\": \"Task title\", \"description\": \"Description details\", \"dueDate\": \"YYYY-MM-DD\" }\n" +
+                                    "     { \"actionType\": \"CREATE_TASK\", \"title\": \"Task title\", \"description\": \"Description details\", \"dueDate\": \"YYYY-MM-DD\", \"startTime\": \"14:00\", \"endTime\": \"16:00\" }\n" +
                                     "  ]\n" +
                                     "}\n" +
                                     "Provide clean raw JSON output. Do NOT wrap it in markdown code blocks like ```json ```.";
