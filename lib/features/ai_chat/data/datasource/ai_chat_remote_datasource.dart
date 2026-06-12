@@ -28,11 +28,18 @@ class AiChatRemoteDatasource {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseBody = json.decode(response.body);
       return ChatResponseModel.fromJson(responseBody['data']);
-    } else if (response.statusCode == 429) {
-      final Map<String, dynamic> responseBody = json.decode(response.body);
-      throw Exception(responseBody['message'] ?? 'Bạn đã hết lượt sử dụng AI hôm nay.');
     } else {
-      throw Exception('Không thể nhận câu trả lời từ AI. Vui lòng thử lại sau.');
+      String? serverMessage;
+      try {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        serverMessage = responseBody['message'];
+      } catch (_) {}
+
+      if (response.statusCode == 429) {
+        throw Exception(serverMessage ?? 'AI daily request limit reached.');
+      } else {
+        throw Exception(serverMessage ?? 'Unable to receive response from AI. Please try again later.');
+      }
     }
   }
 
@@ -45,7 +52,12 @@ class AiChatRemoteDatasource {
       final List<dynamic> jsonList = responseBody['data'] ?? [];
       return jsonList.map((e) => ChatMessageModel.fromJson(e)).toList();
     } else {
-      throw Exception('Không thể tải lịch sử trò chuyện.');
+      String? serverMessage;
+      try {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        serverMessage = responseBody['message'];
+      } catch (_) {}
+      throw Exception(serverMessage ?? 'Unable to load chat history.');
     }
   }
 
@@ -54,7 +66,12 @@ class AiChatRemoteDatasource {
     final response = await http.post(Uri.parse('$aiEndpoint/clear'), headers: headers);
 
     if (response.statusCode != 200) {
-      throw Exception('Không thể xóa lịch sử trò chuyện.');
+      String? serverMessage;
+      try {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        serverMessage = responseBody['message'];
+      } catch (_) {}
+      throw Exception(serverMessage ?? 'Unable to clear chat history.');
     }
   }
 
@@ -77,10 +94,10 @@ class AiChatRemoteDatasource {
       return FlashcardSetModel.fromJson(responseBody['data']);
     } else if (response.statusCode == 429) {
       final Map<String, dynamic> responseBody = json.decode(response.body);
-      throw Exception(responseBody['message'] ?? 'Bạn đã hết lượt sử dụng AI hôm nay.');
+      throw Exception(responseBody['message'] ?? 'AI daily request limit reached.');
     } else {
       final Map<String, dynamic> responseBody = json.decode(response.body);
-      throw Exception(responseBody['message'] ?? 'Không thể sinh flashcard bằng AI.');
+      throw Exception(responseBody['message'] ?? 'Could not generate flashcards using AI.');
     }
   }
 }

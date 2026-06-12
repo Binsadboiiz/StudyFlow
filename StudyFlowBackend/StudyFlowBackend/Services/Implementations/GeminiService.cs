@@ -25,8 +25,8 @@ namespace StudyFlowBackend.Services.Implementations
             _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") 
                       ?? configuration["Gemini:ApiKey"] 
                       ?? string.Empty;
-            // Dùng gemini-1.5-flash hoặc gemini-2.0-flash-lite theo lựa chọn của người dùng
-            _modelName = configuration["Gemini:Model"] ?? "gemini-1.5-flash";
+            // Dùng gemini-2.5-flash hoặc gemini-2.0-flash-lite theo lựa chọn của người dùng
+            _modelName = configuration["Gemini:Model"] ?? "gemini-2.5-flash";
         }
 
         public async Task<(string Reply, List<AiActionSuggestionDto> Actions, bool IsSuccess)> ProcessChatWithContextAsync(
@@ -124,7 +124,7 @@ namespace StudyFlowBackend.Services.Implementations
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Gemini API Error: {Status} - {Response}", response.StatusCode, responseString);
-                    return ("The AI system is currently busy, please try again later.", new List<AiActionSuggestionDto>(), false);
+                    return ($"The AI system is currently busy. (Gemini API Error {response.StatusCode}: {responseString})", new List<AiActionSuggestionDto>(), false);
                 }
 
                 using var doc = JsonDocument.Parse(responseString);
@@ -165,15 +165,19 @@ namespace StudyFlowBackend.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while calling Gemini API");
+                return ($"Unable to receive response from AI: {ex.Message} ({ex.GetType().Name})", new List<AiActionSuggestionDto>(), false);
             }
 
-            return ("Unable to receive response from AI.", new List<AiActionSuggestionDto>(), false);
+            return ("Unable to receive response from AI: Empty response or invalid structure.", new List<AiActionSuggestionDto>(), false);
         }
 
         public async Task<List<CreateFlashcardDto>> GenerateFlashcardsFromTextAsync(string documentText)
         {
             var result = new List<CreateFlashcardDto>();
-            if (string.IsNullOrEmpty(_apiKey)) return result;
+            if (string.IsNullOrEmpty(_apiKey)) 
+            {
+                throw new InvalidOperationException("Error: Gemini API key not configured in the backend.");
+            }
 
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}";
 
@@ -212,7 +216,7 @@ namespace StudyFlowBackend.Services.Implementations
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Gemini Flashcard API Error: {Status} - {Response}", response.StatusCode, responseString);
-                    return result;
+                    throw new HttpRequestException($"Gemini API Error {response.StatusCode}: {responseString}");
                 }
 
                 using var doc = JsonDocument.Parse(responseString);
@@ -239,9 +243,10 @@ namespace StudyFlowBackend.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating flashcards from Gemini API");
+                throw;
             }
 
-            return result;
+            throw new InvalidOperationException("Empty response or invalid structure from Gemini API.");
         }
 
         private class ChatJsonResult

@@ -8,6 +8,9 @@ import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/core/services/notification/app_notification.dart';
+import 'package:studyflow/core/services/notification/notification_type.dart';
+import 'package:studyflow/core/services/notification/notification_service.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -76,18 +79,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
     if (provider.errorMessage != null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(child: Text(provider.errorMessage!)),
-              ],
-            ),
-            backgroundColor: Colors.redAccent,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        NotificationService.instance.show(
+          AppNotification(
+            message: provider.errorMessage!,
+            type: NotificationType.error,
           ),
         );
         provider.clearError();
@@ -633,18 +628,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
       await taskVm.addTask(newTask);
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline_rounded, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(child: Text(AppLocalizations.of(context)!.aiChatAddedSuccess(action.title))),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        NotificationService.instance.show(
+          AppNotification(
+            message: AppLocalizations.of(context)!.aiChatAddedSuccess(action.title),
+            type: NotificationType.success,
           ),
         );
         setState(() {
@@ -653,12 +640,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.aiChatAddFailed(e.toString())),
-            backgroundColor: Colors.redAccent,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        NotificationService.instance.show(
+          AppNotification(
+            message: AppLocalizations.of(context)!.aiChatAddFailed(e.toString()),
+            type: NotificationType.error,
           ),
         );
       }
