@@ -48,6 +48,12 @@ import 'package:studyflow/features/scan/domain/usecase/restore_document_usecase.
 import 'package:studyflow/features/scan/domain/usecase/hard_delete_document_usecase.dart';
 import 'package:studyflow/features/scan/domain/usecase/batch_delete_documents_usecase.dart';
 
+// Flashcard & AI Chat features
+import 'package:studyflow/features/flashcard/data/datasource/flashcard_remote_datasource.dart';
+import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
+import 'package:studyflow/features/ai_chat/data/datasource/ai_chat_remote_datasource.dart';
+import 'package:studyflow/features/ai_chat/presentation/providers/ai_chat_provider.dart';
+
 /// A utility class for setting up dependency injection across the application.
 /// It initializes repositories and provides a list of Providers for state management.
 class DependencyInjection {
@@ -63,6 +69,9 @@ class DependencyInjection {
   static late final PetRepository petRepository;
   /// The globally available scan repository instance (OCR Document Scanning).
   static late final ScanRepositoryImpl scanRepository;
+  /// Flashcard & AI Remote datasources
+  static late final FlashcardRemoteDatasource flashcardRemoteDatasource;
+  static late final AiChatRemoteDatasource aiChatRemoteDatasource;
 
   /// Initializes all the dependencies needed for the application.
   /// This should be called before `runApp()` in `main.dart`.
@@ -90,6 +99,10 @@ class DependencyInjection {
     // Set up data sources and repositories for scan (OCR)
     final scanRemoteDatasource = ScanRemoteDatasource(auth: auth);
     scanRepository = ScanRepositoryImpl(scanRemoteDatasource);
+
+    // Set up Flashcard & AI Datasources
+    flashcardRemoteDatasource = FlashcardRemoteDatasource(auth: auth);
+    aiChatRemoteDatasource = AiChatRemoteDatasource(auth: auth);
   }
 
   /// Returns a list of all state management providers used in the application.
@@ -164,6 +177,17 @@ class DependencyInjection {
           restoreDocumentUseCase: RestoreDocument(scanRepository),
           hardDeleteDocumentUseCase: HardDeleteDocument(scanRepository),
           batchDeleteDocumentsUseCase: BatchDeleteDocuments(scanRepository),
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => FlashcardProvider(
+          remoteDatasource: flashcardRemoteDatasource,
+          aiRemoteDatasource: aiChatRemoteDatasource,
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => AiChatProvider(
+          remoteDatasource: aiChatRemoteDatasource,
         ),
       ),
     ];

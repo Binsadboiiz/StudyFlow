@@ -1055,4 +1055,143 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get scanFilterLast30Days => '30 ngày qua';
+
+  @override
+  String get petGuideTooltip => 'Cẩm nang Pet';
+
+  @override
+  String get petGuideTitle => 'Cẩm nang Thú Cưng';
+
+  @override
+  String get petGuideEarnCoinsTitle => 'Cách kiếm Coins';
+
+  @override
+  String get petGuideEarnCoinsContent =>
+      '• Hoàn thành các phiên học tập tập trung.\n• Hoàn thành nhiệm vụ mỗi ngày.';
+
+  @override
+  String get petGuideCareTitle => 'Chăm sóc Pet';
+
+  @override
+  String get petGuideCareContent =>
+      '• Dùng 10 Coins để mua thức ăn (Feed) cho Pet.\n• Ăn no sẽ giúp Pet phát triển tốt nhất.';
+
+  @override
+  String get petGuideEvolutionTitle => 'Lên cấp & Tiến hóa';
+
+  @override
+  String get petGuideEvolutionContent =>
+      '• Chơi đùa (Play) với Pet giúp tăng 10 EXP nhưng tốn 5 điểm no.\n• Pet sẽ tiến hóa qua các giai đoạn: Trứng ➔ Sơ sinh ➔ Trưởng thành khi đạt mốc Level tương ứng.';
+
+  @override
+  String get gotItBtn => 'Đã hiểu';
+
+  @override
+  String get aiChatTitle => 'Trợ lý học tập AI';
+
+  @override
+  String aiChatRequestsRemaining(int count) {
+    return 'Còn lại $count lượt sử dụng hôm nay';
+  }
+
+  @override
+  String get aiChatClearConfirm => 'Xóa hội thoại?';
+
+  @override
+  String get aiChatEmptyStateTitle => 'Xin chào! Tôi có thể giúp gì cho bạn?';
+
+  @override
+  String get aiChatEmptyStateSubtitle =>
+      'Bạn có thể hỏi tôi sắp xếp task, đặt lịch học tập, hoặc lên kế hoạch chuẩn bị thi cử.';
+
+  @override
+  String get aiChatThinking => 'AI đang suy nghĩ...';
+
+  @override
+  String get aiChatActionSuggestions => 'Đề xuất hành động từ AI';
+
+  @override
+  String get aiChatTaskPrefix => '📝 TASK';
+
+  @override
+  String get aiChatSchedulePrefix => '📅 LÊN LỊCH';
+
+  @override
+  String aiChatAddedSuccess(String title) {
+    return 'Đã thêm thành công: \"$title\"';
+  }
+
+  @override
+  String aiChatAddFailed(String error) {
+    return 'Không thể thêm: $error';
+  }
+
+  @override
+  String get aiChatDismiss => 'Bỏ qua';
+
+  @override
+  String get aiChatAccept => 'Đồng ý';
+
+  @override
+  String get aiChatInputHint => 'Nhập tin nhắn hỗ trợ học tập...';
+
+  @override
+  String get aiChatDailyLimitReached => 'Bạn đã hết lượt sử dụng AI hôm nay.';
+
+  @override
+  String get flashcardTitle => 'Flashcards Học Tập';
+
+  @override
+  String get flashcardEmpty => 'Bạn chưa có bộ flashcard nào.';
+
+  @override
+  String get flashcardGeneratePrompt =>
+      'Hãy dùng AI để sinh flashcard từ tài liệu đã scan nhé!';
+
+  @override
+  String flashcardsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+      one: '1 thẻ',
+      zero: '0 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String flashcardDeleteConfirm(String title) {
+    return 'Bạn có chắc chắn muốn xóa bộ flashcard \"$title\"?';
+  }
+
+  @override
+  String get flashcardGenerateAI => 'Sinh Flashcard bằng AI';
+
+  @override
+  String get flashcardGenerating => 'AI đang phân tích và tạo flashcard...';
+
+  @override
+  String get flashcardGenerateSuccess => 'Sinh Flashcard bằng AI thành công!';
+
+  @override
+  String get flashcardStudyFinished => 'Hoàn thành bài học!';
+
+  @override
+  String get flashcardSummaryTitle => 'Tóm tắt';
+
+  @override
+  String get flashcardSummaryTotal => 'Tổng số thẻ';
+
+  @override
+  String get flashcardSummaryRemembered => 'Đã nhớ';
+
+  @override
+  String get flashcardSummaryForgotten => 'Chưa nhớ';
+
+  @override
+  String get flashcardReplay => 'Học lại';
+
+  @override
+  String get flashcardFlipHint => 'Chạm vào thẻ để xem đáp án';
 }

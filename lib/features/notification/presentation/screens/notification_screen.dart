@@ -368,19 +368,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   String _formatTime(DateTime dateTime) {
+    final localDateTime = dateTime.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    final checkDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    final checkDate = DateTime(localDateTime.year, localDateTime.month, localDateTime.day);
 
-    final timeStr = DateFormat('HH:mm').format(dateTime);
+    final timeStr = DateFormat('HH:mm').format(localDateTime);
 
     if (checkDate == today) {
       return '${AppLocalizations.of(context)!.today}, $timeStr';
     } else if (checkDate == yesterday) {
       return '${AppLocalizations.of(context)!.yesterday}, $timeStr';
     } else {
-      return '${DateFormat('dd MMM').format(dateTime)}, $timeStr';
+      return '${DateFormat('dd MMM').format(localDateTime)}, $timeStr';
     }
   }
 }

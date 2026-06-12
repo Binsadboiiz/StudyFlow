@@ -113,59 +113,69 @@ namespace StudyFlowBackend.Services
                 throw new InvalidOperationException($"You don't have enough Coins! Feeding the pet costs {GamificationConstants.PetFeedCost} Coins.");
             }
 
-            // Trừ Coins của user
-            user.Coins -= GamificationConstants.PetFeedCost;
-
-            // Cộng Hunger no bụng
-            pet.Hunger = Math.Min(GamificationConstants.PetMaxHunger, pet.Hunger + GamificationConstants.PetFeedHungerRecovery);
-
-            // Cộng EXP cho Pet
-            pet.Exp += GamificationConstants.PetFeedExpGain;
-            pet.LastFedTime = DateTime.UtcNow;
-
-            // Kiểm tra thăng cấp cho Pet
-            bool petLeveledUp = false;
-            string oldStage = pet.EvolutionStage;
-            double requiredExp = GetPetRequiredXp(pet.Level);
-
-            while (pet.Exp >= requiredExp)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                pet.Exp -= requiredExp;
-                pet.Level++;
-                petLeveledUp = true;
-                requiredExp = GetPetRequiredXp(pet.Level);
-            }
+                // Trừ Coins của user
+                user.Coins -= GamificationConstants.PetFeedCost;
 
-            // Xử lý tiến hóa dựa trên cấp độ Pet
-            if (pet.Level >= 10) pet.EvolutionStage = "Adult";
-            else if (pet.Level >= 6) pet.EvolutionStage = "Teen";
-            else if (pet.Level >= 3) pet.EvolutionStage = "Baby";
-            else pet.EvolutionStage = "Egg";
+                // Cộng Hunger no bụng
+                pet.Hunger = Math.Min(GamificationConstants.PetMaxHunger, pet.Hunger + GamificationConstants.PetFeedHungerRecovery);
 
-            await _context.SaveChangesAsync();
+                // Cộng EXP cho Pet
+                pet.Exp += GamificationConstants.PetFeedExpGain;
+                pet.LastFedTime = DateTime.UtcNow;
 
-            // Phát thông báo
-            if (petLeveledUp)
-            {
-                await _notificationService.CreateNotificationAsync(
-                    userId,
-                    $"✨ Pet '{pet.Name}' leveled up!",
-                    $"Congratulations! Your pet '{pet.Name}' has reached Level {pet.Level}!",
-                    "Pet"
-                );
+                // Kiểm tra thăng cấp cho Pet
+                bool petLeveledUp = false;
+                string oldStage = pet.EvolutionStage;
+                double requiredExp = GetPetRequiredXp(pet.Level);
 
-                if (pet.EvolutionStage != oldStage)
+                while (pet.Exp >= requiredExp)
+                {
+                    pet.Exp -= requiredExp;
+                    pet.Level++;
+                    petLeveledUp = true;
+                    requiredExp = GetPetRequiredXp(pet.Level);
+                }
+
+                // Xử lý tiến hóa dựa trên cấp độ Pet
+                if (pet.Level >= 10) pet.EvolutionStage = "Adult";
+                else if (pet.Level >= 6) pet.EvolutionStage = "Teen";
+                else if (pet.Level >= 3) pet.EvolutionStage = "Baby";
+                else pet.EvolutionStage = "Egg";
+
+                await _context.SaveChangesAsync();
+
+                // Phát thông báo
+                if (petLeveledUp)
                 {
                     await _notificationService.CreateNotificationAsync(
                         userId,
-                        $"🌟 Your pet has evolved!",
-                        $"Your pet '{pet.Name}' has evolved from the '{oldStage}' stage to the '{pet.EvolutionStage}' stage!",
+                        $"✨ Pet '{pet.Name}' leveled up!",
+                        $"Congratulations! Your pet '{pet.Name}' has reached Level {pet.Level}!",
                         "Pet"
                     );
-                }
-            }
 
-            return pet;
+                    if (pet.EvolutionStage != oldStage)
+                    {
+                        await _notificationService.CreateNotificationAsync(
+                            userId,
+                            $"🌟 Your pet has evolved!",
+                            $"Your pet '{pet.Name}' has evolved from the '{oldStage}' stage to the '{pet.EvolutionStage}' stage!",
+                            "Pet"
+                        );
+                    }
+                }
+
+                await transaction.CommitAsync();
+                return pet;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         /// <summary>
@@ -176,50 +186,68 @@ namespace StudyFlowBackend.Services
             var pet = await _context.StudyPets.FirstOrDefaultAsync(p => p.UserId == userId);
             if (pet == null) throw new InvalidOperationException("You haven't adopted a pet yet.");
 
-            // Tương tác cộng EXP cho Pet
-            pet.Exp += GamificationConstants.PetPlayExpGain;
-
-            // Kiểm tra thăng cấp
-            bool petLeveledUp = false;
-            string oldStage = pet.EvolutionStage;
-            double requiredExp = GetPetRequiredXp(pet.Level);
-
-            while (pet.Exp >= requiredExp)
+            if (pet.Hunger < 5)
             {
-                pet.Exp -= requiredExp;
-                pet.Level++;
-                petLeveledUp = true;
-                requiredExp = GetPetRequiredXp(pet.Level);
+                throw new InvalidOperationException("Pet is too hungry to play! Feed it first.");
             }
 
-            if (pet.Level >= 10) pet.EvolutionStage = "Adult";
-            else if (pet.Level >= 6) pet.EvolutionStage = "Teen";
-            else if (pet.Level >= 3) pet.EvolutionStage = "Baby";
-            else pet.EvolutionStage = "Egg";
-
-            await _context.SaveChangesAsync();
-
-            if (petLeveledUp)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                await _notificationService.CreateNotificationAsync(
-                    userId,
-                    $"✨ Pet '{pet.Name}' leveled up!",
-                    $"Congratulations! Your pet '{pet.Name}' has reached Level {pet.Level}!",
-                    "Pet"
-                );
+                // Giảm hunger
+                pet.Hunger -= 5;
 
-                if (pet.EvolutionStage != oldStage)
+                // Tương tác cộng EXP cho Pet
+                pet.Exp += GamificationConstants.PetPlayExpGain;
+
+                // Kiểm tra thăng cấp
+                bool petLeveledUp = false;
+                string oldStage = pet.EvolutionStage;
+                double requiredExp = GetPetRequiredXp(pet.Level);
+
+                while (pet.Exp >= requiredExp)
+                {
+                    pet.Exp -= requiredExp;
+                    pet.Level++;
+                    petLeveledUp = true;
+                    requiredExp = GetPetRequiredXp(pet.Level);
+                }
+
+                if (pet.Level >= 10) pet.EvolutionStage = "Adult";
+                else if (pet.Level >= 6) pet.EvolutionStage = "Teen";
+                else if (pet.Level >= 3) pet.EvolutionStage = "Baby";
+                else pet.EvolutionStage = "Egg";
+
+                await _context.SaveChangesAsync();
+
+                if (petLeveledUp)
                 {
                     await _notificationService.CreateNotificationAsync(
                         userId,
-                        $"🌟 Your pet has evolved!",
-                        $"Your pet '{pet.Name}' has evolved from the '{oldStage}' stage to the '{pet.EvolutionStage}' stage!",
+                        $"✨ Pet '{pet.Name}' leveled up!",
+                        $"Congratulations! Your pet '{pet.Name}' has reached Level {pet.Level}!",
                         "Pet"
                     );
-                }
-            }
 
-            return pet;
+                    if (pet.EvolutionStage != oldStage)
+                    {
+                        await _notificationService.CreateNotificationAsync(
+                            userId,
+                            $"🌟 Your pet has evolved!",
+                            $"Your pet '{pet.Name}' has evolved from the '{oldStage}' stage to the '{pet.EvolutionStage}' stage!",
+                            "Pet"
+                        );
+                    }
+                }
+
+                await transaction.CommitAsync();
+                return pet;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

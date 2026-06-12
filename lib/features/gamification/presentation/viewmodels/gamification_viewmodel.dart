@@ -61,6 +61,14 @@ class GamificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deduct coins locally for optimistic UI updates.
+  void deductCoinsLocally(int amount) {
+    if (_summary != null) {
+      _summary = _summary!.copyWith(coins: _summary!.coins - amount);
+      notifyListeners();
+    }
+  }
+
   /// Fetches the list of achievement badges.
   Future<void> fetchBadges() async {
     _isLoadingBadges = true;

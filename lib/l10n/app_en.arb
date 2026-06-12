@@ -369,5 +369,79 @@
   "scanHardDeleteConfirmDesc": "This will permanently delete the document. This action cannot be undone.",
   "scanFilterAllTime": "All Time",
   "scanFilterLast7Days": "Last 7 Days",
-  "scanFilterLast30Days": "Last 30 Days"
+  "scanFilterLast30Days": "Last 30 Days",
+  "petGuideTooltip": "Pet Guide",
+  "petGuideTitle": "Pet Guidebook",
+  "petGuideEarnCoinsTitle": "How to earn Coins",
+  "petGuideEarnCoinsContent": "• Complete focused study sessions.\n• Complete daily tasks.",
+  "petGuideCareTitle": "Pet Care",
+  "petGuideCareContent": "• Spend 10 Coins to buy food (Feed) for your Pet.\n• Staying full helps your Pet grow best.",
+  "petGuideEvolutionTitle": "Level Up & Evolution",
+  "petGuideEvolutionContent": "• Playing with your Pet grants 10 EXP but costs 5 hunger.\n• Your pet will evolve through stages: Egg ➔ Baby ➔ Adult at certain Level milestones.",
+  "gotItBtn": "Got it",
+  "aiChatTitle": "AI Study Assistant",
+  "aiChatRequestsRemaining": "Remaining {count} AI requests today",
+  "@aiChatRequestsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiChatClearConfirm": "Clear conversation?",
+  "aiChatEmptyStateTitle": "Hello! How can I help you?",
+  "aiChatEmptyStateSubtitle": "You can ask me to organize tasks, schedule study sessions, or plan exam preparations.",
+  "aiChatThinking": "AI is thinking...",
+  "aiChatActionSuggestions": "AI Action Suggestions",
+  "aiChatTaskPrefix": "📝 TASK",
+  "aiChatSchedulePrefix": "📅 SCHEDULE",
+  "aiChatAddedSuccess": "Successfully added: \"{title}\"",
+  "@aiChatAddedSuccess": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatAddFailed": "Could not add: {error}",
+  "@aiChatAddFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatDismiss": "Dismiss",
+  "aiChatAccept": "Accept",
+  "aiChatInputHint": "Type a study message...",
+  "aiChatDailyLimitReached": "You have reached your daily AI limit today.",
+  "flashcardTitle": "Study Flashcards",
+  "flashcardEmpty": "You don't have any flashcard sets yet.",
+  "flashcardGeneratePrompt": "Use AI to generate flashcards from scanned documents!",
+  "flashcardsCount": "{count, plural, =0{0 cards} =1{1 card} other{{count} cards}}",
+  "@flashcardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardDeleteConfirm": "Are you sure you want to delete \"{title}\"?",
+  "@flashcardDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "flashcardGenerateAI": "Generate Flashcards with AI",
+  "flashcardGenerating": "AI is analyzing and generating flashcards...",
+  "flashcardGenerateSuccess": "Flashcards generated successfully!",
+  "flashcardStudyFinished": "Study Completed!",
+  "flashcardSummaryTitle": "Summary",
+  "flashcardSummaryTotal": "Total Cards",
+  "flashcardSummaryRemembered": "Remembered",
+  "flashcardSummaryForgotten": "Forgotten",
+  "flashcardReplay": "Study Again",
+  "flashcardFlipHint": "Tap card to flip and view answer"
 }

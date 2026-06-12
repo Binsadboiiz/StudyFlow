@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using StudyFlowBackend.Data;
 using StudyFlowBackend.Services;
+using StudyFlowBackend.Services.Implementations;
 using StudyFlowBackend.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -60,6 +61,8 @@ builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<IScannedDocumentService, ScannedDocumentService>();
 builder.Services.AddScoped<IStorageQuotaService, StorageQuotaService>();
+builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 builder.Services.AddHostedService<ReminderWorker>();
 builder.Services.AddHostedService<TrashCleanupService>();
 

@@ -198,6 +198,62 @@ namespace StudyFlowBackend.Migrations
                         });
                 });
 
+            modelBuilder.Entity("StudyFlowBackend.Models.Flashcard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("FlashcardSetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FlashcardSetId");
+
+                    b.ToTable("Flashcards");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.FlashcardSet", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("TargetDocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetDocumentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FlashcardSets");
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.FocusSession", b =>
                 {
                     b.Property<Guid>("Id")
@@ -390,6 +446,9 @@ namespace StudyFlowBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int>("DailyAiRequestsUsed")
+                        .HasColumnType("integer");
+
                     b.Property<int>("DailyTargetMinutes")
                         .HasColumnType("integer");
 
@@ -406,6 +465,9 @@ namespace StudyFlowBackend.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastAiRequestDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("LastStreakDate")
                         .HasColumnType("timestamp without time zone");
@@ -497,6 +559,35 @@ namespace StudyFlowBackend.Migrations
                     b.ToTable("UserNotifications");
                 });
 
+            modelBuilder.Entity("StudyFlowBackend.Models.Flashcard", b =>
+                {
+                    b.HasOne("StudyFlowBackend.Models.FlashcardSet", "FlashcardSet")
+                        .WithMany("Flashcards")
+                        .HasForeignKey("FlashcardSetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FlashcardSet");
+                });
+
+            modelBuilder.Entity("StudyFlowBackend.Models.FlashcardSet", b =>
+                {
+                    b.HasOne("StudyFlowBackend.Models.ScannedDocument", "TargetDocument")
+                        .WithMany()
+                        .HasForeignKey("TargetDocumentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("StudyFlowBackend.Models.User", "User")
+                        .WithMany("FlashcardSets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TargetDocument");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.FocusSession", b =>
                 {
                     b.HasOne("StudyFlowBackend.Models.User", "User")
@@ -586,8 +677,15 @@ namespace StudyFlowBackend.Migrations
                     b.Navigation("UserBadges");
                 });
 
+            modelBuilder.Entity("StudyFlowBackend.Models.FlashcardSet", b =>
+                {
+                    b.Navigation("Flashcards");
+                });
+
             modelBuilder.Entity("StudyFlowBackend.Models.User", b =>
                 {
+                    b.Navigation("FlashcardSets");
+
                     b.Navigation("FocusSessions");
 
                     b.Navigation("Pet");

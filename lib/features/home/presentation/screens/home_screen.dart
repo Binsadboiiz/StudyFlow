@@ -12,6 +12,8 @@ import 'package:studyflow/features/notification/presentation/viewmodels/notifica
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/widgets/featured_badge_tag.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/features/ai_chat/presentation/screens/ai_chat_screen.dart';
+import 'package:studyflow/features/flashcard/presentation/screens/flashcard_list_screen.dart';
 
 /// The main screen of the application (View in MVVM).
 /// Its only responsibility is to compose smaller widgets together
@@ -214,11 +216,116 @@ class HomeScreen extends StatelessWidget {
               const SliverToBoxAdapter(child: SizedBox(height: 70)),
               // 1. Calendar display widget
               const SliverToBoxAdapter(child: HomeCalendar()),
-              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              
+              // Quick Actions Hub
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildQuickActionCard(
+                          context,
+                          title: 'Trợ lý AI',
+                          subtitle: 'Sắp xếp task & chat',
+                          icon: Icons.auto_awesome,
+                          color: AppColors.accent,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AiChatScreen()),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildQuickActionCard(
+                          context,
+                          title: 'Flashcards',
+                          subtitle: 'Ôn tập thông minh',
+                          icon: Icons.style,
+                          color: Colors.blueAccent,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const FlashcardListScreen()),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              
               // 2. Daily goal list display widget
-              // Use SliverFillRemaining with hasScrollBody: false so DailyGoalList
-              // occupies the remaining space and scrolls with the Calendar
               const SliverToBoxAdapter(child: DailyGoalList()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActionCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF151D24) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

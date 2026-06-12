@@ -11,6 +11,8 @@ import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/services/notification/notification_service.dart';
 import 'package:studyflow/core/services/notification/app_notification.dart';
 import 'package:studyflow/core/services/notification/notification_type.dart';
+import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
+import 'package:studyflow/features/flashcard/presentation/screens/flashcard_study_screen.dart';
 
 /// Màn hình chi tiết tài liệu đã quét.
 /// Hiển thị: ảnh đầy đủ, nội dung OCR (copyable), metadata, nút xóa/chỉnh sửa.
@@ -127,6 +129,21 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
             // 2. Metadata tài liệu
             _buildMetadataSection(document, theme, ext),
             const SizedBox(height: 16),
+
+            // 2.5 Sinh Flashcard bằng AI Button
+            if (document.extractedText.isNotEmpty) ...[
+              ElevatedButton.icon(
+                onPressed: () => _generateFlashcards(context, document),
+                icon: const Icon(Icons.auto_awesome, color: Colors.white),
+                label: Text(AppLocalizations.of(context)!.flashcardGenerateAI, style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: AppColors.accent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // 3. Nội dung văn bản OCR
             _buildTextSection(document, theme, ext),
@@ -364,5 +381,52 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
     if (score >= 0.8) return Colors.green;
     if (score >= 0.5) return Colors.orange;
     return Colors.red;
+  }
+
+  Future<void> _generateFlashcards(BuildContext context, ScannedDocumentEntity document) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Expanded(child: Text(AppLocalizations.of(context)!.flashcardGenerating)),
+          ],
+        ),
+      ),
+    );
+
+    final provider = context.read<FlashcardProvider>();
+    final result = await provider.generateFromDocument(document.id);
+
+    if (context.mounted) {
+      Navigator.pop(context); // Pop loading dialog
+    }
+
+    if (result != null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.flashcardGenerateSuccess), backgroundColor: Colors.green),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FlashcardStudyScreen(flashcardSet: result),
+          ),
+        );
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(provider.errorMessage ?? AppLocalizations.of(context)!.aiChatDailyLimitReached),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        provider.clearError();
+      }
+    }
   }
 }

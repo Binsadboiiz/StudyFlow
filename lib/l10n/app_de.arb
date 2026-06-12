@@ -369,5 +369,79 @@
   "scanHardDeleteConfirmDesc": "Dadurch wird das Dokument endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
   "scanFilterAllTime": "Gesamte Zeit",
   "scanFilterLast7Days": "Letzte 7 Tage",
-  "scanFilterLast30Days": "Letzte 30 Tage"
+  "scanFilterLast30Days": "Letzte 30 Tage",
+  "petGuideTooltip": "Haustier-Handbuch",
+  "petGuideTitle": "Haustier-Handbuch",
+  "petGuideEarnCoinsTitle": "Münzen verdienen",
+  "petGuideEarnCoinsContent": "• Schließe konzentrierte Lernsitzungen ab.\n• Erledige tägliche Aufgaben.",
+  "petGuideCareTitle": "Haustierpflege",
+  "petGuideCareContent": "• Gib 10 Münzen aus, um Futter für dein Haustier zu kaufen.\n• Satt zu sein hilft deinem Haustier am besten zu wachsen.",
+  "petGuideEvolutionTitle": "Aufsteigen & Entwicklung",
+  "petGuideEvolutionContent": "• Das Spielen mit deinem Haustier gibt 10 EXP, kostet aber 5 Hunger.\n• Dein Haustier entwickelt sich durch die Phasen: Ei ➔ Baby ➔ Erwachsen bei bestimmten Level-Meilensteinen.",
+  "gotItBtn": "Verstanden",
+  "aiChatTitle": "KI-Lernassistent",
+  "aiChatRequestsRemaining": "Verbleibende {count} KI-Anfragen heute",
+  "@aiChatRequestsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiChatClearConfirm": "Verlauf löschen?",
+  "aiChatEmptyStateTitle": "Hallo! Wie kann ich dir helfen?",
+  "aiChatEmptyStateSubtitle": "Du kannst mich bitten, Aufgaben zu organisieren, Lerneinheiten zu planen oder Prüfungsvorbereitungen zu treffen.",
+  "aiChatThinking": "KI denkt nach...",
+  "aiChatActionSuggestions": "KI-Aktionsvorschläge",
+  "aiChatTaskPrefix": "📝 AUFGABE",
+  "aiChatSchedulePrefix": "📅 PLANEN",
+  "aiChatAddedSuccess": "Erfolgreich hinzugefügt: \"{title}\"",
+  "@aiChatAddedSuccess": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatAddFailed": "Konnte nicht hinzugefügt werden: {error}",
+  "@aiChatAddFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatDismiss": "Verwerfen",
+  "aiChatAccept": "Zustimmen",
+  "aiChatInputHint": "Schreibe eine Nachricht...",
+  "aiChatDailyLimitReached": "Du hast dein tägliches KI-Limit heute erreicht.",
+  "flashcardTitle": "Lern-Flashcards",
+  "flashcardEmpty": "Du hast noch keine Flashcard-Sets.",
+  "flashcardGeneratePrompt": "Nutze KI, um Flashcards aus gescannten Dokumenten zu erstellen!",
+  "flashcardsCount": "{count, plural, =0{0 Karten} =1{1 Karte} other{{count} Karten}}",
+  "@flashcardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardDeleteConfirm": "Möchtest du \"{title}\" wirklich löschen?",
+  "@flashcardDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "flashcardGenerateAI": "Flashcards mit KI generieren",
+  "flashcardGenerating": "KI analysiert und generiert Flashcards...",
+  "flashcardGenerateSuccess": "Flashcards erfolgreich generiert!",
+  "flashcardStudyFinished": "Lernen abgeschlossen!",
+  "flashcardSummaryTitle": "Zusammenfassung",
+  "flashcardSummaryTotal": "Karten insgesamt",
+  "flashcardSummaryRemembered": "Gemerkt",
+  "flashcardSummaryForgotten": "Vergessen",
+  "flashcardReplay": "Wiederholen",
+  "flashcardFlipHint": "Tippe auf Karte, um Antwort anzuzeigen"
 }

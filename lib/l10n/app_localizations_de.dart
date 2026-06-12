@@ -1065,4 +1065,144 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scanFilterLast30Days => 'Letzte 30 Tage';
+
+  @override
+  String get petGuideTooltip => 'Haustier-Handbuch';
+
+  @override
+  String get petGuideTitle => 'Haustier-Handbuch';
+
+  @override
+  String get petGuideEarnCoinsTitle => 'Münzen verdienen';
+
+  @override
+  String get petGuideEarnCoinsContent =>
+      '• Schließe konzentrierte Lernsitzungen ab.\n• Erledige tägliche Aufgaben.';
+
+  @override
+  String get petGuideCareTitle => 'Haustierpflege';
+
+  @override
+  String get petGuideCareContent =>
+      '• Gib 10 Münzen aus, um Futter für dein Haustier zu kaufen.\n• Satt zu sein hilft deinem Haustier am besten zu wachsen.';
+
+  @override
+  String get petGuideEvolutionTitle => 'Aufsteigen & Entwicklung';
+
+  @override
+  String get petGuideEvolutionContent =>
+      '• Das Spielen mit deinem Haustier gibt 10 EXP, kostet aber 5 Hunger.\n• Dein Haustier entwickelt sich durch die Phasen: Ei ➔ Baby ➔ Erwachsen bei bestimmten Level-Meilensteinen.';
+
+  @override
+  String get gotItBtn => 'Verstanden';
+
+  @override
+  String get aiChatTitle => 'KI-Lernassistent';
+
+  @override
+  String aiChatRequestsRemaining(int count) {
+    return 'Verbleibende $count KI-Anfragen heute';
+  }
+
+  @override
+  String get aiChatClearConfirm => 'Verlauf löschen?';
+
+  @override
+  String get aiChatEmptyStateTitle => 'Hallo! Wie kann ich dir helfen?';
+
+  @override
+  String get aiChatEmptyStateSubtitle =>
+      'Du kannst mich bitten, Aufgaben zu organisieren, Lerneinheiten zu planen oder Prüfungsvorbereitungen zu treffen.';
+
+  @override
+  String get aiChatThinking => 'KI denkt nach...';
+
+  @override
+  String get aiChatActionSuggestions => 'KI-Aktionsvorschläge';
+
+  @override
+  String get aiChatTaskPrefix => '📝 AUFGABE';
+
+  @override
+  String get aiChatSchedulePrefix => '📅 PLANEN';
+
+  @override
+  String aiChatAddedSuccess(String title) {
+    return 'Erfolgreich hinzugefügt: \"$title\"';
+  }
+
+  @override
+  String aiChatAddFailed(String error) {
+    return 'Konnte nicht hinzugefügt werden: $error';
+  }
+
+  @override
+  String get aiChatDismiss => 'Verwerfen';
+
+  @override
+  String get aiChatAccept => 'Zustimmen';
+
+  @override
+  String get aiChatInputHint => 'Schreibe eine Nachricht...';
+
+  @override
+  String get aiChatDailyLimitReached =>
+      'Du hast dein tägliches KI-Limit heute erreicht.';
+
+  @override
+  String get flashcardTitle => 'Lern-Flashcards';
+
+  @override
+  String get flashcardEmpty => 'Du hast noch keine Flashcard-Sets.';
+
+  @override
+  String get flashcardGeneratePrompt =>
+      'Nutze KI, um Flashcards aus gescannten Dokumenten zu erstellen!';
+
+  @override
+  String flashcardsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Karten',
+      one: '1 Karte',
+      zero: '0 Karten',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String flashcardDeleteConfirm(String title) {
+    return 'Möchtest du \"$title\" wirklich löschen?';
+  }
+
+  @override
+  String get flashcardGenerateAI => 'Flashcards mit KI generieren';
+
+  @override
+  String get flashcardGenerating => 'KI analysiert und generiert Flashcards...';
+
+  @override
+  String get flashcardGenerateSuccess => 'Flashcards erfolgreich generiert!';
+
+  @override
+  String get flashcardStudyFinished => 'Lernen abgeschlossen!';
+
+  @override
+  String get flashcardSummaryTitle => 'Zusammenfassung';
+
+  @override
+  String get flashcardSummaryTotal => 'Karten insgesamt';
+
+  @override
+  String get flashcardSummaryRemembered => 'Gemerkt';
+
+  @override
+  String get flashcardSummaryForgotten => 'Vergessen';
+
+  @override
+  String get flashcardReplay => 'Wiederholen';
+
+  @override
+  String get flashcardFlipHint => 'Tippe auf Karte, um Antwort anzuzeigen';
 }

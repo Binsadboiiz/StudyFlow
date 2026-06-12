@@ -369,5 +369,79 @@
   "scanHardDeleteConfirmDesc": "Hành động này sẽ xóa vĩnh viễn tài liệu và không thể hoàn tác.",
   "scanFilterAllTime": "Tất cả thời gian",
   "scanFilterLast7Days": "7 ngày qua",
-  "scanFilterLast30Days": "30 ngày qua"
+  "scanFilterLast30Days": "30 ngày qua",
+  "petGuideTooltip": "Cẩm nang Pet",
+  "petGuideTitle": "Cẩm nang Thú Cưng",
+  "petGuideEarnCoinsTitle": "Cách kiếm Coins",
+  "petGuideEarnCoinsContent": "• Hoàn thành các phiên học tập tập trung.\n• Hoàn thành nhiệm vụ mỗi ngày.",
+  "petGuideCareTitle": "Chăm sóc Pet",
+  "petGuideCareContent": "• Dùng 10 Coins để mua thức ăn (Feed) cho Pet.\n• Ăn no sẽ giúp Pet phát triển tốt nhất.",
+  "petGuideEvolutionTitle": "Lên cấp & Tiến hóa",
+  "petGuideEvolutionContent": "• Chơi đùa (Play) với Pet giúp tăng 10 EXP nhưng tốn 5 điểm no.\n• Pet sẽ tiến hóa qua các giai đoạn: Trứng ➔ Sơ sinh ➔ Trưởng thành khi đạt mốc Level tương ứng.",
+  "gotItBtn": "Đã hiểu",
+  "aiChatTitle": "Trợ lý học tập AI",
+  "aiChatRequestsRemaining": "Còn lại {count} lượt sử dụng hôm nay",
+  "@aiChatRequestsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiChatClearConfirm": "Xóa hội thoại?",
+  "aiChatEmptyStateTitle": "Xin chào! Tôi có thể giúp gì cho bạn?",
+  "aiChatEmptyStateSubtitle": "Bạn có thể hỏi tôi sắp xếp task, đặt lịch học tập, hoặc lên kế hoạch chuẩn bị thi cử.",
+  "aiChatThinking": "AI đang suy nghĩ...",
+  "aiChatActionSuggestions": "Đề xuất hành động từ AI",
+  "aiChatTaskPrefix": "📝 TASK",
+  "aiChatSchedulePrefix": "📅 LÊN LỊCH",
+  "aiChatAddedSuccess": "Đã thêm thành công: \"{title}\"",
+  "@aiChatAddedSuccess": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatAddFailed": "Không thể thêm: {error}",
+  "@aiChatAddFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatDismiss": "Bỏ qua",
+  "aiChatAccept": "Đồng ý",
+  "aiChatInputHint": "Nhập tin nhắn hỗ trợ học tập...",
+  "aiChatDailyLimitReached": "Bạn đã hết lượt sử dụng AI hôm nay.",
+  "flashcardTitle": "Flashcards Học Tập",
+  "flashcardEmpty": "Bạn chưa có bộ flashcard nào.",
+  "flashcardGeneratePrompt": "Hãy dùng AI để sinh flashcard từ tài liệu đã scan nhé!",
+  "flashcardsCount": "{count, plural, =0{0 thẻ} =1{1 thẻ} other{{count} thẻ}}",
+  "@flashcardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardDeleteConfirm": "Bạn có chắc chắn muốn xóa bộ flashcard \"{title}\"?",
+  "@flashcardDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "flashcardGenerateAI": "Sinh Flashcard bằng AI",
+  "flashcardGenerating": "AI đang phân tích và tạo flashcard...",
+  "flashcardGenerateSuccess": "Sinh Flashcard bằng AI thành công!",
+  "flashcardStudyFinished": "Hoàn thành bài học!",
+  "flashcardSummaryTitle": "Tóm tắt",
+  "flashcardSummaryTotal": "Tổng số thẻ",
+  "flashcardSummaryRemembered": "Đã nhớ",
+  "flashcardSummaryForgotten": "Chưa nhớ",
+  "flashcardReplay": "Học lại",
+  "flashcardFlipHint": "Chạm vào thẻ để xem đáp án"
 }

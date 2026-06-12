@@ -1,99 +1,138 @@
-# Dự án StudyFlow - Quản lý thời gian biểu & Học tập thông minh
+# Kế hoạch & Tài liệu Kiến trúc Dự án StudyFlow
 
-## 1. Định hướng dự án
-StudyFlow là một ứng dụng di động đa nền tảng (iOS/Android) hỗ trợ người dùng quản lý thời gian biểu, nhắc nhở công việc, thống kê tiến độ học tập và tích hợp AI để tối ưu hóa lộ trình cá nhân. 
-Ứng dụng sử dụng kiến trúc Backend hiện đại với .NET, Database kết hợp (Firebase + PostgreSQL), và sẵn sàng cho các công nghệ AI (Vector Search với Gemini).
+Tài liệu này trình bày chi tiết về kiến trúc hiện tại, các chức năng cốt lõi và mô hình thực thể dữ liệu đang được áp dụng trong hệ sinh thái **StudyFlow**.
 
-## 2. Công nghệ sử dụng
-### Frontend (Mobile App)
-- **Framework**: Flutter
-- **Architecture**: Clean Architecture (Data - Domain - Presentation)
-- **State Management**: BLoC / Cubit (hoặc Provider, tùy chọn)
-- **Local Storage / Offline Sync**: Isar hoặc SQLite (Cho cơ chế Offline-First, có thể thêm vào sau)
+---
 
-### Backend (API Server)
-- **Framework**: .NET 8 Web API
-- **Architecture**: Clean Architecture
-- **Authentication**: Firebase Admin SDK (Verify ID Token)
-- **ORM**: Entity Framework Core
+## 1. Kiến trúc Hệ thống (System Architecture)
 
-### Database & AI (Hybrid Database)
-- **Auth & User Info**: Firebase Authentication
-- **Core Database**: PostgreSQL (với extension `pgvector` để lưu trữ Vector)
-- **AI Engine**: Google Gemini API (Tạo Embeddings và Chat / Phân tích dữ liệu)
+Dự án StudyFlow áp dụng mô hình client-server hiện đại, phân tách rõ ràng trách nhiệm giữa ứng dụng di động (Frontend) và máy chủ API (Backend).
 
-### Gợi ý Hosting (Miễn phí cho giai đoạn phát triển)
-- **.NET API**: **Azure App Service (Gói F1)** (Hoàn toàn miễn phí, support rất tốt cho .NET) hoặc Render.
-- **PostgreSQL**: **Supabase** (Cung cấp gói Free tier hào phóng, đặc biệt là CÓ SẴN extension `pgvector` cực kỳ dễ set up cho AI).
+```mermaid
+graph TD
+    subgraph Client (Mobile App)
+        Presentation[Presentation Layer: Screens & Widgets]
+        ViewModel[ViewModel Layer: State & UI Logic]
+        Domain[Domain Layer: UseCases & Entity Interfaces]
+        Data_Client[Data Layer: API Client & Local Storage]
+    end
 
-## 3. Các chức năng chính (Features)
-- **Authentication**: Đăng nhập/Đăng ký qua Firebase (Email/Password, Google).
-- **Quản lý thời gian biểu (Schedule & Calendar)**: Tạo, chỉnh sửa lịch học, tích hợp Google Calendar.
-- **Quản lý công việc (Task & Note)**: Tạo task, ghi chú (có khả năng tạo thư mục để lưu).
-- **Focus Mode**: Chế độ tập trung (Pomodoro, đếm ngược).
-- **Thống kê (Analytics)**: Biểu đồ theo dõi số giờ học, số task hoàn thành.
-- **Gamification & Streak**: 
-  - Hệ thống Streak (chuỗi ngày học). Nhắc nhở khi Streak sắp mất.
-  - Daily target, Hệ thống XP/Level, Study Pet (Thú cưng học tập lớn lên theo XP).
-- **Quét tài liệu bài tập (Scan)**: OCR nhận diện chữ từ ảnh chụp bài tập -> Convert thành Note/Task.
-- **AI Recommendation (Tính năng nâng cao)**: 
-  - Dùng Gemini API phân tích thói quen, lịch sử học tập.
-  - Dựa trên cơ sở dữ liệu Vector (pgvector) để gợi ý sắp xếp thời gian biểu hoặc đưa ra lời khuyên tối ưu.
+    subgraph Server (Backend API)
+        Controller[API Controllers]
+        Service[Service Layer: Business Logic]
+        EFCore[Entity Framework Core]
+        Worker[Background Hosted Services]
+    end
 
-## 4. Kiến trúc Dự án (Architecture)
+    subgraph Database & Cloud
+        PostgreSQL[(PostgreSQL DB)]
+        FirebaseAuth[Firebase Auth]
+    end
 
-### 4.1. Kiến trúc thư mục Frontend (Flutter)
-Áp dụng Clean Architecture chia module theo feature (Feature-first):
-```text
-lib/
-├── core/
-│   ├── network/       # Dio/HTTP client, Interceptors (gắn Firebase Token)
-│   ├── local_db/      # Setup Isar/SQLite
-│   ├── theme/, utils/, constants/
-│
-├── features/
-│   ├── auth/          # Xử lý login Firebase -> Lấy ID Token
-│   ├── task/          # Quản lý Task
-│   │   ├── data/      # API calls, Local DB calls
-│   │   ├── domain/    # Entities, Usecases, Repository interfaces
-│   │   ├── presentation/ # Screens, Widgets, State (BLoC)
-│   ├── schedule/
-│   ├── analytics/
-│   ├── gamification/
-│
-└── main.dart
+    %% Client Interactions
+    Presentation -->|Observes State| ViewModel
+    ViewModel -->|Invokes| Domain
+    Domain -->|Calls Repository| Data_Client
+
+    %% Client to Server & Cloud
+    Data_Client -->|HTTP Requests / Auth Token| Controller
+    Data_Client -->|SDK Auth| FirebaseAuth
+    Controller -->|Validates JWT| FirebaseAuth
+
+    %% Server Interactions
+    Controller -->|Invokes| Service
+    Service -->|Uses ORM| EFCore
+    EFCore -->|Queries & Updates| PostgreSQL
+    Worker -->|Processes Actions| Service
 ```
 
-### 4.2. Kiến trúc thư mục Backend (.NET)
-Sử dụng Clean Architecture chia thành các layer:
-```text
-StudyFlowBackend/
-├── Core (Domain Layer)      # Entities (User, Task, Note), Exceptions, Interfaces
-├── Application Layer        # UseCases (Services/CQRS), DTOs, Validation
-├── Infrastructure Layer     # EF Core DbContext, PostgreSQL config, Firebase Admin SDK, Gemini AI Service
-└── API Layer (Presentation) # Controllers, JWT Middleware (nhận Firebase Token)
-```
+### 1.1. Kiến trúc Frontend (Flutter)
+Ứng dụng di động sử dụng kiến trúc **Clean Architecture** được tổ chức theo hướng **Feature-First** (chia thư mục theo từng tính năng độc lập). Mỗi tính năng (Feature) trong thư mục `lib/features/` được chia làm 3 lớp chính:
+*   **Data Layer:** Chịu trách nhiệm tương tác với nguồn dữ liệu ngoài (gọi API bằng HTTP, kết nối cơ sở dữ liệu cục bộ).
+*   **Domain Layer:** Chứa các thực thể kinh doanh (Entities) và các Cách sử dụng (UseCases) định nghĩa các luồng nghiệp vụ thuần túy của ứng dụng, không phụ thuộc vào framework UI.
+*   **Presentation Layer:** Chứa giao diện người dùng (Screens, Widgets) và các **ViewModel** làm nhiệm vụ quản lý trạng thái.
+*   **Giải pháp Quản lý trạng thái (State Management):** Sử dụng thư viện **Provider** (`ChangeNotifierProvider`, `Consumer`) để quản lý và phản hồi dữ liệu thay đổi trên UI một cách hiệu quả, tránh việc vẽ lại màn hình không cần thiết.
 
-## 5. Workflow: Xác thực & Xử lý Dữ liệu
+### 1.2. Kiến trúc Backend (.NET Web API)
+API Server được thiết kế theo kiến trúc phân tầng (Layered Architecture) trong một dự án C# duy nhất:
+*   **Controllers:** Tiếp nhận các yêu cầu HTTP từ client, kiểm tra tính hợp lệ của Firebase JWT Token trong header.
+*   **Services:** Chứa logic nghiệp vụ cốt lõi (Business Logic) xử lý bài toán về tính điểm, thăng cấp thú cưng, giới hạn bộ nhớ quét tài liệu.
+*   **Data (EF Core):** Sử dụng Entity Framework Core làm ORM kết nối tới cơ sở dữ liệu PostgreSQL. Tự động kiểm tra và thực thi các tệp Migration (`dbContext.Database.Migrate()`) ngay khi ứng dụng khởi chạy.
+*   **Background Services (Hosted Services):** Chạy ngầm trong hệ thống để thực hiện các nhiệm vụ tự động (nhắc nhở lịch trình, dọn dẹp thùng rác định kỳ).
 
-### 5.1. Authentication Flow
-1. User đăng nhập trên App (Flutter) thông qua Firebase SDK.
-2. Firebase trả về một `ID Token`.
-3. Flutter gửi `ID Token` lên endpoint đăng nhập/đồng bộ của .NET API (Kèm trong header `Authorization: Bearer <ID_Token>`).
-4. .NET dùng Firebase Admin SDK để kiểm tra tính hợp lệ của token. Nếu hợp lệ, lấy `uid` và lưu/cập nhật thông tin User vào bảng `Users` trên PostgreSQL.
-5. Các API gọi sau này (như lấy danh sách Task) cũng đều phải kèm `ID Token` này để backend biết ai đang request.
+---
 
-### 5.2. Offline-First & Batch Sync (Cơ chế đồng bộ)
-*Cách thức để triển khai cơ chế bạn thấy "hay và hiệu quả":*
-1. **Lưu Local Trước**: Bất cứ khi nào tạo/sửa/xóa Task, Flutter lưu xuống Local DB (Isar/SQLite) trước, đồng thời đánh dấu field `isSynced = false`. UI cập nhật phản hồi lập tức cho người dùng, mang lại trải nghiệm siêu mượt.
-2. **Background Sync**: Sử dụng package như `workmanager` trên Flutter. Khi máy có Internet, một background worker chạy ngầm, query các bản ghi có `isSynced = false` và gửi lên API của .NET qua endpoint `/api/sync/batch` (Dạng mảng dữ liệu).
-3. **Phản hồi & Cập nhật**: .NET nhận mảng, update vào PostgreSQL (có thể dùng Transaction để đảm bảo tính nhất quán) rồi trả về 200 OK. Flutter nhận kết quả và đổi trạng thái các bản ghi đó thành `isSynced = true`.
+## 2. Các Chức năng Cốt lõi (Features)
 
-### 5.3. AI Recommendation & Vector Search (Gemini)
-1. **Tạo Vector (Embeddings)**: Mỗi khi người dùng tạo/nhập text (Ghi chú, Task, Mục tiêu), Backend .NET gọi **Gemini API (Embedding Model)** để mã hóa văn bản đó thành một chuỗi mảng số thực (Vector).
-2. **Lưu trữ**: Lưu chuỗi Vector này vào bảng trong PostgreSQL ở một cột có kiểu `vector` (sử dụng `pgvector` extension).
-3. **Tìm kiếm & Gợi ý (RAG)**: 
-   - Khi user hỏi AI: "Tuần này tôi nên ưu tiên làm bài tập nào trước dựa trên lịch sử học của tôi?"
-   - .NET gửi câu hỏi này qua Gemini API để lấy Vector câu hỏi.
-   - Query PostgreSQL để tìm các Vector có độ tương đồng cao nhất (Cosine Similarity), trích xuất ra các Task/Note phù hợp.
-   - Gửi nội dung Task/Note đó làm Context cho Gemini Chat API (Prompt: Dựa vào các task đang có sau đây, hãy gợi ý lịch học tối ưu cho user...). Gemini sẽ tạo ra câu trả lời tự nhiên.
+1.  **Đăng nhập & Đăng ký (Auth):** Xác thực người dùng qua Firebase Authentication (Email/Password, Google Sign-In). Backend xác thực lại thông qua Firebase JWT Token để bảo mật tài nguyên API.
+2.  **Quản lý Công việc & Thời gian biểu (Task & Schedule):** Tạo lập, cập nhật, xóa các đầu việc học tập. Tích hợp lịch tuần/tháng sinh động thông qua `Table Calendar`.
+3.  **Chế độ tập trung (Focus Mode):** Đồng hồ đếm ngược Pomodoro hỗ trợ người dùng rèn luyện sự tập trung. Kết quả của mỗi phiên được đồng bộ lên máy chủ để tính điểm.
+4.  **Hệ thống Thú cưng học tập (Study Pet Gamification):** Tích hợp **Flame Game Engine** trên di động để nuôi thú cưng ảo. Khi hoàn thành task hoặc tập trung học, người dùng tích lũy XP giúp thú cưng thăng cấp và thay đổi trạng thái hoạt động.
+5.  **Quét tài liệu OCR (Scan Document):** Quét ảnh tài liệu học tập, nhận diện chữ tự động bằng **Google ML Kit**. Hệ thống hỗ trợ nén ảnh, cắt/xoay ảnh trước khi lưu trữ, phân phối tài liệu vào Thùng rác (Trash) khi xóa tạm và kiểm soát dung lượng bộ nhớ.
+6.  **Thống kê & Đồ thị (Analytics):** Trực quan hóa kết quả học tập, tổng thời gian tập trung và tỷ lệ hoàn thành task của người dùng dưới dạng biểu đồ tròn/cột bằng thư viện `FL Chart`.
+7.  **Hệ thống Thông báo (Notification):** Lập lịch gửi thông báo nhắc nhở học tập cục bộ trên thiết bị theo múi giờ địa phương, kết hợp dịch vụ quét dữ liệu ngầm từ backend.
+
+---
+
+## 3. Mô hình Thực thể Dữ liệu (Database Models)
+
+Hệ thống quản lý dữ liệu tập trung thông qua cơ sở dữ liệu PostgreSQL. Các bảng dữ liệu chính (được ánh xạ qua Entity Framework Core) bao gồm:
+
+### 3.1. Thực thể Người dùng (`User`)
+Lưu trữ thông tin hồ sơ và tiến trình tích lũy học tập của người dùng.
+*   `Id` (Khóa chính): Đồng bộ với UID của Firebase Auth.
+*   `DisplayName`, `Email`, `PhotoUrl`: Thông tin cá nhân.
+*   `Points` (Điểm tích lũy): Dùng để xếp hạng và mua vật phẩm cho thú cưng.
+*   `Xp` (Kinh nghiệm tích lũy): Thể hiện mức độ nỗ lực học tập của bản thân.
+*   `Level` (Cấp độ hiện tại): Tăng lên dựa trên điểm XP.
+*   `CurrentStreak`, `LongestStreak`: Ghi nhận chuỗi ngày học liên tục.
+*   `LastActive`: Lần cuối người dùng tương tác để tính Streak.
+*   `FeaturedBadgeId` (Khóa ngoại): Huy hiệu được chọn để hiển thị nổi bật trên trang cá nhân.
+
+### 3.2. Thực thể Công việc (`StudyTask`)
+Quản lý các nhiệm vụ cần thực hiện của người dùng.
+*   `Id` (Khóa chính): Mã định danh duy nhất của công việc.
+*   `Title`, `Description`: Tiêu đề và nội dung công việc.
+*   `DueDate`: Hạn chót hoàn thành.
+*   `Priority`: Độ ưu tiên (Thấp, Trung bình, Cao).
+*   `IsCompleted`: Trạng thái hoàn thành công việc.
+*   `UserId` (Khóa ngoại): Liên kết đến người dùng sở hữu công việc này.
+
+### 3.3. Thực thể Phiên tập trung (`FocusSession`)
+Lưu trữ lịch sử sử dụng đồng hồ Pomodoro.
+*   `Id` (Khóa chính): Định danh phiên.
+*   `StartTime`, `EndTime`: Thời gian bắt đầu và kết thúc của phiên tập trung.
+*   `DurationInMinutes`: Tổng số phút thực tế tập trung.
+*   `IsCompleted`: Phiên tập trung có bị hủy giữa chừng hay không.
+*   `UserId` (Khóa ngoại): Liên kết đến người dùng thực hiện tập trung.
+
+### 3.4. Thực thể Thú cưng học tập (`StudyPet`)
+Quản lý trạng thái thú cưng ảo của từng người dùng (quan hệ 1-1 với `User`).
+*   `Id` (Khóa chính): Định danh thú cưng.
+*   `Name`: Tên thú cưng do người dùng đặt.
+*   `Level`, `Xp`: Cấp độ và kinh nghiệm hiện tại của thú cưng (pet phát triển song hành cùng người dùng).
+*   `PetType`: Chủng loại thú cưng (ví dụ: Mèo, Chó, Thỏ...).
+*   `Status`: Trạng thái hiện tại của pet (Đang ngủ, Học bài, Vui chơi, Đói...).
+*   `UserId` (Khóa ngoại): Liên kết duy nhất tới một tài khoản người dùng.
+
+### 3.5. Thực thể Tài liệu đã quét (`ScannedDocument`)
+Quản lý tài liệu OCR đã lưu trữ của người dùng.
+*   `Id` (Khóa chính): Định danh tài liệu.
+*   `Title`: Tiêu đề tài liệu.
+*   `RawText`: Đoạn văn bản thu được sau khi chạy nhận diện chữ OCR.
+*   `ImageUrl`: Liên kết lưu trữ hình ảnh tài liệu đã quét.
+*   `FileSizeInBytes`: Dung lượng file hình ảnh để tính toán quota lưu trữ.
+*   `IsDeleted`: Trạng thái xóa tạm (Soft delete) phục vụ tính năng Thùng rác.
+*   `DeletedAt`: Thời gian tài liệu bị đưa vào thùng rác (để tự động xóa vĩnh viễn sau 30 ngày).
+*   `UserId` (Khóa ngoại): Liên kết tới người dùng tải lên tài liệu.
+
+### 3.6. Thực thể Huy hiệu (`Badge` & `UserBadge`)
+Thiết lập hệ thống thành tựu (Quan hệ Nhiều - Nhiều giữa `User` và `Badge`).
+*   **`Badge` (Thực thể tĩnh):**
+    *   `Id`: Mã huy hiệu.
+    *   `Name`, `Description`: Tên và mô tả cách đạt được huy hiệu.
+    *   `IconUrl`: Hình ảnh đại diện cho huy hiệu.
+*   **`UserBadge` (Thực thể liên kết):**
+    *   `UserId` (Khóa ngoại): Người dùng nhận huy hiệu.
+    *   `BadgeId` (Khóa ngoại): Huy hiệu được mở khóa.
+    *   `UnlockedAt`: Ngày giờ mở khóa huy hiệu.

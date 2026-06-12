@@ -18,6 +18,8 @@ namespace StudyFlowBackend.Data
         public DbSet<UserBadge> UserBadges { get; set; }
         public DbSet<StudyPet> StudyPets { get; set; }
         public DbSet<ScannedDocument> ScannedDocuments { get; set; }
+        public DbSet<FlashcardSet> FlashcardSets { get; set; }
+        public DbSet<Flashcard> Flashcards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -111,6 +113,32 @@ namespace StudyFlowBackend.Data
                 .WithMany()
                 .HasForeignKey(u => u.FeaturedBadgeId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Cấu hình FlashcardSet & Flashcard
+            modelBuilder.Entity<FlashcardSet>(entity =>
+            {
+                entity.HasKey(fs => fs.Id);
+
+                entity.HasOne(fs => fs.User)
+                    .WithMany(u => u.FlashcardSets)
+                    .HasForeignKey(fs => fs.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(fs => fs.TargetDocument)
+                    .WithMany()
+                    .HasForeignKey(fs => fs.TargetDocumentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<Flashcard>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+
+                entity.HasOne(f => f.FlashcardSet)
+                    .WithMany(fs => fs.Flashcards)
+                    .HasForeignKey(f => f.FlashcardSetId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             // Seed dữ liệu ban đầu cho bảng Badges (Achievements) từ GamificationConstants
             modelBuilder.Entity<Badge>().HasData(GamificationConstants.DefaultBadges.ToArray());

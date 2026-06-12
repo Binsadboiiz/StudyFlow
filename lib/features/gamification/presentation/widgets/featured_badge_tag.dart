@@ -32,19 +32,25 @@ class FeaturedBadgeTag extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconData = _getIconData(iconKey);
 
-    // Sử dụng gradient vàng/cam neon sang trọng để làm nổi bật danh hiệu
+    // Sử dụng gradient cầu vồng
     final gradientColors = isLarge
         ? [
-            Colors.amber.shade400,
-            Colors.orangeAccent.shade400,
+            Colors.redAccent,
+            Colors.orangeAccent,
+            Colors.greenAccent,
+            Colors.blueAccent,
+            Colors.purpleAccent,
           ]
         : [
-            Colors.amber.shade300.withValues(alpha: 0.15),
-            Colors.orangeAccent.shade200.withValues(alpha: 0.15),
+            Colors.redAccent.withValues(alpha: 0.2),
+            Colors.orangeAccent.withValues(alpha: 0.2),
+            Colors.greenAccent.withValues(alpha: 0.2),
+            Colors.blueAccent.withValues(alpha: 0.2),
+            Colors.purpleAccent.withValues(alpha: 0.2),
           ];
 
-    final textColor = isLarge ? Colors.black : Colors.amber.shade300;
-    final borderColor = Colors.amber.shade400.withValues(alpha: 0.5);
+    final textColor = isLarge ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final borderColor = Colors.purpleAccent.withValues(alpha: 0.5);
 
     return Container(
       padding: EdgeInsets.symmetric(

@@ -9,6 +9,8 @@ import 'package:studyflow/features/gamification/data/models/pet_model.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/gamification_viewmodel.dart';
 import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:flame/game.dart';
+import 'package:studyflow/features/gamification/presentation/widgets/pet_flame/pet_game.dart';
 
 import 'package:studyflow/shared/widgets/loading/pet_skeleton.dart';
 
@@ -23,7 +25,10 @@ class PetTab extends StatefulWidget {
 class _PetTabState extends State<PetTab> {
   // Biến điều khiển hoạt cảnh
   bool _isEating = false;
-  bool _isPlaying = false;
+  bool _showFoodIcon = false;
+
+  PetGame? _petGame;
+  String? _lastPetKey;
 
   // Biến nhập liệu khi nhận nuôi Pet
   final _nameController = TextEditingController();
@@ -61,6 +66,17 @@ class _PetTabState extends State<PetTab> {
 
     final pet = petVm.pet;
 
+    if (pet != null) {
+      final currentPetKey = '${pet.petType}_${pet.evolutionStage}';
+      if (_petGame == null || _lastPetKey != currentPetKey) {
+        _petGame = PetGame(
+          petType: pet.petType,
+          evolutionStage: pet.evolutionStage,
+        );
+        _lastPetKey = currentPetKey;
+      }
+    }
+
     if (pet == null) {
       // 1. GIAO DIỆN NHẬN NUÔI PET
       return _buildAdoptionScreen(context, petVm, theme, ext);
@@ -76,6 +92,14 @@ class _PetTabState extends State<PetTab> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
         children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              icon: Icon(Icons.menu_book_rounded, color: theme.colorScheme.primary),
+              tooltip: AppLocalizations.of(context)!.petGuideTooltip,
+              onPressed: () => _showGuideDialog(context, theme, ext),
+            ),
+          ),
           // Thẻ hiển thị hình ảnh Pet động
           GlassCard(
             padding: const EdgeInsets.all(24),
@@ -125,21 +149,16 @@ class _PetTabState extends State<PetTab> {
                 ),
                 const SizedBox(height: 16),
 
-                // Biểu diễn Pet hoạt họa (Dùng Emoji kèm Animate)
+                // Biểu diễn Pet hoạt họa (Flame & Animate)
                 SizedBox(
                   height: 180,
                   child: Center(
-                    child: _buildPetEmojiWidget(pet)
+                    child: _buildPetFlameWidget(pet)
                         .animate(
                           target: _isEating ? 1 : 0,
                           onComplete: (_) => setState(() => _isEating = false),
                         )
-                        .shake(duration: 800.ms, hz: 6, curve: Curves.easeInOut)
-                        .animate(
-                          target: _isPlaying ? 1 : 0,
-                          onComplete: (_) => setState(() => _isPlaying = false),
-                        )
-                        .scale(duration: 800.ms, curve: Curves.bounceOut)
+                        .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 200.ms)
                         .animate(onPlay: (controller) => controller.repeat(reverse: true))
                         .slideY(begin: 0.05, end: -0.05, duration: 1.5.seconds, curve: Curves.easeInOut),
                   ),
@@ -271,73 +290,96 @@ class _PetTabState extends State<PetTab> {
 
   /// Cho Pet ăn bánh quy
   void _handleFeed(PetViewModel petVm, GamificationViewModel gamificationVm) async {
+    final pet = petVm.pet;
+    if (pet == null) return;
+    
+    if (pet.hunger >= 100) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Pet is already full!"),
+          backgroundColor: Colors.orangeAccent,
+        ),
+      );
+      return;
+    }
+
+    final coins = gamificationVm.summary?.coins ?? 0;
+    if (coins < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Not enough Coins. Please study more to earn Coins!"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isEating = true;
+      _showFoodIcon = true;
     });
-    final success = await petVm.feedPet();
-    if (success) {
-      // Đồng bộ ví xu từ Gamification Summary
-      gamificationVm.fetchSummary();
-    }
+
+    Future.delayed(1.seconds, () {
+      if (mounted) setState(() => _showFoodIcon = false);
+    });
+
+    // Optimistic Update
+    final newHunger = (pet.hunger + 20).clamp(0, 100);
+    petVm.updatePetLocally(pet.copyWith(hunger: newHunger));
+    gamificationVm.deductCoinsLocally(10);
+
+    // Bỏ fetchSummary để giảm request cho backend
+    await petVm.feedPet();
   }
 
   /// Chơi cùng Pet
   void _handlePlay(PetViewModel petVm) async {
-    setState(() {
-      _isPlaying = true;
-    });
+    final pet = petVm.pet;
+    if (pet == null) return;
+
+    if (pet.hunger < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Pet is too hungry to play! Feed it first!"),
+          backgroundColor: Colors.orangeAccent,
+        ),
+      );
+      return;
+    }
+
+    _petGame?.playJumpAnimation();
+
+    // Optimistic Update: mỗi lần bấm play sẽ giảm 5 hunger và tăng 10xp pet
+    final newHunger = (pet.hunger - 5).clamp(0, 100);
+    final newExp = pet.exp + 10;
+    petVm.updatePetLocally(pet.copyWith(hunger: newHunger, exp: newExp));
+
     await petVm.playWithPet();
   }
 
-  /// Render Widget Emoji cho Pet tương ứng loại và giai đoạn tiến hóa
-  Widget _buildPetEmojiWidget(PetModel pet) {
-    // Nếu là quả trứng (EvolutionStage == 'Egg')
-    if (pet.evolutionStage == 'Egg') {
-      return const Text(
-        '🥚',
-        style: TextStyle(fontSize: 90),
-      );
-    }
-
-    // Xác định emoji cơ sở
-    String petEmoji = '🐱';
-    if (pet.petType == 'Dog') petEmoji = '🐶';
-    if (pet.petType == 'Panda') petEmoji = '🐼';
-
-    double scale = 1.0;
-    List<Widget> overlays = [];
-
-    if (pet.evolutionStage == 'Baby') {
-      scale = 0.7; // Thú sơ sinh nhỏ bé
-      overlays.add(
-        const Positioned(
-          bottom: 0,
-          right: 0,
-          child: Text('🍼', style: TextStyle(fontSize: 24)),
-        ),
-      );
-    } else if (pet.evolutionStage == 'Adult') {
-      scale = 1.3; // Thú trưởng thành to lớn
-      overlays.add(
-        const Positioned(
-          top: -10,
-          left: 20,
-          child: Text('👑', style: TextStyle(fontSize: 28)), // Vương miện oai phong
-        ),
-      );
-    }
+  /// Render Widget Pet Flame hoặc Trứng
+  Widget _buildPetFlameWidget(PetModel pet) {
 
     return Stack(
+      alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        Transform.scale(
-          scale: scale,
-          child: Text(
-            petEmoji,
-            style: const TextStyle(fontSize: 96),
+        if (_petGame != null)
+          SizedBox(
+            width: 150,
+            height: 150,
+            child: GameWidget(game: _petGame!),
           ),
-        ),
-        ...overlays,
+        if (_showFoodIcon)
+          const Positioned(
+            top: 20,
+            child: Icon(Icons.cookie_rounded, color: Colors.orangeAccent, size: 50),
+          )
+              .animate()
+              .slideY(begin: 2.0, end: 0.0, duration: 400.ms, curve: Curves.easeOutBack)
+              .scale(begin: const Offset(0.5, 0.5), end: const Offset(1.5, 1.5))
+              .then(delay: 200.ms)
+              .fadeOut(duration: 200.ms),
       ],
     );
   }
@@ -540,5 +582,82 @@ class _PetTabState extends State<PetTab> {
       // Tải lại Pet
       petVm.fetchPet();
     }
+  }
+
+  void _showGuideDialog(BuildContext context, ThemeData theme, AppThemeExtension ext) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: Row(
+            children: [
+              const Icon(Icons.menu_book_rounded, color: AppColors.accent),
+              const SizedBox(width: 8),
+              Text(l10n.petGuideTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: theme.colorScheme.onSurface)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildGuideSection(
+                  icon: Icons.monetization_on_rounded,
+                  color: Colors.amber,
+                  title: l10n.petGuideEarnCoinsTitle,
+                  content: l10n.petGuideEarnCoinsContent,
+                  theme: theme,
+                  ext: ext,
+                ),
+                const SizedBox(height: 16),
+                _buildGuideSection(
+                  icon: Icons.cookie_rounded,
+                  color: Colors.orangeAccent,
+                  title: l10n.petGuideCareTitle,
+                  content: l10n.petGuideCareContent,
+                  theme: theme,
+                  ext: ext,
+                ),
+                const SizedBox(height: 16),
+                _buildGuideSection(
+                  icon: Icons.star_rounded,
+                  color: Colors.purpleAccent,
+                  title: l10n.petGuideEvolutionTitle,
+                  content: l10n.petGuideEvolutionContent,
+                  theme: theme,
+                  ext: ext,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.gotItBtn, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildGuideSection({required IconData icon, required Color color, required String title, required String content, required ThemeData theme, required AppThemeExtension ext}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: 6),
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.colorScheme.onSurface)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(content, style: TextStyle(fontSize: 13, color: ext.subtext, height: 1.4)),
+      ],
+    );
   }
 }

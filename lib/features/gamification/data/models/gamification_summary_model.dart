@@ -57,4 +57,30 @@ class GamificationSummaryModel {
       'featuredBadgeIcon': featuredBadgeIcon,
     };
   }
+
+  GamificationSummaryModel copyWith({
+    int? level,
+    double? xpPoints,
+    double? nextLevelXp,
+    int? coins,
+    int? streak,
+    int? dailyTargetMinutes,
+    int? focusedMinutesToday,
+    String? featuredBadgeId,
+    String? featuredBadgeName,
+    String? featuredBadgeIcon,
+  }) {
+    return GamificationSummaryModel(
+      level: level ?? this.level,
+      xpPoints: xpPoints ?? this.xpPoints,
+      nextLevelXp: nextLevelXp ?? this.nextLevelXp,
+      coins: coins ?? this.coins,
+      streak: streak ?? this.streak,
+      dailyTargetMinutes: dailyTargetMinutes ?? this.dailyTargetMinutes,
+      focusedMinutesToday: focusedMinutesToday ?? this.focusedMinutesToday,
+      featuredBadgeId: featuredBadgeId ?? this.featuredBadgeId,
+      featuredBadgeName: featuredBadgeName ?? this.featuredBadgeName,
+      featuredBadgeIcon: featuredBadgeIcon ?? this.featuredBadgeIcon,
+    );
+  }
 }

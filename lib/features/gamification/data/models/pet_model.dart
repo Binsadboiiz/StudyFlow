@@ -24,17 +24,16 @@ class PetModel {
     required this.createdAt,
   });
 
-  /// Factory chuyển đổi dữ liệu từ JSON.
   factory PetModel.fromJson(Map<String, dynamic> json) {
     return PetModel(
       id: json['id'] ?? '',
       userId: json['userId'] ?? '',
       name: json['name'] ?? '',
       petType: json['petType'] ?? '',
-      level: json['level'] ?? 1,
-      exp: (json['exp'] ?? 0.0).toDouble(),
+      level: (json['level'] as num?)?.toInt() ?? 1,
+      exp: (json['exp'] as num?)?.toDouble() ?? 0.0,
       evolutionStage: json['evolutionStage'] ?? 'Egg',
-      hunger: json['hunger'] ?? 100,
+      hunger: (json['hunger'] as num?)?.toInt() ?? 100,
       lastFedTime: json['lastFedTime'] != null 
           ? DateTime.parse(json['lastFedTime']) 
           : DateTime.now(),
@@ -58,5 +57,31 @@ class PetModel {
       'lastFedTime': lastFedTime.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
     };
+  }
+
+  PetModel copyWith({
+    String? id,
+    String? userId,
+    String? name,
+    String? petType,
+    int? level,
+    double? exp,
+    String? evolutionStage,
+    int? hunger,
+    DateTime? lastFedTime,
+    DateTime? createdAt,
+  }) {
+    return PetModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      petType: petType ?? this.petType,
+      level: level ?? this.level,
+      exp: exp ?? this.exp,
+      evolutionStage: evolutionStage ?? this.evolutionStage,
+      hunger: hunger ?? this.hunger,
+      lastFedTime: lastFedTime ?? this.lastFedTime,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
 }

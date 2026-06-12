@@ -46,6 +46,16 @@ namespace StudyFlowBackend.Models
         /// </summary>
         public List<string> StreakHistory { get; set; } = new List<string>();
 
+        /// <summary>
+        /// Số lượng AI request đã sử dụng trong ngày
+        /// </summary>
+        public int DailyAiRequestsUsed { get; set; } = 0;
+
+        /// <summary>
+        /// Lần cuối cùng thực hiện AI request (để reset daily limit)
+        /// </summary>
+        public DateTime? LastAiRequestDate { get; set; }
+
         // Navigation Property: 1 User có 1 StudyPet
         public StudyPet? Pet { get; set; }
 
@@ -60,6 +70,9 @@ namespace StudyFlowBackend.Models
 
         // Navigation Property: 1 User có nhiều ScannedDocuments
         public ICollection<ScannedDocument> ScannedDocuments { get; set; } = new List<ScannedDocument>();
+        
+        // Navigation Property: 1 User có nhiều FlashcardSets
+        public ICollection<FlashcardSet> FlashcardSets { get; set; } = new List<FlashcardSet>();
     }
 }
 

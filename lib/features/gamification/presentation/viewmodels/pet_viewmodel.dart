@@ -52,42 +52,36 @@ class PetViewModel extends ChangeNotifier {
     }
   }
 
-  /// Cho thú cưng ăn bánh quy (tiêu tốn 10 coins).
-  Future<bool> feedPet() async {
-    _isActionInProgress = true;
+  void updatePetLocally(PetModel newPet) {
+    _pet = newPet;
     _errorMessage = null;
     notifyListeners();
+  }
 
+  /// Cho thú cưng ăn bánh quy (tiêu tốn 10 coins).
+  Future<bool> feedPet() async {
+    // Không set _isActionInProgress = true để tránh giật UI do re-build
     final result = await petRepository.feedPet();
-    _isActionInProgress = false;
 
     if (result != null) {
       _pet = result;
       notifyListeners();
       return true;
     } else {
-      _errorMessage = "Not enough Coins or system error. Please study more to earn Coins!";
-      notifyListeners();
+      // Bỏ set cứng _errorMessage vì đã xử lý optimistic update ở UI
       return false;
     }
   }
 
   /// Tương tác/Vui chơi cùng thú cưng.
   Future<bool> playWithPet() async {
-    _isActionInProgress = true;
-    _errorMessage = null;
-    notifyListeners();
-
     final result = await petRepository.interactPet();
-    _isActionInProgress = false;
 
     if (result != null) {
       _pet = result;
       notifyListeners();
       return true;
     } else {
-      _errorMessage = "Error occurred while playing with the pet. Please try again.";
-      notifyListeners();
       return false;
     }
   }

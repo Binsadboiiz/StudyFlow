@@ -2025,6 +2025,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last 30 Days'**
   String get scanFilterLast30Days;
+
+  /// No description provided for @petGuideTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet Guide'**
+  String get petGuideTooltip;
+
+  /// No description provided for @petGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet Guidebook'**
+  String get petGuideTitle;
+
+  /// No description provided for @petGuideEarnCoinsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to earn Coins'**
+  String get petGuideEarnCoinsTitle;
+
+  /// No description provided for @petGuideEarnCoinsContent.
+  ///
+  /// In en, this message translates to:
+  /// **'• Complete focused study sessions.\n• Complete daily tasks.'**
+  String get petGuideEarnCoinsContent;
+
+  /// No description provided for @petGuideCareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet Care'**
+  String get petGuideCareTitle;
+
+  /// No description provided for @petGuideCareContent.
+  ///
+  /// In en, this message translates to:
+  /// **'• Spend 10 Coins to buy food (Feed) for your Pet.\n• Staying full helps your Pet grow best.'**
+  String get petGuideCareContent;
+
+  /// No description provided for @petGuideEvolutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Level Up & Evolution'**
+  String get petGuideEvolutionTitle;
+
+  /// No description provided for @petGuideEvolutionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'• Playing with your Pet grants 10 EXP but costs 5 hunger.\n• Your pet will evolve through stages: Egg ➔ Baby ➔ Adult at certain Level milestones.'**
+  String get petGuideEvolutionContent;
+
+  /// No description provided for @gotItBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotItBtn;
+
+  /// No description provided for @aiChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Study Assistant'**
+  String get aiChatTitle;
+
+  /// No description provided for @aiChatRequestsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining {count} AI requests today'**
+  String aiChatRequestsRemaining(int count);
+
+  /// No description provided for @aiChatClearConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear conversation?'**
+  String get aiChatClearConfirm;
+
+  /// No description provided for @aiChatEmptyStateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello! How can I help you?'**
+  String get aiChatEmptyStateTitle;
+
+  /// No description provided for @aiChatEmptyStateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You can ask me to organize tasks, schedule study sessions, or plan exam preparations.'**
+  String get aiChatEmptyStateSubtitle;
+
+  /// No description provided for @aiChatThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is thinking...'**
+  String get aiChatThinking;
+
+  /// No description provided for @aiChatActionSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Action Suggestions'**
+  String get aiChatActionSuggestions;
+
+  /// No description provided for @aiChatTaskPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'📝 TASK'**
+  String get aiChatTaskPrefix;
+
+  /// No description provided for @aiChatSchedulePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'📅 SCHEDULE'**
+  String get aiChatSchedulePrefix;
+
+  /// No description provided for @aiChatAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully added: \"{title}\"'**
+  String aiChatAddedSuccess(String title);
+
+  /// No description provided for @aiChatAddFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add: {error}'**
+  String aiChatAddFailed(String error);
+
+  /// No description provided for @aiChatDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get aiChatDismiss;
+
+  /// No description provided for @aiChatAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get aiChatAccept;
+
+  /// No description provided for @aiChatInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a study message...'**
+  String get aiChatInputHint;
+
+  /// No description provided for @aiChatDailyLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily AI limit today.'**
+  String get aiChatDailyLimitReached;
+
+  /// No description provided for @flashcardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study Flashcards'**
+  String get flashcardTitle;
+
+  /// No description provided for @flashcardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any flashcard sets yet.'**
+  String get flashcardEmpty;
+
+  /// No description provided for @flashcardGeneratePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Use AI to generate flashcards from scanned documents!'**
+  String get flashcardGeneratePrompt;
+
+  /// No description provided for @flashcardsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 cards} =1{1 card} other{{count} cards}}'**
+  String flashcardsCount(int count);
+
+  /// No description provided for @flashcardDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{title}\"?'**
+  String flashcardDeleteConfirm(String title);
+
+  /// No description provided for @flashcardGenerateAI.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Flashcards with AI'**
+  String get flashcardGenerateAI;
+
+  /// No description provided for @flashcardGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is analyzing and generating flashcards...'**
+  String get flashcardGenerating;
+
+  /// No description provided for @flashcardGenerateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Flashcards generated successfully!'**
+  String get flashcardGenerateSuccess;
+
+  /// No description provided for @flashcardStudyFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Study Completed!'**
+  String get flashcardStudyFinished;
+
+  /// No description provided for @flashcardSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get flashcardSummaryTitle;
+
+  /// No description provided for @flashcardSummaryTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Cards'**
+  String get flashcardSummaryTotal;
+
+  /// No description provided for @flashcardSummaryRemembered.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembered'**
+  String get flashcardSummaryRemembered;
+
+  /// No description provided for @flashcardSummaryForgotten.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgotten'**
+  String get flashcardSummaryForgotten;
+
+  /// No description provided for @flashcardReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Study Again'**
+  String get flashcardReplay;
+
+  /// No description provided for @flashcardFlipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap card to flip and view answer'**
+  String get flashcardFlipHint;
 }
 
 class _AppLocalizationsDelegate

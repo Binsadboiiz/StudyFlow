@@ -100,7 +100,7 @@ namespace StudyFlowBackend.Constants
         /// <summary>
         /// Chỉ số no bụng giảm đi của Pet trên mỗi giờ trôi qua.
         /// </summary>
-        public const int PetHungerDecayRatePerHour = 5;
+        public const int PetHungerDecayRatePerHour = 10;
 
         /// <summary>
         /// Danh sách 14 huy hiệu (Achievements) mặc định trong hệ thống và điều kiện để mở khóa chúng.

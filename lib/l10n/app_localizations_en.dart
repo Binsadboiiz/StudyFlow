@@ -1047,4 +1047,145 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanFilterLast30Days => 'Last 30 Days';
+
+  @override
+  String get petGuideTooltip => 'Pet Guide';
+
+  @override
+  String get petGuideTitle => 'Pet Guidebook';
+
+  @override
+  String get petGuideEarnCoinsTitle => 'How to earn Coins';
+
+  @override
+  String get petGuideEarnCoinsContent =>
+      '• Complete focused study sessions.\n• Complete daily tasks.';
+
+  @override
+  String get petGuideCareTitle => 'Pet Care';
+
+  @override
+  String get petGuideCareContent =>
+      '• Spend 10 Coins to buy food (Feed) for your Pet.\n• Staying full helps your Pet grow best.';
+
+  @override
+  String get petGuideEvolutionTitle => 'Level Up & Evolution';
+
+  @override
+  String get petGuideEvolutionContent =>
+      '• Playing with your Pet grants 10 EXP but costs 5 hunger.\n• Your pet will evolve through stages: Egg ➔ Baby ➔ Adult at certain Level milestones.';
+
+  @override
+  String get gotItBtn => 'Got it';
+
+  @override
+  String get aiChatTitle => 'AI Study Assistant';
+
+  @override
+  String aiChatRequestsRemaining(int count) {
+    return 'Remaining $count AI requests today';
+  }
+
+  @override
+  String get aiChatClearConfirm => 'Clear conversation?';
+
+  @override
+  String get aiChatEmptyStateTitle => 'Hello! How can I help you?';
+
+  @override
+  String get aiChatEmptyStateSubtitle =>
+      'You can ask me to organize tasks, schedule study sessions, or plan exam preparations.';
+
+  @override
+  String get aiChatThinking => 'AI is thinking...';
+
+  @override
+  String get aiChatActionSuggestions => 'AI Action Suggestions';
+
+  @override
+  String get aiChatTaskPrefix => '📝 TASK';
+
+  @override
+  String get aiChatSchedulePrefix => '📅 SCHEDULE';
+
+  @override
+  String aiChatAddedSuccess(String title) {
+    return 'Successfully added: \"$title\"';
+  }
+
+  @override
+  String aiChatAddFailed(String error) {
+    return 'Could not add: $error';
+  }
+
+  @override
+  String get aiChatDismiss => 'Dismiss';
+
+  @override
+  String get aiChatAccept => 'Accept';
+
+  @override
+  String get aiChatInputHint => 'Type a study message...';
+
+  @override
+  String get aiChatDailyLimitReached =>
+      'You have reached your daily AI limit today.';
+
+  @override
+  String get flashcardTitle => 'Study Flashcards';
+
+  @override
+  String get flashcardEmpty => 'You don\'t have any flashcard sets yet.';
+
+  @override
+  String get flashcardGeneratePrompt =>
+      'Use AI to generate flashcards from scanned documents!';
+
+  @override
+  String flashcardsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String flashcardDeleteConfirm(String title) {
+    return 'Are you sure you want to delete \"$title\"?';
+  }
+
+  @override
+  String get flashcardGenerateAI => 'Generate Flashcards with AI';
+
+  @override
+  String get flashcardGenerating =>
+      'AI is analyzing and generating flashcards...';
+
+  @override
+  String get flashcardGenerateSuccess => 'Flashcards generated successfully!';
+
+  @override
+  String get flashcardStudyFinished => 'Study Completed!';
+
+  @override
+  String get flashcardSummaryTitle => 'Summary';
+
+  @override
+  String get flashcardSummaryTotal => 'Total Cards';
+
+  @override
+  String get flashcardSummaryRemembered => 'Remembered';
+
+  @override
+  String get flashcardSummaryForgotten => 'Forgotten';
+
+  @override
+  String get flashcardReplay => 'Study Again';
+
+  @override
+  String get flashcardFlipHint => 'Tap card to flip and view answer';
 }
