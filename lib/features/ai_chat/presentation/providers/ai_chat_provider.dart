@@ -61,6 +61,7 @@ class AiChatProvider with ChangeNotifier {
     try {
       _messages = await remoteDatasource.getChatHistory();
     } catch (e) {
+      debugPrint('[AiChatProvider] loadChatHistory error: $e');
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {
       _isLoading = false;

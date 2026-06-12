@@ -45,8 +45,9 @@ namespace StudyFlowBackend.Controllers
 
             var history = await _context.ChatMessages
                 .Where(cm => cm.UserId == userId)
+                .OrderByDescending(cm => cm.CreatedAt)
+                .Take(50)
                 .OrderBy(cm => cm.CreatedAt)
-                .TakeLast(50)
                 .Select(cm => new ChatMessageDto
                 {
                     Role = cm.Role,

@@ -54,25 +54,44 @@ namespace StudyFlowBackend.Services.Implementations
             }
 
             // Tạo system instruction/prompt yêu cầu trả về JSON
-            var systemInstruction = "You are a highly efficient learning assistant in the StudyFlow system. Your task is to support users in studying, organizing tasks, arranging schedules, and generating review flashcards.\n" +
-                                    "CRITICAL RULES:\n" +
+            var currentDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            var currentTime = DateTime.UtcNow.ToString("HH:mm");
+            var systemInstruction = $"You are a highly efficient learning assistant in the StudyFlow system. Today's date is {currentDate} and current time is {currentTime} (UTC).\n" +
+                                    "Your task is to support users in studying, organizing tasks, arranging schedules, and generating review flashcards.\n\n" +
+                                    "=== ACTION TYPE DEFINITIONS ===\n" +
+                                    "You have exactly 3 action types. You MUST pick the correct one based on user intent:\n\n" +
+                                    "1. **CREATE_TASK** — For creating a to-do item, assignment, homework, reminder, or any actionable work item.\n" +
+                                    "   - Keywords: \"task\", \"to-do\", \"homework\", \"assignment\", \"remind me\", \"add work\", \"deadline\", \"submit\", \"complete\"\n" +
+                                    "   - Required fields: `title`, `description`, `dueDate` (YYYY-MM-DD)\n" +
+                                    "   - Optional fields: `startTime` (HH:mm), `endTime` (HH:mm)\n" +
+                                    "   - Example: User says \"Add a task to review math chapter 5 by Friday\" → CREATE_TASK\n\n" +
+                                    "2. **CREATE_SCHEDULE** — For scheduling a study session, class, meeting, or time-blocked event.\n" +
+                                    "   - Keywords: \"schedule\", \"plan\", \"session\", \"class\", \"arrange\", \"study session\", \"timetable\"\n" +
+                                    "   - Required fields: `title`, `description`, `date` (YYYY-MM-DD), `startTime` (HH:mm), `endTime` (HH:mm)\n" +
+                                    "   - Example: User says \"Schedule a study session for tomorrow 2-4pm\" → CREATE_SCHEDULE\n\n" +
+                                    "3. **CREATE_FLASHCARD_SET** — For generating a SET of question-and-answer flashcards for studying/reviewing a topic.\n" +
+                                    "   - Keywords: \"flashcard\", \"flash card\", \"study cards\", \"review cards\", \"Q&A cards\", \"quiz cards\", \"create cards\", \"generate cards\", \"thẻ ghi nhớ\", \"thẻ học\"\n" +
+                                    "   - Required fields: `title`, `flashcards` array (each with `question` and `answer`, generate 5-10 cards)\n" +
+                                    "   - DO NOT fill `dueDate`, `startTime`, `endTime`, or `date` for flashcard sets.\n" +
+                                    "   - Example: User says \"Create flashcards about World War 2\" → CREATE_FLASHCARD_SET with 5-10 Q&A pairs\n" +
+                                    "   - Example: User says \"Make study cards for biology chapter 3\" → CREATE_FLASHCARD_SET\n" +
+                                    "   - Example: User says \"Tạo flashcard về lịch sử Việt Nam\" → CREATE_FLASHCARD_SET\n\n" +
+                                    "=== CRITICAL RULES ===\n" +
                                     "1. You MUST NOT trigger any deletion of user data under any circumstances.\n" +
-                                    "2. If the user wants to create a new task, plan a new schedule event, or generate/create a set of flashcards, provide the structural details in the `suggestedActions` array:\n" +
-                                    "   - actionType: 'CREATE_TASK', 'CREATE_SCHEDULE', or 'CREATE_FLASHCARD_SET'.\n" +
-                                    "   - Each action must contain a `title`, and optional `description`.\n" +
-                                    "   - For 'CREATE_TASK', fill `dueDate` (format: YYYY-MM-DD), and optionally `startTime` (format: HH:mm) and `endTime` (format: HH:mm) if specified by the user or relevant.\n" +
-                                    "   - For 'CREATE_SCHEDULE', fill `date` (format: YYYY-MM-DD), `startTime` (format: HH:mm), and `endTime` (format: HH:mm).\n" +
-                                    "   - For 'CREATE_FLASHCARD_SET', fill `title` (e.g. 'Flashcards: History'), and a `flashcards` array where each card contains a `question` and an `answer` (provide 5 to 10 cards based on the topic).\n" +
-                                    "3. Always respond strictly in the following JSON format:\n" +
+                                    "2. **FLASHCARD vs TASK DISTINCTION (MOST IMPORTANT RULE):**\n" +
+                                    "   - If the user mentions \"flashcard\", \"flash card\", \"thẻ ghi nhớ\", \"study cards\", \"review cards\", \"cards\", \"Q&A\", or asks to generate/create question-answer pairs for studying → ALWAYS use **CREATE_FLASHCARD_SET**. NEVER use CREATE_TASK for these.\n" +
+                                    "   - CREATE_FLASHCARD_SET MUST include a `flashcards` array with actual question-answer pairs. Never return an empty flashcards array.\n" +
+                                    "   - CREATE_TASK is ONLY for actionable work items (things to do/complete), NOT for generating study materials.\n" +
+                                    "3. If the user does not specify a date, use today's date.\n" +
+                                    "4. Always respond strictly in the following JSON format:\n" +
                                     "{\n" +
-                                    "  \"reply\": \"Friendly response message to the user, formatted beautifully with markdown\",\n" +
+                                    "  \"reply\": \"Friendly response message to the user\",\n" +
                                     "  \"suggestedActions\": [\n" +
-                                    "     { \"actionType\": \"CREATE_TASK\", \"title\": \"Task title\", \"description\": \"Description details\", \"dueDate\": \"YYYY-MM-DD\", \"startTime\": \"14:00\", \"endTime\": \"16:00\" },\n" +
-                                    "     { \"actionType\": \"CREATE_FLASHCARD_SET\", \"title\": \"Flashcard Set Title\", \"flashcards\": [ { \"question\": \"Q1?\", \"answer\": \"A1\" } ] }\n" +
+                                    "     { \"actionType\": \"CREATE_TASK\", \"title\": \"Task title\", \"description\": \"Details\", \"dueDate\": \"YYYY-MM-DD\", \"startTime\": \"14:00\", \"endTime\": \"16:00\" },\n" +
+                                    "     { \"actionType\": \"CREATE_FLASHCARD_SET\", \"title\": \"Flashcard Set Title\", \"description\": \"Topic description\", \"flashcards\": [ { \"question\": \"Q1?\", \"answer\": \"A1\" }, { \"question\": \"Q2?\", \"answer\": \"A2\" } ] }\n" +
                                     "  ]\n" +
                                     "}\n" +
-                                    "4. If the user asks to generate, create, make, or build flashcards or study cards, you MUST generate a 'CREATE_FLASHCARD_SET' suggestion in `suggestedActions`. DO NOT create a 'CREATE_TASK' action for flashcard requests. Make sure to generate the list of questions and answers inside the `flashcards` array parameter for 'CREATE_FLASHCARD_SET'.\n" +
-                                    "Provide clean raw JSON output. Do NOT wrap it in markdown code blocks like ```json ```.";
+                                    "5. Provide clean raw JSON output. Do NOT wrap it in markdown code blocks like ```json ```.";
 
             // Xây dựng payload contents
             var contents = new List<object>();
@@ -86,7 +105,7 @@ namespace StudyFlowBackend.Services.Implementations
             contents.Add(new
             {
                 role = "model",
-                parts = new[] { new { text = "I understand the instructions clearly and will respond in the requested JSON schema format." } }
+                parts = new[] { new { text = "I understand the instructions clearly. I will:\n1. Use CREATE_TASK only for actionable to-do items\n2. Use CREATE_FLASHCARD_SET whenever the user wants flashcards, study cards, or Q&A pairs - and always include the flashcards array with actual questions and answers\n3. Use CREATE_SCHEDULE for time-blocked study sessions\n4. Never confuse flashcards with tasks\n5. Respond in the requested JSON format" } }
             });
 
             // Lịch sử hội thoại (giới hạn vài tin nhắn gần nhất để tiết kiệm token)

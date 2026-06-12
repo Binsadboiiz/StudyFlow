@@ -709,6 +709,12 @@ class _AiChatScreenState extends State<AiChatScreen> {
       await taskVm.addTask(newTask);
       
       if (mounted) {
+        // Ensure task list shows the correct date where the new task was added
+        await taskVm.selectDate(taskDate);
+        
+        if (!mounted) return;
+
+        // Refresh schedule and home screens
         context.read<ScheduleViewmodel>().loadWeekTasks();
         context.read<HomeViewModel>().refreshTasks();
         
