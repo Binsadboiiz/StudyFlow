@@ -11,10 +11,29 @@ class ChatMessageModel {
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
     return ChatMessageModel(
-      role: json['role'] ?? '',
-      content: json['content'] ?? '',
+      role: json['role'] ?? json['Role'] ?? '',
+      content: json['content'] ?? json['Content'] ?? '',
     );
   }
+}
+
+class FlashcardSuggestionModel {
+  final String question;
+  final String answer;
+
+  FlashcardSuggestionModel({required this.question, required this.answer});
+
+  factory FlashcardSuggestionModel.fromJson(Map<String, dynamic> json) {
+    return FlashcardSuggestionModel(
+      question: json['question'] ?? json['Question'] ?? '',
+      answer: json['answer'] ?? json['Answer'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'question': question,
+        'answer': answer,
+      };
 }
 
 class AiActionSuggestionModel {
@@ -25,6 +44,7 @@ class AiActionSuggestionModel {
   final String? startTime;
   final String? endTime;
   final String? date;
+  final List<FlashcardSuggestionModel>? flashcards;
 
   AiActionSuggestionModel({
     required this.actionType,
@@ -34,6 +54,7 @@ class AiActionSuggestionModel {
     this.startTime,
     this.endTime,
     this.date,
+    this.flashcards,
   });
 
   factory AiActionSuggestionModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +64,13 @@ class AiActionSuggestionModel {
         parsedDue = DateTime.parse(json['dueDate'] ?? json['DueDate']);
       } catch (_) {}
     }
+    var rawCards = json['flashcards'] ?? json['Flashcards'];
+    List<FlashcardSuggestionModel>? cards;
+    if (rawCards != null && rawCards is List) {
+      cards = (rawCards)
+          .map((e) => FlashcardSuggestionModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
     return AiActionSuggestionModel(
       actionType: json['actionType'] ?? json['ActionType'] ?? '',
       title: json['title'] ?? json['Title'] ?? '',
@@ -51,6 +79,7 @@ class AiActionSuggestionModel {
       startTime: json['startTime'] ?? json['StartTime'],
       endTime: json['endTime'] ?? json['EndTime'],
       date: json['date'] ?? json['Date'],
+      flashcards: cards,
     );
   }
 }

@@ -24,12 +24,13 @@ namespace StudyFlowBackend.DTOs
 
     public class AiActionSuggestionDto
     {
-        public string ActionType { get; set; } = string.Empty; // "CREATE_TASK" or "CREATE_SCHEDULE"
+        public string ActionType { get; set; } = string.Empty; // "CREATE_TASK", "CREATE_SCHEDULE", or "CREATE_FLASHCARD_SET"
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime? DueDate { get; set; }
         public string? StartTime { get; set; } // e.g. "08:00"
         public string? EndTime { get; set; } // e.g. "09:00"
         public string? Date { get; set; } // e.g. "2026-06-13"
+        public List<CreateFlashcardDto>? Flashcards { get; set; }
     }
 }

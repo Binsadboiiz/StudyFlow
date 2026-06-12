@@ -1117,6 +1117,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get aiChatSchedulePrefix => '📅 LÊN LỊCH';
 
   @override
+  String get aiChatFlashcardPrefix => '🎴 FLASHCARDS';
+
+  @override
   String aiChatAddedSuccess(String title) {
     return 'Đã thêm thành công: \"$title\"';
   }
@@ -1206,4 +1209,40 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get homeQuickFlashcardsSubtitle => 'Ôn tập thông minh';
+
+  @override
+  String get flashcardCreateTitle => 'Tạo bộ Flashcard';
+
+  @override
+  String get flashcardTitleLabel => 'Tiêu đề bộ thẻ';
+
+  @override
+  String get flashcardTitleHint =>
+      'Nhập tiêu đề bộ thẻ (ví dụ: Công thức Vật lý)';
+
+  @override
+  String get flashcardQuestionHint => 'Câu hỏi';
+
+  @override
+  String get flashcardAnswerHint => 'Câu trả lời';
+
+  @override
+  String get flashcardAddCard => 'Thêm thẻ';
+
+  @override
+  String get flashcardSave => 'Lưu bộ thẻ';
+
+  @override
+  String get flashcardValidationTitle => 'Tiêu đề không được để trống';
+
+  @override
+  String get flashcardValidationEmptyCard =>
+      'Câu hỏi và câu trả lời không được để trống';
+
+  @override
+  String get flashcardValidationMinCards => 'Vui lòng thêm ít nhất một thẻ';
+
+  @override
+  String get flashcardLimitReached =>
+      'Bạn đã đạt giới hạn tối đa 200 thẻ flashcard.';
 }

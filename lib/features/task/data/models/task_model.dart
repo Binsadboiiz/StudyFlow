@@ -21,6 +21,13 @@ class TaskModel {
     this.reminderTime,
   });
 
+  static DateTime _parseUtcDateTime(String dateStr) {
+    if (!dateStr.endsWith('Z') && !dateStr.contains('+') && !dateStr.contains('-')) {
+      return DateTime.parse('${dateStr}Z').toLocal();
+    }
+    return DateTime.parse(dateStr).toLocal();
+  }
+
   /// Factory constructor to create a TaskModel from JSON (returned by .NET API)
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
@@ -28,11 +35,11 @@ class TaskModel {
       userId: json['userId'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      date: DateTime.parse(json['date']),
-      startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : null,
-      endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
+      date: _parseUtcDateTime(json['date']),
+      startTime: json['startTime'] != null ? _parseUtcDateTime(json['startTime']) : null,
+      endTime: json['endTime'] != null ? _parseUtcDateTime(json['endTime']) : null,
       isCompleted: json['isCompleted'] ?? false,
-      reminderTime: json['reminderTime'] != null ? DateTime.parse(json['reminderTime']) : null,
+      reminderTime: json['reminderTime'] != null ? _parseUtcDateTime(json['reminderTime']) : null,
     );
   }
 
@@ -43,11 +50,11 @@ class TaskModel {
       'userId': userId,
       'title': title,
       'description': description,
-      'date': date.toIso8601String(),
-      'startTime': startTime?.toIso8601String(),
-      'endTime': endTime?.toIso8601String(),
+      'date': date.toUtc().toIso8601String(),
+      'startTime': startTime?.toUtc().toIso8601String(),
+      'endTime': endTime?.toUtc().toIso8601String(),
       'isCompleted': isCompleted,
-      'reminderTime': reminderTime?.toIso8601String(),
+      'reminderTime': reminderTime?.toUtc().toIso8601String(),
     };
   }
 }

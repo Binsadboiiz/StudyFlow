@@ -395,6 +395,7 @@
   "aiChatActionSuggestions": "AI Action Suggestions",
   "aiChatTaskPrefix": "📝 TASK",
   "aiChatSchedulePrefix": "📅 SCHEDULE",
+  "aiChatFlashcardPrefix": "🎴 FLASHCARDS",
   "aiChatAddedSuccess": "Successfully added: \"{title}\"",
   "@aiChatAddedSuccess": {
     "placeholders": {
@@ -447,5 +448,16 @@
   "homeQuickAiTitle": "AI Assistant",
   "homeQuickAiSubtitle": "Organize tasks & chat",
   "homeQuickFlashcardsTitle": "Flashcards",
-  "homeQuickFlashcardsSubtitle": "Smart review"
+  "homeQuickFlashcardsSubtitle": "Smart review",
+  "flashcardCreateTitle": "Create Flashcard Set",
+  "flashcardTitleLabel": "Set Title",
+  "flashcardTitleHint": "Enter set title (e.g. Physics Formulas)",
+  "flashcardQuestionHint": "Question",
+  "flashcardAnswerHint": "Answer",
+  "flashcardAddCard": "Add Card",
+  "flashcardSave": "Save Set",
+  "flashcardValidationTitle": "Title cannot be empty",
+  "flashcardValidationEmptyCard": "Questions and answers cannot be empty",
+  "flashcardValidationMinCards": "Please add at least one card",
+  "flashcardLimitReached": "You have reached the maximum limit of 200 flashcards."
 }

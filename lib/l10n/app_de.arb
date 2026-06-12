@@ -395,6 +395,7 @@
   "aiChatActionSuggestions": "KI-Aktionsvorschläge",
   "aiChatTaskPrefix": "📝 AUFGABE",
   "aiChatSchedulePrefix": "📅 PLANEN",
+  "aiChatFlashcardPrefix": "🎴 FLASHCARDS",
   "aiChatAddedSuccess": "Erfolgreich hinzugefügt: \"{title}\"",
   "@aiChatAddedSuccess": {
     "placeholders": {
@@ -447,5 +448,16 @@
   "homeQuickAiTitle": "KI-Assistent",
   "homeQuickAiSubtitle": "Aufgaben organisieren & chatten",
   "homeQuickFlashcardsTitle": "Lernkarten",
-  "homeQuickFlashcardsSubtitle": "Intelligente Wiederholung"
+  "homeQuickFlashcardsSubtitle": "Intelligente Wiederholung",
+  "flashcardCreateTitle": "Flashcard-Set erstellen",
+  "flashcardTitleLabel": "Set-Titel",
+  "flashcardTitleHint": "Set-Titel eingeben (z. B. Physikformeln)",
+  "flashcardQuestionHint": "Frage",
+  "flashcardAnswerHint": "Antwort",
+  "flashcardAddCard": "Karte hinzufügen",
+  "flashcardSave": "Set speichern",
+  "flashcardValidationTitle": "Titel darf nicht leer sein",
+  "flashcardValidationEmptyCard": "Fragen und Antworten dürfen nicht leer sein",
+  "flashcardValidationMinCards": "Bitte fügen Sie mindestens eine Karte hinzu",
+  "flashcardLimitReached": "Sie haben das maximale Limit von 200 Karteikarten erreicht."
 }

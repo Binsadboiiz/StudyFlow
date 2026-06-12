@@ -2134,6 +2134,12 @@ abstract class AppLocalizations {
   /// **'📅 SCHEDULE'**
   String get aiChatSchedulePrefix;
 
+  /// No description provided for @aiChatFlashcardPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'🎴 FLASHCARDS'**
+  String get aiChatFlashcardPrefix;
+
   /// No description provided for @aiChatAddedSuccess.
   ///
   /// In en, this message translates to:
@@ -2283,6 +2289,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Smart review'**
   String get homeQuickFlashcardsSubtitle;
+
+  /// No description provided for @flashcardCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Flashcard Set'**
+  String get flashcardCreateTitle;
+
+  /// No description provided for @flashcardTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Title'**
+  String get flashcardTitleLabel;
+
+  /// No description provided for @flashcardTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter set title (e.g. Physics Formulas)'**
+  String get flashcardTitleHint;
+
+  /// No description provided for @flashcardQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Question'**
+  String get flashcardQuestionHint;
+
+  /// No description provided for @flashcardAnswerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer'**
+  String get flashcardAnswerHint;
+
+  /// No description provided for @flashcardAddCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Card'**
+  String get flashcardAddCard;
+
+  /// No description provided for @flashcardSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Set'**
+  String get flashcardSave;
+
+  /// No description provided for @flashcardValidationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title cannot be empty'**
+  String get flashcardValidationTitle;
+
+  /// No description provided for @flashcardValidationEmptyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions and answers cannot be empty'**
+  String get flashcardValidationEmptyCard;
+
+  /// No description provided for @flashcardValidationMinCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one card'**
+  String get flashcardValidationMinCards;
+
+  /// No description provided for @flashcardLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the maximum limit of 200 flashcards.'**
+  String get flashcardLimitReached;
 }
 
 class _AppLocalizationsDelegate

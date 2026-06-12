@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
 import 'package:studyflow/features/flashcard/presentation/screens/flashcard_study_screen.dart';
+import 'package:studyflow/features/flashcard/presentation/screens/flashcard_create_screen.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 
 class FlashcardListScreen extends StatefulWidget {
@@ -132,6 +133,24 @@ class _FlashcardListScreenState extends State<FlashcardListScreen> {
                       },
                     ),
             ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'flashcard_add_fab',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FlashcardCreateScreen(),
+            ),
+          );
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(Icons.add_rounded, size: 26),
+      ),
     );
   }
 

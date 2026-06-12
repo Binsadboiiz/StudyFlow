@@ -1127,6 +1127,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aiChatSchedulePrefix => '📅 PLANEN';
 
   @override
+  String get aiChatFlashcardPrefix => '🎴 FLASHCARDS';
+
+  @override
   String aiChatAddedSuccess(String title) {
     return 'Erfolgreich hinzugefügt: \"$title\"';
   }
@@ -1217,4 +1220,40 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeQuickFlashcardsSubtitle => 'Intelligente Wiederholung';
+
+  @override
+  String get flashcardCreateTitle => 'Flashcard-Set erstellen';
+
+  @override
+  String get flashcardTitleLabel => 'Set-Titel';
+
+  @override
+  String get flashcardTitleHint => 'Set-Titel eingeben (z. B. Physikformeln)';
+
+  @override
+  String get flashcardQuestionHint => 'Frage';
+
+  @override
+  String get flashcardAnswerHint => 'Antwort';
+
+  @override
+  String get flashcardAddCard => 'Karte hinzufügen';
+
+  @override
+  String get flashcardSave => 'Set speichern';
+
+  @override
+  String get flashcardValidationTitle => 'Titel darf nicht leer sein';
+
+  @override
+  String get flashcardValidationEmptyCard =>
+      'Fragen und Antworten dürfen nicht leer sein';
+
+  @override
+  String get flashcardValidationMinCards =>
+      'Bitte fügen Sie mindestens eine Karte hinzu';
+
+  @override
+  String get flashcardLimitReached =>
+      'Sie haben das maximale Limit von 200 Karteikarten erreicht.';
 }

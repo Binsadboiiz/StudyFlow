@@ -8,11 +8,11 @@ import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
-import 'package:studyflow/core/theme/app_colors.dart';
-import 'package:studyflow/core/widgets/glass_card.dart';
 import 'package:studyflow/core/services/notification/app_notification.dart';
 import 'package:studyflow/core/services/notification/notification_type.dart';
 import 'package:studyflow/core/services/notification/notification_service.dart';
+import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
+import 'package:studyflow/features/flashcard/presentation/screens/flashcard_study_screen.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -31,8 +31,20 @@ class _AiChatScreenState extends State<AiChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AiChatProvider>().loadChatHistory().then((_) {
-        _scrollToBottom();
+      final provider = context.read<AiChatProvider>();
+      provider.loadChatHistory().then((_) {
+        if (mounted) {
+          _scrollToBottom();
+          if (provider.errorMessage != null) {
+            NotificationService.instance.show(
+              AppNotification(
+                message: provider.errorMessage!,
+                type: NotificationType.error,
+              ),
+            );
+            provider.clearError();
+          }
+        }
       });
     });
   }
@@ -482,6 +494,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
             child: Row(
               children: _latestSuggestions.map((action) {
                 final isTask = action.actionType == 'CREATE_TASK';
+                final isFlashcard = action.actionType == 'CREATE_FLASHCARD_SET';
+                IconData actionIcon = Icons.calendar_today_rounded;
+                String actionPrefix = AppLocalizations.of(context)!.aiChatSchedulePrefix;
+                if (isTask) {
+                  actionIcon = Icons.checklist_rounded;
+                  actionPrefix = AppLocalizations.of(context)!.aiChatTaskPrefix;
+                } else if (isFlashcard) {
+                  actionIcon = Icons.style_rounded;
+                  actionPrefix = AppLocalizations.of(context)!.aiChatFlashcardPrefix;
+                }
                 return Container(
                   width: 250,
                   margin: const EdgeInsets.only(right: 12),
@@ -507,15 +529,13 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       Row(
                         children: [
                           Icon(
-                            isTask ? Icons.checklist_rounded : Icons.calendar_today_rounded,
+                            actionIcon,
                             size: 14,
                             color: primaryColor,
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isTask 
-                                ? AppLocalizations.of(context)!.aiChatTaskPrefix 
-                                : AppLocalizations.of(context)!.aiChatSchedulePrefix,
+                            actionPrefix,
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -591,6 +611,65 @@ class _AiChatScreenState extends State<AiChatScreen> {
   }
 
   Future<void> _executeSuggestion(AiActionSuggestionModel action) async {
+    if (action.actionType == 'CREATE_FLASHCARD_SET') {
+      final flashcardProvider = context.read<FlashcardProvider>();
+      if (action.flashcards == null || action.flashcards!.isEmpty) {
+        NotificationService.instance.show(
+          AppNotification(
+            message: "Suggested action has no flashcards.",
+            type: NotificationType.error,
+          ),
+        );
+        return;
+      }
+
+      final List<Map<String, String>> cards = action.flashcards!
+          .map((card) => {
+                'question': card.question,
+                'answer': card.answer,
+              })
+          .toList();
+
+      try {
+        final newSet = await flashcardProvider.createFlashcardSet(action.title, cards);
+        if (newSet != null && mounted) {
+          NotificationService.instance.show(
+            AppNotification(
+              message: AppLocalizations.of(context)!.flashcardGenerateSuccess,
+              type: NotificationType.success,
+            ),
+          );
+          setState(() {
+            _latestSuggestions.remove(action);
+          });
+          // Navigate to FlashcardStudyScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlashcardStudyScreen(flashcardSet: newSet),
+            ),
+          );
+        } else if (mounted) {
+          NotificationService.instance.show(
+            AppNotification(
+              message: flashcardProvider.errorMessage ?? "Failed to create flashcard set.",
+              type: NotificationType.error,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          NotificationService.instance.show(
+            AppNotification(
+              message: e.toString(),
+              type: NotificationType.error,
+            ),
+          );
+        }
+      }
+      return;
+    }
+
     final taskVm = context.read<TaskViewmodel>();
     final now = DateTime.now();
     DateTime taskDate = action.dueDate ?? now;

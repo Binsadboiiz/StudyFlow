@@ -395,6 +395,7 @@
   "aiChatActionSuggestions": "Đề xuất hành động từ AI",
   "aiChatTaskPrefix": "📝 TASK",
   "aiChatSchedulePrefix": "📅 LÊN LỊCH",
+  "aiChatFlashcardPrefix": "🎴 FLASHCARDS",
   "aiChatAddedSuccess": "Đã thêm thành công: \"{title}\"",
   "@aiChatAddedSuccess": {
     "placeholders": {
@@ -447,5 +448,16 @@
   "homeQuickAiTitle": "Trợ lý AI",
   "homeQuickAiSubtitle": "Sắp xếp task & chat",
   "homeQuickFlashcardsTitle": "Flashcards",
-  "homeQuickFlashcardsSubtitle": "Ôn tập thông minh"
+  "homeQuickFlashcardsSubtitle": "Ôn tập thông minh",
+  "flashcardCreateTitle": "Tạo bộ Flashcard",
+  "flashcardTitleLabel": "Tiêu đề bộ thẻ",
+  "flashcardTitleHint": "Nhập tiêu đề bộ thẻ (ví dụ: Công thức Vật lý)",
+  "flashcardQuestionHint": "Câu hỏi",
+  "flashcardAnswerHint": "Câu trả lời",
+  "flashcardAddCard": "Thêm thẻ",
+  "flashcardSave": "Lưu bộ thẻ",
+  "flashcardValidationTitle": "Tiêu đề không được để trống",
+  "flashcardValidationEmptyCard": "Câu hỏi và câu trả lời không được để trống",
+  "flashcardValidationMinCards": "Vui lòng thêm ít nhất một thẻ",
+  "flashcardLimitReached": "Bạn đã đạt giới hạn tối đa 200 thẻ flashcard."
 }
