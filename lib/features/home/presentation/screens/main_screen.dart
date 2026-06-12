@@ -39,20 +39,9 @@ class _MainScreenState extends State<MainScreen>
   int _currentIndex = 0;
   bool _showTutorial = false;
   
-  // Cache screens in RAM to avoid re-constructing them on every build
-  late final List<Widget> _screens;
-
   @override
   void initState() {
     super.initState();
-    _screens = const [
-      HomeScreen(),
-      FocusScreen(),
-      ScanHomeScreen(),
-      TaskScheduleHubScreen(),
-      GamificationHubScreen(),
-      SettingsScreen(),
-    ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<NotificationViewModel>().fetchNotifications();
@@ -136,7 +125,15 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = _currentIndex.clamp(0, _screens.length - 1);
+    final screens = const [
+      HomeScreen(),
+      FocusScreen(),
+      ScanHomeScreen(),
+      TaskScheduleHubScreen(),
+      GamificationHubScreen(),
+      SettingsScreen(),
+    ];
+    final currentIndex = _currentIndex.clamp(0, screens.length - 1);
     final homeViewModel = context.watch<HomeViewModel>();
 
     return Scaffold(
@@ -146,7 +143,7 @@ class _MainScreenState extends State<MainScreen>
         children: [
           IndexedStack(
             index: currentIndex,
-            children: _screens,
+            children: screens,
           ),
           if (_showTutorial)
             TutorialOverlay(

@@ -53,10 +53,32 @@ class AiChatProvider with ChangeNotifier {
     }
   }
 
-  void clearConversation() {
+  Future<void> loadChatHistory() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _messages = await remoteDatasource.getChatHistory();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> clearConversation() async {
     _messages.clear();
     _errorMessage = null;
     notifyListeners();
+
+    try {
+      await remoteDatasource.clearChatHistory();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+    }
   }
 
   void clearError() {

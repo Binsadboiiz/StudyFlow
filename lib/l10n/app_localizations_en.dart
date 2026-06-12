@@ -1188,4 +1188,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flashcardFlipHint => 'Tap card to flip and view answer';
+
+  @override
+  String get homeQuickAiTitle => 'AI Assistant';
+
+  @override
+  String get homeQuickAiSubtitle => 'Organize tasks & chat';
+
+  @override
+  String get homeQuickFlashcardsTitle => 'Flashcards';
+
+  @override
+  String get homeQuickFlashcardsSubtitle => 'Smart review';
 }

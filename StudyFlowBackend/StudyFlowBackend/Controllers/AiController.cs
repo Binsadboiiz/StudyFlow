@@ -37,6 +37,39 @@ namespace StudyFlowBackend.Controllers
             _userUtils = userUtils;
         }
 
+        [HttpGet("history")]
+        public async Task<IActionResult> GetChatHistory()
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var history = await _context.ChatMessages
+                .Where(cm => cm.UserId == userId)
+                .OrderBy(cm => cm.CreatedAt)
+                .TakeLast(50)
+                .Select(cm => new ChatMessageDto
+                {
+                    Role = cm.Role,
+                    Content = cm.Content
+                })
+                .ToListAsync();
+
+            return Ok(ApiResponse<IEnumerable<ChatMessageDto>>.SuccessResponse(history));
+        }
+
+        [HttpPost("clear")]
+        public async Task<IActionResult> ClearChatHistory()
+        {
+            var userId = _userUtils.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var messages = await _context.ChatMessages.Where(cm => cm.UserId == userId).ToListAsync();
+            _context.ChatMessages.RemoveRange(messages);
+            await _context.SaveChangesAsync();
+
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Chat history cleared."));
+        }
+
         [HttpPost("chat")]
         public async Task<IActionResult> Chat([FromBody] ChatRequestDto request)
         {
@@ -49,13 +82,59 @@ namespace StudyFlowBackend.Controllers
                 return StatusCode(429, ApiResponse<object>.ErrorResponse("You have used up all your AI requests today (Maximum 20 requests/day). Please try again tomorrow!"));
             }
 
+            // Lưu thay đổi quota tạm thời để giảm thiểu race condition (hoặc lưu khi thành công/thất bại)
             await _context.SaveChangesAsync();
 
-            // 1. Tìm các flashcards liên quan để làm context (RAG Lite)
+            // 1. Lấy lịch sử hội thoại thực tế từ DB để gửi lên AI
+            var history = await _context.ChatMessages
+                .Where(cm => cm.UserId == user.Id)
+                .OrderByDescending(cm => cm.CreatedAt)
+                .Take(10)
+                .OrderBy(cm => cm.CreatedAt)
+                .Select(cm => new ChatMessageDto
+                {
+                    Role = cm.Role,
+                    Content = cm.Content
+                })
+                .ToListAsync();
+
+            // Tìm các flashcards liên quan để làm context (RAG Lite)
             var relevantCards = await _flashcardService.SearchRelevantFlashcardsAsync(user.Id, request.Message, limit: 15);
 
             // 2. Gửi request đến Gemini
-            var result = await _geminiService.ProcessChatWithContextAsync(request.Message, request.History, relevantCards);
+            var result = await _geminiService.ProcessChatWithContextAsync(request.Message, history, relevantCards);
+
+            if (!result.IsSuccess)
+            {
+                // Revert quota
+                if (user.DailyAiRequestsUsed > 0)
+                {
+                    user.DailyAiRequestsUsed--;
+                    await _context.SaveChangesAsync();
+                }
+                return StatusCode(503, ApiResponse<object>.ErrorResponse(result.Reply));
+            }
+
+            // Lưu tin nhắn của user vào database
+            var userMsg = new ChatMessage
+            {
+                UserId = user.Id,
+                Role = "user",
+                Content = request.Message,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.ChatMessages.Add(userMsg);
+
+            // Lưu câu trả lời của AI vào database
+            var modelMsg = new ChatMessage
+            {
+                UserId = user.Id,
+                Role = "model",
+                Content = result.Reply,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.ChatMessages.Add(modelMsg);
+            await _context.SaveChangesAsync();
 
             var responseDto = new ChatResponseDto
             {
@@ -83,25 +162,43 @@ namespace StudyFlowBackend.Controllers
             var doc = await _context.ScannedDocuments.FirstOrDefaultAsync(d => d.Id == request.DocumentId && d.UserId == user.Id);
             if (doc == null)
             {
+                // Revert quota
+                if (user.DailyAiRequestsUsed > 0)
+                {
+                    user.DailyAiRequestsUsed--;
+                    await _context.SaveChangesAsync();
+                }
                 return NotFound(ApiResponse<object>.ErrorResponse("Could not find the scanned document."));
             }
 
             if (string.IsNullOrWhiteSpace(doc.ExtractedText))
             {
+                // Revert quota
+                if (user.DailyAiRequestsUsed > 0)
+                {
+                    user.DailyAiRequestsUsed--;
+                    await _context.SaveChangesAsync();
+                }
                 return BadRequest(ApiResponse<object>.ErrorResponse("The document does not contain any extracted text."));
             }
 
-            // 3. Đánh dấu lưu DB trước khi gọi để update hạn mức request
+            // Lưu thay đổi hạn mức request trước khi gọi
             await _context.SaveChangesAsync();
 
-            // 4. Sinh flashcard từ Gemini
+            // 3. Sinh flashcard từ Gemini
             var generatedCards = await _geminiService.GenerateFlashcardsFromTextAsync(doc.ExtractedText);
             if (generatedCards == null || generatedCards.Count == 0)
             {
-                return BadRequest(ApiResponse<object>.ErrorResponse("Could not generate flashcards from this document text."));
+                // Revert quota
+                if (user.DailyAiRequestsUsed > 0)
+                {
+                    user.DailyAiRequestsUsed--;
+                    await _context.SaveChangesAsync();
+                }
+                return StatusCode(503, ApiResponse<object>.ErrorResponse("Could not generate flashcards from this document text."));
             }
 
-            // 5. Lưu bộ flashcard vào DB
+            // 4. Lưu bộ flashcard vào DB
             var createDto = new CreateFlashcardSetDto
             {
                 Title = string.IsNullOrEmpty(request.CustomTitle) ? $"Flashcards: {doc.Title}" : request.CustomTitle,
@@ -116,6 +213,12 @@ namespace StudyFlowBackend.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                // Revert quota if saving failed
+                if (user.DailyAiRequestsUsed > 0)
+                {
+                    user.DailyAiRequestsUsed--;
+                    await _context.SaveChangesAsync();
+                }
                 return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }

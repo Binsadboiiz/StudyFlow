@@ -1194,4 +1194,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get flashcardFlipHint => 'Chạm vào thẻ để xem đáp án';
+
+  @override
+  String get homeQuickAiTitle => 'Trợ lý AI';
+
+  @override
+  String get homeQuickAiSubtitle => 'Sắp xếp task & chat';
+
+  @override
+  String get homeQuickFlashcardsTitle => 'Flashcards';
+
+  @override
+  String get homeQuickFlashcardsSubtitle => 'Ôn tập thông minh';
 }

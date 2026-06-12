@@ -443,5 +443,9 @@
   "flashcardSummaryRemembered": "Remembered",
   "flashcardSummaryForgotten": "Forgotten",
   "flashcardReplay": "Study Again",
-  "flashcardFlipHint": "Tap card to flip and view answer"
+  "flashcardFlipHint": "Tap card to flip and view answer",
+  "homeQuickAiTitle": "AI Assistant",
+  "homeQuickAiSubtitle": "Organize tasks & chat",
+  "homeQuickFlashcardsTitle": "Flashcards",
+  "homeQuickFlashcardsSubtitle": "Smart review"
 }

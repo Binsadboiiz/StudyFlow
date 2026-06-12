@@ -2259,6 +2259,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap card to flip and view answer'**
   String get flashcardFlipHint;
+
+  /// No description provided for @homeQuickAiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get homeQuickAiTitle;
+
+  /// No description provided for @homeQuickAiSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize tasks & chat'**
+  String get homeQuickAiSubtitle;
+
+  /// No description provided for @homeQuickFlashcardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flashcards'**
+  String get homeQuickFlashcardsTitle;
+
+  /// No description provided for @homeQuickFlashcardsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart review'**
+  String get homeQuickFlashcardsSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:studyflow/features/ai_chat/presentation/providers/ai_chat_provider.dart';
 import 'package:studyflow/features/ai_chat/data/models/ai_chat_model.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/core/theme/app_colors.dart';
+import 'package:studyflow/core/widgets/glass_card.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -16,15 +19,34 @@ class AiChatScreen extends StatefulWidget {
 class _AiChatScreenState extends State<AiChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
   List<AiActionSuggestionModel> _latestSuggestions = [];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AiChatProvider>().loadChatHistory().then((_) {
+        _scrollToBottom();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 150), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          curve: Curves.easeOutQuad,
         );
       }
     });
@@ -34,6 +56,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     _controller.clear();
+    _focusNode.requestFocus();
     
     setState(() {
       _latestSuggestions.clear();
@@ -55,8 +78,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(provider.errorMessage!),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(provider.errorMessage!)),
+              ],
+            ),
             backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
         provider.clearError();
@@ -67,140 +98,371 @@ class _AiChatScreenState extends State<AiChatScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AiChatProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        title: Row(
           children: [
-            Text(AppLocalizations.of(context)!.aiChatTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            Text(
-              AppLocalizations.of(context)!.aiChatRequestsRemaining(provider.dailyRequestsRemaining),
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.auto_awesome_rounded, color: primaryColor, size: 20),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+             .shimmer(duration: 1.5.seconds, color: primaryColor.withOpacity(0.4)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.aiChatTitle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.aiChatRequestsRemaining(provider.dailyRequestsRemaining),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep_outlined),
-            onPressed: () {
-              provider.clearConversation();
-              setState(() {
-                _latestSuggestions.clear();
-              });
-            },
-            tooltip: AppLocalizations.of(context)!.clearAll,
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.redAccent, size: 22),
+              onPressed: () {
+                _showClearDialog(provider);
+              },
+              tooltip: AppLocalizations.of(context)!.clearAll,
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
+          if (provider.dailyRequestsRemaining <= 0)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Colors.orangeAccent.withOpacity(0.15),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.aiChatDailyLimitReached,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orangeAccent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(),
           Expanded(
-            child: provider.messages.isEmpty
+            child: provider.messages.isEmpty && !provider.isLoading
                 ? _buildEmptyState(isDark)
                 : ListView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: provider.messages.length,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                    itemCount: provider.messages.length + (provider.isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
+                      if (index == provider.messages.length) {
+                        return _buildThinkingBubble(isDark, primaryColor)
+                            .animate()
+                            .fadeIn(duration: 250.ms)
+                            .slideY(begin: 0.1, end: 0, curve: Curves.easeOut);
+                      }
                       final msg = provider.messages[index];
                       final isUser = msg.role == 'user';
-                      return _buildChatBubble(msg, isUser, isDark, primaryColor);
+                      return _buildChatBubble(msg, isUser, isDark, primaryColor)
+                          .animate()
+                          .fadeIn(duration: 300.ms)
+                          .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
                     },
                   ),
           ),
-          if (provider.isLoading)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: primaryColor),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context)!.aiChatThinking, style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                ],
-              ),
-            ),
-          if (_latestSuggestions.isNotEmpty) _buildSuggestionsWidget(primaryColor, isDark),
+          if (_latestSuggestions.isNotEmpty) 
+            _buildSuggestionsWidget(primaryColor, isDark)
+                .animate()
+                .fadeIn(duration: 250.ms)
+                .slideY(begin: 0.2, end: 0, curve: Curves.easeOut),
           _buildInputArea(provider.isLoading, primaryColor, isDark),
         ],
       ),
     );
   }
 
+  void _showClearDialog(AiChatProvider provider) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.aiChatClearConfirm),
+        content: const Text('Do you want to permanently clear the conversation history? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.clearConversation();
+              setState(() {
+                _latestSuggestions.clear();
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Clear', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState(bool isDark) {
+    final theme = Theme.of(context);
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                gradient: LinearGradient(
+                  colors: [theme.colorScheme.primary.withOpacity(0.15), theme.colorScheme.secondary.withOpacity(0.05)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              child: Icon(Icons.chat_bubble_outline, size: 48, color: Theme.of(context).colorScheme.primary),
-            ),
+              child: Icon(Icons.auto_awesome, size: 56, color: theme.colorScheme.primary),
+            ).animate().scale(delay: 100.ms, duration: 400.ms, curve: Curves.easeOutBack),
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.aiChatEmptyStateTitle,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ).animate().fadeIn(delay: 200.ms),
             const SizedBox(height: 12),
             Text(
               AppLocalizations.of(context)!.aiChatEmptyStateSubtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey),
-            ),
+              style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6), height: 1.4),
+            ).animate().fadeIn(delay: 350.ms),
+            const SizedBox(height: 32),
+            _buildSamplePromptCard("Arrange a study session for tomorrow afternoon"),
+            const SizedBox(height: 12),
+            _buildSamplePromptCard("Add a reminder to scan history notes next Monday"),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildSamplePromptCard(String text) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: () {
+        _controller.text = text;
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey.shade400),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0);
+  }
+
   Widget _buildChatBubble(ChatMessageModel msg, bool isUser, bool isDark, Color primaryColor) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isUser
-              ? primaryColor
-              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB)),
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 0),
-            bottomRight: Radius.circular(isUser ? 0 : 16),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[
+            Container(
+              margin: const EdgeInsets.only(right: 8, top: 4),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.auto_awesome, size: 14, color: primaryColor),
+            ),
+          ],
+          Flexible(
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: isUser
+                    ? LinearGradient(
+                        colors: [primaryColor, primaryColor.withOpacity(0.85)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
+                color: isUser
+                    ? null
+                    : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: Radius.circular(isUser ? 20 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 20),
+                ),
+                border: !isUser
+                    ? Border.all(
+                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                        width: 1.2,
+                      )
+                    : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isUser ? 0.08 : 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+              child: Text(
+                msg.content,
+                style: TextStyle(
+                  color: isUser ? Colors.white : (isDark ? Colors.grey.shade100 : Colors.black87),
+                  fontSize: 14.5,
+                  height: 1.45,
+                ),
+              ),
+            ),
           ),
-        ),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        child: Text(
-          msg.content,
-          style: TextStyle(
-            color: isUser ? Colors.white : (isDark ? Colors.white : Colors.black87),
-            fontSize: 15,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildThinkingBubble(bool isDark, Color primaryColor) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 8, top: 4),
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.auto_awesome, size: 14, color: primaryColor),
           ),
-        ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomLeft: Radius.circular(4),
+                bottomRight: Radius.circular(20),
+              ),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  AppLocalizations.of(context)!.aiChatThinking,
+                  style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSuggestionsWidget(Color primaryColor, bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        border: Border(top: BorderSide(color: isDark ? Colors.grey.shade900 : Colors.grey.shade200)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,59 +470,119 @@ class _AiChatScreenState extends State<AiChatScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome_outlined, size: 16, color: primaryColor),
+              Icon(Icons.assistant_outlined, size: 16, color: primaryColor),
               const SizedBox(width: 8),
-              Text(AppLocalizations.of(context)!.aiChatActionSuggestions, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(
+                AppLocalizations.of(context)!.aiChatActionSuggestions,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: _latestSuggestions.map((action) {
-                return Card(
+                final isTask = action.actionType == 'CREATE_TASK';
+                return Container(
+                  width: 250,
                   margin: const EdgeInsets.only(right: 12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          action.actionType == 'CREATE_TASK' 
-                              ? AppLocalizations.of(context)!.aiChatTaskPrefix 
-                              : AppLocalizations.of(context)!.aiChatSchedulePrefix,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            isTask ? Icons.checklist_rounded : Icons.calendar_today_rounded,
+                            size: 14,
                             color: primaryColor,
                           ),
-                        ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isTask 
+                                ? AppLocalizations.of(context)!.aiChatTaskPrefix 
+                                : AppLocalizations.of(context)!.aiChatSchedulePrefix,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        action.title, 
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (action.description.isNotEmpty) ...[
                         const SizedBox(height: 4),
-                        Text(action.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                        const SizedBox(height: 2),
                         Text(
-                          action.description.isNotEmpty ? action.description : 'Tự động tạo bởi AI',
+                          action.description,
                           style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _latestSuggestions.remove(action);
-                                });
-                              },
-                              child: Text(AppLocalizations.of(context)!.aiChatDismiss, style: const TextStyle(color: Colors.grey)),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => _executeSuggestion(action),
-                              child: Text(AppLocalizations.of(context)!.aiChatAccept),
-                            ),
-                          ],
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _latestSuggestions.remove(action);
+                              });
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!.aiChatDismiss, 
+                              style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () => _executeSuggestion(action),
+                            child: Text(
+                              AppLocalizations.of(context)!.aiChatAccept,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 );
               }).toList(),
@@ -273,8 +595,6 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   Future<void> _executeSuggestion(AiActionSuggestionModel action) async {
     final taskVm = context.read<TaskViewmodel>();
-    
-    // Tạo Task Entity
     final now = DateTime.now();
     DateTime taskDate = action.dueDate ?? now;
     if (action.date != null) {
@@ -300,7 +620,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
     }
 
     final newTask = Task(
-      id: '', // Backend/Firebase tự tạo UUID
+      id: '',
       title: action.title,
       description: action.description,
       date: taskDate,
@@ -315,8 +635,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.aiChatAddedSuccess(action.title)),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline_rounded, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(AppLocalizations.of(context)!.aiChatAddedSuccess(action.title))),
+              ],
+            ),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
         setState(() {
@@ -329,6 +657,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
           SnackBar(
             content: Text(AppLocalizations.of(context)!.aiChatAddFailed(e.toString())),
             backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -337,36 +667,68 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   Widget _buildInputArea(bool isLoading, Color primaryColor, bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF151D24) : Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        border: Border(top: BorderSide(color: isDark ? Colors.grey.shade900 : Colors.grey.shade200)),
       ),
       child: SafeArea(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: TextField(
-                controller: _controller,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.aiChatInputHint,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  fillColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFF3F4F6),
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    width: 1,
                   ),
                 ),
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _send(),
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  enabled: !isLoading,
+                  maxLines: 5,
+                  minLines: 1,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.aiChatInputHint,
+                    hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),
-            IconButton(
-              icon: Icon(Icons.send, color: primaryColor),
-              onPressed: isLoading ? null : _send,
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: isLoading ? Colors.grey.shade300 : primaryColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  if (!isLoading)
+                    BoxShadow(
+                      color: primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                ],
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                onPressed: isLoading ? null : _send,
+              ),
             ),
           ],
         ),

@@ -29,14 +29,14 @@ namespace StudyFlowBackend.Services.Implementations
             _modelName = configuration["Gemini:Model"] ?? "gemini-1.5-flash";
         }
 
-        public async Task<(string Reply, List<AiActionSuggestionDto> Actions)> ProcessChatWithContextAsync(
+        public async Task<(string Reply, List<AiActionSuggestionDto> Actions, bool IsSuccess)> ProcessChatWithContextAsync(
             string userMessage, 
             List<ChatMessageDto> history, 
             List<FlashcardDto> contextCards)
         {
             if (string.IsNullOrEmpty(_apiKey))
             {
-                return ("Error: Gemini API key not configured in the backend.", new List<AiActionSuggestionDto>());
+                return ("Error: Gemini API key not configured in the backend.", new List<AiActionSuggestionDto>(), false);
             }
 
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}";
@@ -124,7 +124,7 @@ namespace StudyFlowBackend.Services.Implementations
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Gemini API Error: {Status} - {Response}", response.StatusCode, responseString);
-                    return ("The AI system is currently busy, please try again later.", new List<AiActionSuggestionDto>());
+                    return ("The AI system is currently busy, please try again later.", new List<AiActionSuggestionDto>(), false);
                 }
 
                 using var doc = JsonDocument.Parse(responseString);
@@ -151,13 +151,13 @@ namespace StudyFlowBackend.Services.Implementations
 
                             if (chatResult != null)
                             {
-                                return (chatResult.Reply, chatResult.SuggestedActions ?? new List<AiActionSuggestionDto>());
+                                return (chatResult.Reply, chatResult.SuggestedActions ?? new List<AiActionSuggestionDto>(), true);
                             }
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Failed to parse Gemini response JSON: {RawText}", text);
-                            return (text, new List<AiActionSuggestionDto>());
+                            return (text, new List<AiActionSuggestionDto>(), true);
                         }
                     }
                 }
@@ -167,7 +167,7 @@ namespace StudyFlowBackend.Services.Implementations
                 _logger.LogError(ex, "Error while calling Gemini API");
             }
 
-            return ("Unable to receive response from AI.", new List<AiActionSuggestionDto>());
+            return ("Unable to receive response from AI.", new List<AiActionSuggestionDto>(), false);
         }
 
         public async Task<List<CreateFlashcardDto>> GenerateFlashcardsFromTextAsync(string documentText)

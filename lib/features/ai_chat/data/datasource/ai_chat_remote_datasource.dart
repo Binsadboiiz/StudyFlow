@@ -36,6 +36,28 @@ class AiChatRemoteDatasource {
     }
   }
 
+  Future<List<ChatMessageModel>> getChatHistory() async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.get(Uri.parse('$aiEndpoint/history'), headers: headers);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      final List<dynamic> jsonList = responseBody['data'] ?? [];
+      return jsonList.map((e) => ChatMessageModel.fromJson(e)).toList();
+    } else {
+      throw Exception('Không thể tải lịch sử trò chuyện.');
+    }
+  }
+
+  Future<void> clearChatHistory() async {
+    final headers = await ApiConstants.getAuthHeaders(auth);
+    final response = await http.post(Uri.parse('$aiEndpoint/clear'), headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception('Không thể xóa lịch sử trò chuyện.');
+    }
+  }
+
   Future<FlashcardSetModel> generateFlashcardsFromDocument(String documentId, {String? customTitle}) async {
     final headers = await ApiConstants.getAuthHeaders(auth);
 

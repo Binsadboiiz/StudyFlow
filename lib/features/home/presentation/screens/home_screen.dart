@@ -227,8 +227,8 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: _buildQuickActionCard(
                           context,
-                          title: 'Trợ lý AI',
-                          subtitle: 'Sắp xếp task & chat',
+                          title: AppLocalizations.of(context)!.homeQuickAiTitle,
+                          subtitle: AppLocalizations.of(context)!.homeQuickAiSubtitle,
                           icon: Icons.auto_awesome,
                           color: AppColors.accent,
                           onTap: () => Navigator.push(
@@ -241,8 +241,8 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: _buildQuickActionCard(
                           context,
-                          title: 'Flashcards',
-                          subtitle: 'Ôn tập thông minh',
+                          title: AppLocalizations.of(context)!.homeQuickFlashcardsTitle,
+                          subtitle: AppLocalizations.of(context)!.homeQuickFlashcardsSubtitle,
                           icon: Icons.style,
                           color: Colors.blueAccent,
                           onTap: () => Navigator.push(

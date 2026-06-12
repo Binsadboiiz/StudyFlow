@@ -443,5 +443,9 @@
   "flashcardSummaryRemembered": "Gemerkt",
   "flashcardSummaryForgotten": "Vergessen",
   "flashcardReplay": "Wiederholen",
-  "flashcardFlipHint": "Tippe auf Karte, um Antwort anzuzeigen"
+  "flashcardFlipHint": "Tippe auf Karte, um Antwort anzuzeigen",
+  "homeQuickAiTitle": "KI-Assistent",
+  "homeQuickAiSubtitle": "Aufgaben organisieren & chatten",
+  "homeQuickFlashcardsTitle": "Lernkarten",
+  "homeQuickFlashcardsSubtitle": "Intelligente Wiederholung"
 }

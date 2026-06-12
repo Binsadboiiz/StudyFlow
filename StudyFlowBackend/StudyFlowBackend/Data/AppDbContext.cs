@@ -20,6 +20,7 @@ namespace StudyFlowBackend.Data
         public DbSet<ScannedDocument> ScannedDocuments { get; set; }
         public DbSet<FlashcardSet> FlashcardSets { get; set; }
         public DbSet<Flashcard> Flashcards { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -137,6 +138,16 @@ namespace StudyFlowBackend.Data
                 entity.HasOne(f => f.FlashcardSet)
                     .WithMany(fs => fs.Flashcards)
                     .HasForeignKey(f => f.FlashcardSetId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasKey(cm => cm.Id);
+
+                entity.HasOne(cm => cm.User)
+                    .WithMany()
+                    .HasForeignKey(cm => cm.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

@@ -1205,4 +1205,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get flashcardFlipHint => 'Tippe auf Karte, um Antwort anzuzeigen';
+
+  @override
+  String get homeQuickAiTitle => 'KI-Assistent';
+
+  @override
+  String get homeQuickAiSubtitle => 'Aufgaben organisieren & chatten';
+
+  @override
+  String get homeQuickFlashcardsTitle => 'Lernkarten';
+
+  @override
+  String get homeQuickFlashcardsSubtitle => 'Intelligente Wiederholung';
 }

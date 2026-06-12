@@ -443,5 +443,9 @@
   "flashcardSummaryRemembered": "Đã nhớ",
   "flashcardSummaryForgotten": "Chưa nhớ",
   "flashcardReplay": "Học lại",
-  "flashcardFlipHint": "Chạm vào thẻ để xem đáp án"
+  "flashcardFlipHint": "Chạm vào thẻ để xem đáp án",
+  "homeQuickAiTitle": "Trợ lý AI",
+  "homeQuickAiSubtitle": "Sắp xếp task & chat",
+  "homeQuickFlashcardsTitle": "Flashcards",
+  "homeQuickFlashcardsSubtitle": "Ôn tập thông minh"
 }

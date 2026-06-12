@@ -6,7 +6,7 @@ namespace StudyFlowBackend.Services
 {
     public interface IGeminiService
     {
-        Task<(string Reply, List<AiActionSuggestionDto> Actions)> ProcessChatWithContextAsync(
+        Task<(string Reply, List<AiActionSuggestionDto> Actions, bool IsSuccess)> ProcessChatWithContextAsync(
             string userMessage, 
             List<ChatMessageDto> history, 
             List<FlashcardDto> contextCards);
