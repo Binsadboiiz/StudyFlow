@@ -103,7 +103,7 @@ namespace StudyFlowBackend.Controllers
             var relevantCards = await _flashcardService.SearchRelevantFlashcardsAsync(user.Id, request.Message, limit: 15);
 
             // 2. Gửi request đến Gemini
-            var result = await _geminiService.ProcessChatWithContextAsync(request.Message, history, relevantCards);
+            var result = await _geminiService.ProcessChatWithContextAsync(request.Message, history, relevantCards, user.Timezone);
 
             if (!result.IsSuccess)
             {

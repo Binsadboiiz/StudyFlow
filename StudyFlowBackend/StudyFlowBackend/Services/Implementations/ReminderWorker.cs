@@ -86,9 +86,13 @@ namespace StudyFlowBackend.Services
                 var userTodayStart = userNow.Date;
                 var userTodayEnd = userTodayStart.AddDays(1);
 
-                // 1. Custom task reminders
+                // Convert local start/end times back to UTC for database queries
+                var userTodayStartUtc = TimeZoneInfo.ConvertTimeToUtc(userTodayStart, userTimeZone);
+                var userTodayEndUtc = TimeZoneInfo.ConvertTimeToUtc(userTodayEnd, userTimeZone);
+
+                // 1. Custom task reminders (ReminderTime is stored in UTC, so we compare with UTC time)
                 var pendingCustomReminders = await context.Tasks
-                    .Where(t => t.UserId == user.Id && t.ReminderTime != null && !t.IsReminderSent && t.ReminderTime <= userNow && !t.IsCompleted)
+                    .Where(t => t.UserId == user.Id && t.ReminderTime != null && !t.IsReminderSent && t.ReminderTime <= DateTime.UtcNow && !t.IsCompleted)
                     .ToListAsync();
 
                 if (pendingCustomReminders.Any())
@@ -116,8 +120,8 @@ namespace StudyFlowBackend.Services
                 {
                     var hasIncompleteTasks = await context.Tasks.AnyAsync(t =>
                         t.UserId == user.Id &&
-                        t.Date >= userTodayStart &&
-                        t.Date < userTodayEnd &&
+                        t.Date >= userTodayStartUtc &&
+                        t.Date < userTodayEndUtc &&
                         !t.IsCompleted);
 
                     if (hasIncompleteTasks)
@@ -125,8 +129,8 @@ namespace StudyFlowBackend.Services
                         var alreadySentToday = await context.UserNotifications.AnyAsync(un =>
                             un.UserId == user.Id &&
                             un.Type == "Daily" &&
-                            un.CreatedAt >= userTodayStart &&
-                            un.CreatedAt < userTodayEnd);
+                            un.CreatedAt >= userTodayStartUtc &&
+                            un.CreatedAt < userTodayEndUtc);
 
                         if (!alreadySentToday)
                         {

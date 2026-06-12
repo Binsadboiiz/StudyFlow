@@ -25,14 +25,14 @@ namespace StudyFlowBackend.Services.Implementations
             _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") 
                       ?? configuration["Gemini:ApiKey"] 
                       ?? string.Empty;
-            // Dùng gemini-2.5-flash hoặc gemini-2.0-flash-lite theo lựa chọn của người dùng
-            _modelName = configuration["Gemini:Model"] ?? "gemini-2.5-flash";
+            _modelName = configuration["Gemini:Model"] ?? "gemini-3.1-flash-lite";
         }
 
         public async Task<(string Reply, List<AiActionSuggestionDto> Actions, bool IsSuccess)> ProcessChatWithContextAsync(
             string userMessage, 
             List<ChatMessageDto> history, 
-            List<FlashcardDto> contextCards)
+            List<FlashcardDto> contextCards,
+            string userTimeZoneId = "Asia/Ho_Chi_Minh")
         {
             if (string.IsNullOrEmpty(_apiKey))
             {
@@ -53,10 +53,28 @@ namespace StudyFlowBackend.Services.Implementations
                 contextBuilder.AppendLine("---");
             }
 
-            // Tạo system instruction/prompt yêu cầu trả về JSON
-            var currentDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            var currentTime = DateTime.UtcNow.ToString("HH:mm");
-            var systemInstruction = $"You are a highly efficient learning assistant in the StudyFlow system. Today's date is {currentDate} and current time is {currentTime} (UTC).\n" +
+            // Resolve user's timezone, fallback to "Asia/Ho_Chi_Minh"
+            TimeZoneInfo userTimeZone;
+            try
+            {
+                userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZoneId);
+            }
+            catch
+            {
+                try
+                {
+                    userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                }
+                catch
+                {
+                    userTimeZone = TimeZoneInfo.Utc;
+                }
+            }
+
+            var userNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTimeZone);
+            var currentDate = userNow.ToString("yyyy-MM-dd");
+            var currentTime = userNow.ToString("HH:mm");
+            var systemInstruction = $"You are a highly efficient learning assistant in the StudyFlow system. Today's date is {currentDate} ({userNow.DayOfWeek}) and current time is {currentTime} (Local Time: {userTimeZoneId}).\n" +
                                     "Your task is to support users in studying, organizing tasks, arranging schedules, and generating review flashcards.\n\n" +
                                     "=== ACTION TYPE DEFINITIONS ===\n" +
                                     "You have exactly 3 action types. You MUST pick the correct one based on user intent:\n\n" +

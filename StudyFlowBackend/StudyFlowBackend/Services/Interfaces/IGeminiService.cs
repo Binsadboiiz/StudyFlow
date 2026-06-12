@@ -9,7 +9,8 @@ namespace StudyFlowBackend.Services
         Task<(string Reply, List<AiActionSuggestionDto> Actions, bool IsSuccess)> ProcessChatWithContextAsync(
             string userMessage, 
             List<ChatMessageDto> history, 
-            List<FlashcardDto> contextCards);
+            List<FlashcardDto> contextCards,
+            string userTimeZoneId = "Asia/Ho_Chi_Minh");
 
         Task<List<CreateFlashcardDto>> GenerateFlashcardsFromTextAsync(string documentText);
     }
