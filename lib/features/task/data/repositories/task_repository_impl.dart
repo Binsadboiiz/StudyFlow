@@ -50,31 +50,15 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Stream<List<Task>> getTasksStream() {
-    // Trigger an initial asynchronous fetch from remote
+  Stream<List<Task>> getTasksStream() async* {
+    if (_tasksCache != null) {
+      yield _tasksCache!;
+    }
+    
+    // Trigger a fresh fetch
     _fetchAndEmit();
-
-    // Create a listener controller that pushes cache immediately, then forwards updates
-    late StreamController<List<Task>> listenerController;
-    StreamSubscription<List<Task>>? subscription;
-
-    listenerController = StreamController<List<Task>>(
-      onListen: () {
-        if (_tasksCache != null) {
-          listenerController.add(_tasksCache!);
-        }
-        subscription = _tasksController.stream.listen(
-          (data) => listenerController.add(data),
-          onError: (err) => listenerController.addError(err),
-          onDone: () => listenerController.close(),
-        );
-      },
-      onCancel: () {
-        subscription?.cancel();
-      },
-    );
-
-    return listenerController.stream;
+    
+    yield* _tasksController.stream;
   }
 
   @override
