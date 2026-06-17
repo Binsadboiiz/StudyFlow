@@ -1256,4 +1256,25 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get flashcardLimitReached =>
       'Sie haben das maximale Limit von 200 Karteikarten erreicht.';
+
+  @override
+  String get internetRequiredTitle => 'Internetverbindung erforderlich';
+
+  @override
+  String offlineFeaturePrompt(String featureName) {
+    return 'Die Funktion „$featureName“ erfordert eine aktive Internetverbindung, um Daten zu laden oder zu synchronisieren. Bitte aktivieren Sie WLAN oder mobile Daten, um fortzufahren.';
+  }
+
+  @override
+  String get retryConnection => 'Verbindung erneut versuchen';
+
+  @override
+  String get connectionSuccess => 'Erfolgreich mit dem Internet verbunden!';
+
+  @override
+  String get connectionFailed =>
+      'Das Gerät ist immer noch offline. Bitte überprüfen Sie Ihre Netzwerkverbindung.';
+
+  @override
+  String get scanViewOriginalImage => 'Originalbelegbild anzeigen';
 }

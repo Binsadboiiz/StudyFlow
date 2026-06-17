@@ -2355,6 +2355,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have reached the maximum limit of 200 flashcards.'**
   String get flashcardLimitReached;
+
+  /// No description provided for @internetRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet Connection Required'**
+  String get internetRequiredTitle;
+
+  /// No description provided for @offlineFeaturePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'The feature \"{featureName}\" requires an active internet connection to load or sync data. Please enable Wi-Fi or cellular data to continue.'**
+  String offlineFeaturePrompt(String featureName);
+
+  /// No description provided for @retryConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Reconnecting'**
+  String get retryConnection;
+
+  /// No description provided for @connectionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully reconnected to the internet!'**
+  String get connectionSuccess;
+
+  /// No description provided for @connectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Device is still offline. Please check your network connection.'**
+  String get connectionFailed;
+
+  /// No description provided for @scanViewOriginalImage.
+  ///
+  /// In en, this message translates to:
+  /// **'View original document image'**
+  String get scanViewOriginalImage;
 }
 
 class _AppLocalizationsDelegate

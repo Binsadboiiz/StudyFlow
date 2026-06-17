@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/core/widgets/glass_card.dart';
+import 'package:studyflow/core/widgets/offline_feature_blocker.dart';
 import 'package:studyflow/features/scan/domain/entities/scanned_document_entity.dart';
 import 'package:studyflow/features/scan/presentation/viewmodels/scan_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
@@ -83,41 +84,44 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
             // 1. Ảnh tài liệu (nếu có)
             if (document.originalImageUrl != null &&
                 document.originalImageUrl!.isNotEmpty)
-              GlassCard(
-                borderRadius: 16,
-                padding: const EdgeInsets.all(8),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    document.originalImageUrl!,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return SizedBox(
+              OfflineFeatureBlocker(
+                featureName: AppLocalizations.of(context)!.scanViewOriginalImage,
+                child: GlassCard(
+                  borderRadius: 16,
+                  padding: const EdgeInsets.all(8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      document.originalImageUrl!,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: AppColors.accent,
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => SizedBox(
                         height: 200,
                         child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            color: AppColors.accent,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image_rounded, size: 48, color: ext.subtext),
+                              const SizedBox(height: 8),
+                              Text(AppLocalizations.of(context)!.scanLoadImageFailed,
+                                  style: TextStyle(color: ext.subtext)),
+                            ],
                           ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => SizedBox(
-                      height: 200,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image_rounded, size: 48, color: ext.subtext),
-                            const SizedBox(height: 8),
-                            Text(AppLocalizations.of(context)!.scanLoadImageFailed,
-                                style: TextStyle(color: ext.subtext)),
-                          ],
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studyflow/core/theme/app_colors.dart';
+import 'package:studyflow/core/widgets/offline_feature_blocker.dart';
 import 'package:studyflow/features/gamification/presentation/screens/tabs/streak_tab.dart';
 import 'package:studyflow/features/gamification/presentation/screens/tabs/pet_tab.dart';
 import 'package:studyflow/features/gamification/presentation/screens/tabs/badges_tab.dart';
@@ -200,11 +201,17 @@ class _GamificationHubScreenState extends State<GamificationHubScreen> with Sing
         body: TabBarView(
           controller: _tabController,
           physics: const NeverScrollableScrollPhysics(), // Vô hiệu hóa vuốt để tránh xung đột cử chỉ với Lịch
-          children: const [
-            StreakTab(),
-            PetTab(),
-            BadgesTab(),
-            LeaderboardTab(),
+          children: [
+            const StreakTab(),
+            const PetTab(),
+            OfflineFeatureBlocker(
+              featureName: AppLocalizations.of(context)!.achievements,
+              child: const BadgesTab(),
+            ),
+            OfflineFeatureBlocker(
+              featureName: AppLocalizations.of(context)!.leaderboard,
+              child: const LeaderboardTab(),
+            ),
           ],
         ),
       ),

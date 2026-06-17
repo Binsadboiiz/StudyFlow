@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyflow/core/widgets/offline_feature_blocker.dart';
 import 'package:studyflow/features/auth/presentation/screens/register_screen.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:studyflow/features/home/presentation/screens/main_screen.dart';
@@ -102,9 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
     // final isLoading = context.watch<AuthViewmodel>().isLoading;
     final isLoading = context.select<AuthViewmodel, bool>((vm) => vm.isLoading);
 
-    return Scaffold(
-      body: Stack(
-        children: [
+    return OfflineFeatureBlocker(
+      featureName: AppLocalizations.of(context)!.login,
+      child: Scaffold(
+        body: Stack(
+          children: [
           // Background Gradient
           Container(
             decoration: const BoxDecoration(
@@ -361,7 +364,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildLanguageSelector(BuildContext context) {

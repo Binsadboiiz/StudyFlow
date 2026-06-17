@@ -1245,4 +1245,25 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get flashcardLimitReached =>
       'Bạn đã đạt giới hạn tối đa 200 thẻ flashcard.';
+
+  @override
+  String get internetRequiredTitle => 'Yêu Cầu Kết Nối Internet';
+
+  @override
+  String offlineFeaturePrompt(String featureName) {
+    return 'Tính năng \"$featureName\" yêu cầu kết nối mạng để tải hoặc đồng bộ dữ liệu. Vui lòng bật Wi-Fi hoặc dữ liệu di động để tiếp tục.';
+  }
+
+  @override
+  String get retryConnection => 'Thử Kết Nối Lại';
+
+  @override
+  String get connectionSuccess => 'Đã khôi phục kết nối internet thành công!';
+
+  @override
+  String get connectionFailed =>
+      'Thiết bị vẫn đang ngoại tuyến. Vui lòng kiểm tra lại mạng.';
+
+  @override
+  String get scanViewOriginalImage => 'Xem ảnh tài liệu gốc';
 }

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:studyflow/core/database/isar_service.dart';
+import 'package:studyflow/core/services/network_connection_service.dart';
 
 import 'package:studyflow/features/auth/data/datasource/auth_remote_datasource.dart';
 import 'package:studyflow/features/auth/data/repositories/auth_repository_impl.dart';
@@ -72,17 +74,25 @@ class DependencyInjection {
   /// Flashcard & AI Remote datasources
   static late final FlashcardRemoteDatasource flashcardRemoteDatasource;
   static late final AiChatRemoteDatasource aiChatRemoteDatasource;
+  /// The globally available network connection service instance.
+  static late final NetworkConnectionService connectionService;
 
   /// Initializes all the dependencies needed for the application.
   /// This should be called before `runApp()` in `main.dart`.
   static Future<void> init() async {
+    // Khởi tạo Isar Local Database
+    await IsarService.init();
+
+    // Khởi tạo Network Connection Service
+    connectionService = NetworkConnectionService();
+
     // Initialize Firebase instances
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
 
     // Set up data sources and repositories for tasks
     final taskRemoteDatasource = TaskRemoteDatasource(auth: auth);
-    taskRepository = TaskRepositoryImpl(taskRemoteDatasource);
+    taskRepository = TaskRepositoryImpl(taskRemoteDatasource, connectionService);
 
     // Set up data sources and repositories for authentication
     final authRemoteDatasource = AuthRemoteDatasource(auth: auth, firestore: firestore);
@@ -109,6 +119,9 @@ class DependencyInjection {
   /// These are injected at the root level using `MultiProvider`.
   static List<SingleChildWidget> getProviders() {
     return [
+      ChangeNotifierProvider.value(
+        value: connectionService,
+      ),
       ChangeNotifierProvider(
         create: (_) => HomeViewModel(
           taskRepository: taskRepository,

@@ -1238,4 +1238,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get flashcardLimitReached =>
       'You have reached the maximum limit of 200 flashcards.';
+
+  @override
+  String get internetRequiredTitle => 'Internet Connection Required';
+
+  @override
+  String offlineFeaturePrompt(String featureName) {
+    return 'The feature \"$featureName\" requires an active internet connection to load or sync data. Please enable Wi-Fi or cellular data to continue.';
+  }
+
+  @override
+  String get retryConnection => 'Try Reconnecting';
+
+  @override
+  String get connectionSuccess => 'Successfully reconnected to the internet!';
+
+  @override
+  String get connectionFailed =>
+      'Device is still offline. Please check your network connection.';
+
+  @override
+  String get scanViewOriginalImage => 'View original document image';
 }

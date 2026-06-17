@@ -459,5 +459,18 @@
   "flashcardValidationTitle": "Titel darf nicht leer sein",
   "flashcardValidationEmptyCard": "Fragen und Antworten dürfen nicht leer sein",
   "flashcardValidationMinCards": "Bitte fügen Sie mindestens eine Karte hinzu",
-  "flashcardLimitReached": "Sie haben das maximale Limit von 200 Karteikarten erreicht."
+  "flashcardLimitReached": "Sie haben das maximale Limit von 200 Karteikarten erreicht.",
+  "internetRequiredTitle": "Internetverbindung erforderlich",
+  "offlineFeaturePrompt": "Die Funktion „{featureName}“ erfordert eine aktive Internetverbindung, um Daten zu laden oder zu synchronisieren. Bitte aktivieren Sie WLAN oder mobile Daten, um fortzufahren.",
+  "@offlineFeaturePrompt": {
+    "placeholders": {
+      "featureName": {
+        "type": "String"
+      }
+    }
+  },
+  "retryConnection": "Verbindung erneut versuchen",
+  "connectionSuccess": "Erfolgreich mit dem Internet verbunden!",
+  "connectionFailed": "Das Gerät ist immer noch offline. Bitte überprüfen Sie Ihre Netzwerkverbindung.",
+  "scanViewOriginalImage": "Originalbelegbild anzeigen"
 }

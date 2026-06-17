@@ -459,5 +459,18 @@
   "flashcardValidationTitle": "Tiêu đề không được để trống",
   "flashcardValidationEmptyCard": "Câu hỏi và câu trả lời không được để trống",
   "flashcardValidationMinCards": "Vui lòng thêm ít nhất một thẻ",
-  "flashcardLimitReached": "Bạn đã đạt giới hạn tối đa 200 thẻ flashcard."
+  "flashcardLimitReached": "Bạn đã đạt giới hạn tối đa 200 thẻ flashcard.",
+  "internetRequiredTitle": "Yêu Cầu Kết Nối Internet",
+  "offlineFeaturePrompt": "Tính năng \"{featureName}\" yêu cầu kết nối mạng để tải hoặc đồng bộ dữ liệu. Vui lòng bật Wi-Fi hoặc dữ liệu di động để tiếp tục.",
+  "@offlineFeaturePrompt": {
+    "placeholders": {
+      "featureName": {
+        "type": "String"
+      }
+    }
+  },
+  "retryConnection": "Thử Kết Nối Lại",
+  "connectionSuccess": "Đã khôi phục kết nối internet thành công!",
+  "connectionFailed": "Thiết bị vẫn đang ngoại tuyến. Vui lòng kiểm tra lại mạng.",
+  "scanViewOriginalImage": "Xem ảnh tài liệu gốc"
 }
