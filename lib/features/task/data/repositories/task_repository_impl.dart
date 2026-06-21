@@ -140,7 +140,13 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<void> addTask(Task task) async {
     final isar = IsarService.isar;
-    final localModel = TaskIsarModel.fromDomain(task, syncStatus: 'pending_insert');
+    // Tạo ID cục bộ duy nhất nếu ID trống (khi tạo offline)
+    final taskId = task.id.isEmpty
+        ? DateTime.now().microsecondsSinceEpoch.toString()
+        : task.id;
+    final taskWithId = task.copyWith(id: taskId);
+    
+    final localModel = TaskIsarModel.fromDomain(taskWithId, syncStatus: 'pending_insert');
     
     // 1. Lưu local ngay lập tức
     await isar.writeTxn(() async {
@@ -156,15 +162,15 @@ class TaskRepositoryImpl implements TaskRepository {
     if (connectionService.isOnline) {
       try {
         final model = TaskModel(
-          id: task.id,
+          id: taskWithId.id,
           userId: '', 
-          title: task.title,
-          description: task.description,
-          date: task.date,
-          startTime: task.startTime,
-          endTime: task.endTime,
-          isCompleted: task.isCompleted,
-          reminderTime: task.reminderTime,
+          title: taskWithId.title,
+          description: taskWithId.description,
+          date: taskWithId.date,
+          startTime: taskWithId.startTime,
+          endTime: taskWithId.endTime,
+          isCompleted: taskWithId.isCompleted,
+          reminderTime: taskWithId.reminderTime,
         );
         await remoteDatasource.addTask(model);
         

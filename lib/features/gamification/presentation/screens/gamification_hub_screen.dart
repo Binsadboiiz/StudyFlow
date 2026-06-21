@@ -202,8 +202,14 @@ class _GamificationHubScreenState extends State<GamificationHubScreen> with Sing
           controller: _tabController,
           physics: const NeverScrollableScrollPhysics(), // Vô hiệu hóa vuốt để tránh xung đột cử chỉ với Lịch
           children: [
-            const StreakTab(),
-            const PetTab(),
+            OfflineFeatureBlocker(
+              featureName: AppLocalizations.of(context)!.streak,
+              child: const StreakTab(),
+            ),
+            OfflineFeatureBlocker(
+              featureName: AppLocalizations.of(context)!.pet,
+              child: const PetTab(),
+            ),
             OfflineFeatureBlocker(
               featureName: AppLocalizations.of(context)!.achievements,
               child: const BadgesTab(),

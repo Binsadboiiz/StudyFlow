@@ -1,6 +1,8 @@
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:studyflow/features/task/data/models/task_isar_model.dart';
+import 'package:studyflow/features/flashcard/data/models/flashcard_set_isar_model.dart';
+import 'package:studyflow/features/focus/data/models/focus_session_isar_model.dart';
 
 /// Service quản lý vòng đời và kết nối tới Isar local database.
 class IsarService {
@@ -23,7 +25,11 @@ class IsarService {
 
     // Mở cơ sở dữ liệu Isar với các Schema đã định nghĩa
     _isar = await Isar.open(
-      [TaskIsarModelSchema],
+      [
+        TaskIsarModelSchema,
+        FlashcardSetIsarModelSchema,
+        FocusSessionIsarModelSchema,
+      ],
       directory: dir.path,
     );
   }

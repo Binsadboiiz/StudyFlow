@@ -682,6 +682,36 @@ abstract class AppLocalizations {
   /// **'FOCUS'**
   String get focusLabel;
 
+  /// No description provided for @focusLeaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Focus Screen?'**
+  String get focusLeaveTitle;
+
+  /// No description provided for @focusLeaveDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your focus session is running. If you switch screens, the session will be canceled and reset. Do you still want to proceed?'**
+  String get focusLeaveDesc;
+
+  /// No description provided for @focusChangeModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Mode?'**
+  String get focusChangeModeTitle;
+
+  /// No description provided for @focusChangeModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to change modes? The current focus session will be canceled and reset.'**
+  String get focusChangeModeDesc;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
   /// No description provided for @overviewMetrics.
   ///
   /// In en, this message translates to:

@@ -314,6 +314,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get focusLabel => 'TẬP TRUNG';
 
   @override
+  String get focusLeaveTitle => 'Rời khỏi màn hình tập trung?';
+
+  @override
+  String get focusLeaveDesc =>
+      'Phiên tập trung hiện tại của bạn đang chạy. Nếu bạn chuyển màn hình, phiên sẽ bị hủy và đặt lại. Bạn vẫn muốn tiếp tục?';
+
+  @override
+  String get focusChangeModeTitle => 'Thay đổi chế độ?';
+
+  @override
+  String get focusChangeModeDesc =>
+      'Bạn có chắc chắn muốn chuyển chế độ? Phiên tập trung hiện tại sẽ bị hủy và đặt lại.';
+
+  @override
+  String get yes => 'Đồng ý';
+
+  @override
   String get overviewMetrics => 'Số liệu tổng quan';
 
   @override

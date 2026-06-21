@@ -196,6 +196,7 @@ class DependencyInjection {
         create: (_) => FlashcardProvider(
           remoteDatasource: flashcardRemoteDatasource,
           aiRemoteDatasource: aiChatRemoteDatasource,
+          connectionService: connectionService,
         ),
       ),
       ChangeNotifierProvider(

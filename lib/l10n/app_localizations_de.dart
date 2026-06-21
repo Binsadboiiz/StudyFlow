@@ -318,6 +318,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get focusLabel => 'FOKUS';
 
   @override
+  String get focusLeaveTitle => 'Fokusbildschirm verlassen?';
+
+  @override
+  String get focusLeaveDesc =>
+      'Deine Fokussitzung läuft gerade. Wenn du den Bildschirm wechselst, wird die Sitzung abgebrochen und zurückgesetzt. Möchtest du trotzdem fortfahren?';
+
+  @override
+  String get focusChangeModeTitle => 'Modus ändern?';
+
+  @override
+  String get focusChangeModeDesc =>
+      'Bist du sicher, dass du den Modus ändern möchtest? Die aktuelle Fokussitzung wird abgebrochen und zurückgesetzt.';
+
+  @override
+  String get yes => 'Ja';
+
+  @override
   String get overviewMetrics => 'Übersichtsmetriken';
 
   @override

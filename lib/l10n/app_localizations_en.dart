@@ -309,6 +309,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusLabel => 'FOCUS';
 
   @override
+  String get focusLeaveTitle => 'Leave Focus Screen?';
+
+  @override
+  String get focusLeaveDesc =>
+      'Your focus session is running. If you switch screens, the session will be canceled and reset. Do you still want to proceed?';
+
+  @override
+  String get focusChangeModeTitle => 'Change Mode?';
+
+  @override
+  String get focusChangeModeDesc =>
+      'Are you sure you want to change modes? The current focus session will be canceled and reset.';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
   String get overviewMetrics => 'Overview Metrics';
 
   @override

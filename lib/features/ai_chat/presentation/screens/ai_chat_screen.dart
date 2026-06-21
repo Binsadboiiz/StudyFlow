@@ -13,6 +13,8 @@ import 'package:studyflow/core/services/notification/notification_type.dart';
 import 'package:studyflow/core/services/notification/notification_service.dart';
 import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
 import 'package:studyflow/features/flashcard/presentation/screens/flashcard_study_screen.dart';
+import 'package:studyflow/core/services/network_connection_service.dart';
+import 'package:studyflow/core/widgets/offline_feature_blocker.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -110,6 +112,22 @@ class _AiChatScreenState extends State<AiChatScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
+    final connectionService = context.watch<NetworkConnectionService>();
+
+    if (!connectionService.isOnline) {
+      return Scaffold(
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text(AppLocalizations.of(context)!.aiChatTitle),
+        ),
+        body: OfflineFeatureBlocker(
+          featureName: AppLocalizations.of(context)!.aiChatTitle,
+          child: const SizedBox.shrink(),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),

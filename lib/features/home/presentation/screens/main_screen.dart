@@ -19,6 +19,7 @@ import 'package:studyflow/features/notification/presentation/viewmodels/notifica
 import 'package:studyflow/features/focus/presentation/screens/focus_screen.dart';
 import 'package:studyflow/features/scan/presentation/screens/scan_home_screen.dart';
 import 'package:studyflow/features/scan/presentation/viewmodels/scan_viewmodel.dart';
+import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyflow/features/home/presentation/widgets/tutorial_overlay.dart';
 import 'package:studyflow/features/auth/presentation/viewmodels/auth_viewmodel.dart';
@@ -38,13 +39,14 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   bool _showTutorial = false;
-  
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<NotificationViewModel>().fetchNotifications();
+      context.read<FlashcardProvider>().loadFlashcardSets();
       _checkTutorialStatus();
     });
   }
@@ -88,7 +90,8 @@ class _MainScreenState extends State<MainScreen>
     if (userId == null || userId.isEmpty) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final explained = prefs.getBool('timezone_permission_explained_$userId') ?? false;
+    final explained =
+        prefs.getBool('timezone_permission_explained_$userId') ?? false;
     if (explained) return;
 
     final isNotificationGranted = await Permission.notification.isGranted;
@@ -121,8 +124,6 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final screens = const [
@@ -141,10 +142,7 @@ class _MainScreenState extends State<MainScreen>
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          IndexedStack(
-            index: currentIndex,
-            children: screens,
-          ),
+          IndexedStack(index: currentIndex, children: screens),
           if (_showTutorial)
             TutorialOverlay(
               onComplete: _dismissTutorial,
@@ -156,8 +154,7 @@ class _MainScreenState extends State<MainScreen>
                 }
               },
             ),
-          if (homeViewModel.isLoading)
-            const InitialLoadingScreen(),
+          if (homeViewModel.isLoading) const InitialLoadingScreen(),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -175,13 +172,25 @@ class _MainScreenState extends State<MainScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildNavItem(icon: Icons.grid_view_rounded, label: AppLocalizations.of(context)!.home, index: 0),
-                        _buildNavItem(icon: Icons.hourglass_empty_rounded, label: AppLocalizations.of(context)!.focus, index: 1),
-                        _buildNavItem(icon: Icons.document_scanner_rounded, label: AppLocalizations.of(context)!.scanTitle, index: 2),
+                        _buildNavItem(
+                          icon: Icons.grid_view_rounded,
+                          label: AppLocalizations.of(context)!.home,
+                          index: 0,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.hourglass_empty_rounded,
+                          label: AppLocalizations.of(context)!.focus,
+                          index: 1,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.document_scanner_rounded,
+                          label: AppLocalizations.of(context)!.scanTitle,
+                          index: 2,
+                        ),
                       ],
                     ),
                   ),
-                  
+
                   // Center Floating Action Button (integrated in dock)
                   GestureDetector(
                     onTap: () => showModalBottomSheet(
@@ -221,9 +230,21 @@ class _MainScreenState extends State<MainScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildNavItem(icon: Icons.assignment_rounded, label: AppLocalizations.of(context)!.tasks, index: 3),
-                        _buildNavItem(icon: Icons.emoji_events_rounded, label: AppLocalizations.of(context)!.quest, index: 4),
-                        _buildNavItem(icon: Icons.settings_rounded, label: AppLocalizations.of(context)!.settings, index: 5),
+                        _buildNavItem(
+                          icon: Icons.assignment_rounded,
+                          label: AppLocalizations.of(context)!.tasks,
+                          index: 3,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.emoji_events_rounded,
+                          label: AppLocalizations.of(context)!.quest,
+                          index: 4,
+                        ),
+                        _buildNavItem(
+                          icon: Icons.settings_rounded,
+                          label: AppLocalizations.of(context)!.settings,
+                          index: 5,
+                        ),
                       ],
                     ),
                   ),
@@ -236,18 +257,70 @@ class _MainScreenState extends State<MainScreen>
     );
   }
 
+  Future<bool> _showExitConfirmationDialog() async {
+    final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context)!;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(
+          localizations.focusLeaveTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(localizations.focusLeaveDesc),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              localizations.cancel,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              localizations.yes,
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   // Function to create each button in the dock with a modern scale animation
-  Widget _buildNavItem({required IconData icon, required String label, required int index}) {
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final unselectedColor = isDark ? Colors.grey.shade500 : const Color.fromARGB(255, 51, 51, 51);
+    final unselectedColor = isDark
+        ? Colors.grey.shade500
+        : const Color.fromARGB(255, 51, 51, 51);
 
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
+        onTap: () async {
           if (_currentIndex == index) return;
+
+          if (_currentIndex == 1 && FocusScreen.isTimerActive) {
+            final confirm = await _showExitConfirmationDialog();
+            if (!confirm) return;
+            FocusScreen.onResetTimer?.call();
+          }
+
           setState(() {
             _currentIndex = index;
           });
@@ -263,7 +336,13 @@ class _MainScreenState extends State<MainScreen>
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
-              transform: Matrix4.identity()..scaleByDouble(isSelected ? 1.2 : 1.0, isSelected ? 1.2 : 1.0, 1.0, 1.0),
+              transform: Matrix4.identity()
+                ..scaleByDouble(
+                  isSelected ? 1.2 : 1.0,
+                  isSelected ? 1.2 : 1.0,
+                  1.0,
+                  1.0,
+                ),
               child: Icon(
                 icon,
                 color: isSelected ? AppColors.accent : unselectedColor,
@@ -279,11 +358,7 @@ class _MainScreenState extends State<MainScreen>
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? AppColors.accent : unselectedColor,
               ),
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
@@ -314,5 +389,3 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 }
-
-

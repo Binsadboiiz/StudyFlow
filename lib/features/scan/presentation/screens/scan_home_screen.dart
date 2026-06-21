@@ -10,6 +10,8 @@ import 'package:studyflow/features/scan/presentation/screens/camera_scan_screen.
 import 'package:studyflow/features/scan/presentation/screens/document_detail_screen.dart';
 import 'package:studyflow/features/scan/presentation/screens/trash_screen.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
+import 'package:studyflow/core/services/network_connection_service.dart';
+import 'package:studyflow/core/widgets/offline_feature_blocker.dart';
 
 /// Main screen for the OCR scanning feature.
 /// Displays document list, storage indicator, search, and selection mode.
@@ -39,6 +41,14 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final ext = theme.extension<AppThemeExtension>()!;
     final scanVm = context.watch<ScanViewModel>();
+    final connectionService = context.watch<NetworkConnectionService>();
+
+    if (!connectionService.isOnline) {
+      return OfflineFeatureBlocker(
+        featureName: AppLocalizations.of(context)!.scanTitle,
+        child: const SizedBox.shrink(),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
