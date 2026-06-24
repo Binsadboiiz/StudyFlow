@@ -11,6 +11,9 @@ class FlashcardSetIsarModel {
   @Index(unique: true)
   late String uuid;
 
+  @Index()
+  late String userId;
+
   late String title;
   
   String? targetDocumentId;
@@ -40,9 +43,10 @@ class FlashcardSetIsarModel {
   }
 
   /// Khởi tạo Isar model từ FlashcardSetModel
-  static FlashcardSetIsarModel fromDomain(FlashcardSetModel model, {required String syncStatus, DateTime? updatedAt}) {
+  static FlashcardSetIsarModel fromDomain(FlashcardSetModel model, {required String userId, required String syncStatus, DateTime? updatedAt}) {
     final isarModel = FlashcardSetIsarModel();
     isarModel.uuid = model.id;
+    isarModel.userId = userId;
     isarModel.title = model.title;
     isarModel.targetDocumentId = model.targetDocumentId;
     isarModel.createdAt = model.createdAt;

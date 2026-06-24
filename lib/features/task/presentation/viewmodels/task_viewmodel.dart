@@ -165,4 +165,13 @@ class TaskViewmodel extends ChangeNotifier with SafeChangeNotifier {
   Future<void> updateTask(Task task) async {
     await updateTaskUseCase(task);
   }
+
+  /// Clears in-memory task lists upon logout
+  void clear() {
+    _allTasks = [];
+    tasks = [];
+    _isLoading = false;
+    _selectedDate = DateTime.now();
+    notifyListenersSafely();
+  }
 }

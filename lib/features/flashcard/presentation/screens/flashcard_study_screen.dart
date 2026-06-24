@@ -48,7 +48,6 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
   Widget build(BuildContext context) {
     final list = widget.flashcardSet.flashcards;
     final isFinished = _currentIndex >= list.length;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(

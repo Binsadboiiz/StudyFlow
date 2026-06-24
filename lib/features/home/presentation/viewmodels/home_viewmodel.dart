@@ -98,4 +98,15 @@ class HomeViewModel extends ChangeNotifier with SafeChangeNotifier {
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
     await _taskRepository.updateTask(updatedTask);
   }
+
+  /// Clears in-memory task list and selected dates upon logout
+  void clear() {
+    _allTasks = [];
+    _dailyTasks = [];
+    _selectedDate = DateTime.now();
+    _focusedDate = DateTime.now();
+    _calendarFormat = CalendarFormat.month;
+    _isLoading = false;
+    notifyListenersSafely();
+  }
 }

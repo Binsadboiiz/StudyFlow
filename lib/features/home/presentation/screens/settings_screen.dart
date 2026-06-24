@@ -19,6 +19,13 @@ import 'package:studyflow/features/home/presentation/screens/about_screen.dart';
 import 'package:studyflow/features/home/presentation/screens/privacy_policy_screen.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/providers/language_provider.dart';
+import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
+import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
+import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
+import 'package:studyflow/features/notification/presentation/viewmodels/notification_viewmodel.dart';
+import 'package:studyflow/features/gamification/presentation/viewmodels/pet_viewmodel.dart';
+import 'package:studyflow/features/scan/presentation/viewmodels/scan_viewmodel.dart';
+import 'package:studyflow/features/flashcard/presentation/providers/flashcard_provider.dart';
 
 /// `SettingsScreen` is the settings screen of the application.
 /// It allows users to view account information, log out, toggle Light/Dark Mode, 
@@ -142,6 +149,17 @@ class SettingsScreen extends StatelessWidget {
                   onPressed: () async {
                     final navigator = Navigator.of(context);
                     await context.read<AuthViewmodel>().logout();
+
+                    if (navigator.mounted) {
+                      navigator.context.read<HomeViewModel>().clear();
+                      navigator.context.read<TaskViewmodel>().clear();
+                      navigator.context.read<ScheduleViewmodel>().clear();
+                      navigator.context.read<NotificationViewModel>().clear();
+                      navigator.context.read<GamificationViewModel>().clear();
+                      navigator.context.read<PetViewModel>().clear();
+                      navigator.context.read<ScanViewModel>().clear();
+                      navigator.context.read<FlashcardProvider>().clear();
+                    }
 
                     navigator.pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const LoginScreen()),

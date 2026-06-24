@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:isar_community/isar.dart';
 import 'package:studyflow/core/database/isar_service.dart';
@@ -45,8 +44,10 @@ class FlashcardProvider with ChangeNotifier {
   /// Khôi phục danh sách bộ flashcards từ Isar local database (dữ liệu offline hiển thị tức thời)
   Future<List<FlashcardSetModel>> _getLocalFlashcardSets() async {
     final isar = IsarService.isar;
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
     final localModels = await isar.flashcardSetIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .not()
         .syncStatusEqualTo('pending_delete')
         .findAll();
@@ -75,25 +76,30 @@ class FlashcardProvider with ChangeNotifier {
 
         final isar = IsarService.isar;
         await isar.writeTxn(() async {
+          final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
           // Lấy danh sách local UUIDs để tránh xóa nhầm các record đang chờ đồng bộ offline
           final pendingModels = await isar.flashcardSetIsarModels
               .filter()
-              .syncStatusEqualTo('pending_insert')
-              .or()
-              .syncStatusEqualTo('pending_delete')
+              .userIdEqualTo(currentUid)
+              .and()
+              .group((q) => q
+                  .syncStatusEqualTo('pending_insert')
+                  .or()
+                  .syncStatusEqualTo('pending_delete'))
               .findAll();
           final pendingUuids = pendingModels.map((m) => m.uuid).toSet();
 
           // Xóa các record đã synced cũ không còn nằm trong danh sách pending
           await isar.flashcardSetIsarModels
               .filter()
+              .userIdEqualTo(currentUid)
               .syncStatusEqualTo('synced')
               .deleteAll();
 
           // Ghi đè dữ liệu mới từ Server vào Local Isar dưới dạng 'synced'
           for (final set in remoteSets) {
             if (!pendingUuids.contains(set.id)) {
-              final isarModel = FlashcardSetIsarModel.fromDomain(set, syncStatus: 'synced');
+              final isarModel = FlashcardSetIsarModel.fromDomain(set, userId: currentUid, syncStatus: 'synced');
               await isar.flashcardSetIsarModels.put(isarModel);
             }
           }
@@ -134,7 +140,8 @@ class FlashcardProvider with ChangeNotifier {
     );
 
     final isar = IsarService.isar;
-    final localModel = FlashcardSetIsarModel.fromDomain(localSet, syncStatus: 'pending_insert');
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
+    final localModel = FlashcardSetIsarModel.fromDomain(localSet, userId: currentUid, syncStatus: 'pending_insert');
 
     try {
       // 2. Lưu local ngay lập tức
@@ -158,7 +165,7 @@ class FlashcardProvider with ChangeNotifier {
             if (modelToDelete != null) {
               await isar.flashcardSetIsarModels.delete(modelToDelete.id);
             }
-            final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, syncStatus: 'synced');
+            final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, userId: currentUid, syncStatus: 'synced');
             await isar.flashcardSetIsarModels.put(syncedModel);
           });
 
@@ -187,7 +194,8 @@ class FlashcardProvider with ChangeNotifier {
 
     final isar = IsarService.isar;
     try {
-      final existingModel = await isar.flashcardSetIsarModels.filter().uuidEqualTo(id).findFirst();
+      final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
+      final existingModel = await isar.flashcardSetIsarModels.filter().userIdEqualTo(currentUid).uuidEqualTo(id).findFirst();
       if (existingModel == null) return false;
 
       // 1. Cập nhật local
@@ -242,8 +250,9 @@ class FlashcardProvider with ChangeNotifier {
       
       // Lưu local cache
       final isar = IsarService.isar;
+      final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
       await isar.writeTxn(() async {
-        final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, syncStatus: 'synced');
+        final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, userId: currentUid, syncStatus: 'synced');
         await isar.flashcardSetIsarModels.put(syncedModel);
       });
 
@@ -262,11 +271,15 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> syncAllPending() async {
     if (!connectionService.isOnline) return;
 
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
+    if (currentUid.isEmpty) return;
+
     final isar = IsarService.isar;
 
     // 1. Đồng bộ lệnh XÓA
     final pendingDeletes = await isar.flashcardSetIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .syncStatusEqualTo('pending_delete')
         .findAll();
 
@@ -284,6 +297,7 @@ class FlashcardProvider with ChangeNotifier {
     // 2. Đồng bộ lệnh THÊM
     final pendingInserts = await isar.flashcardSetIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .syncStatusEqualTo('pending_insert')
         .findAll();
 
@@ -304,7 +318,7 @@ class FlashcardProvider with ChangeNotifier {
         // Cập nhật trạng thái record local: xóa record tạm offline và ghi record đã sync từ server
         await isar.writeTxn(() async {
           await isar.flashcardSetIsarModels.delete(model.id);
-          final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, syncStatus: 'synced');
+          final syncedModel = FlashcardSetIsarModel.fromDomain(newSet, userId: currentUid, syncStatus: 'synced');
           await isar.flashcardSetIsarModels.put(syncedModel);
         });
       } catch (e) {
@@ -314,6 +328,13 @@ class FlashcardProvider with ChangeNotifier {
   }
 
   void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  void clear() {
+    _flashcardSets = [];
+    _isLoading = false;
     _errorMessage = null;
     notifyListeners();
   }

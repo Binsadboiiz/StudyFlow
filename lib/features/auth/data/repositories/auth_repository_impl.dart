@@ -4,7 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:studyflow/core/database/isar_service.dart';
+import 'package:studyflow/core/di/injection.dart';
+import 'package:isar_community/isar.dart';
 import 'package:studyflow/core/network/api_constants.dart';
+import 'package:studyflow/features/task/data/models/task_isar_model.dart';
+import 'package:studyflow/features/flashcard/data/models/flashcard_set_isar_model.dart';
+import 'package:studyflow/features/focus/data/models/focus_session_isar_model.dart';
 import 'package:studyflow/features/auth/data/datasource/auth_remote_datasource.dart';
 import 'package:studyflow/features/auth/data/models/user_model.dart';
 import 'package:studyflow/features/auth/domain/entities/user_entity.dart';
@@ -28,6 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /// Loads the cached avatar URL from SharedPreferences.
   Future<void> _loadAvatarCache(String userId) async {
+    _cachedAvatarUrl = null; // Always reset first to prevent leaking old avatar
     try {
       final prefs = await SharedPreferences.getInstance();
       _cachedAvatarUrl = prefs.getString('user_avatar_$userId');
@@ -204,6 +211,24 @@ class AuthRepositoryImpl implements AuthRepository {
         if (cachedModel != null && lastModel == null) {
           lastModel = cachedModel;
           await emitLatest();
+        } else if (cachedModel == null && lastModel == null) {
+          // If no cached user profile, check if user is logged in via Firebase Auth
+          final currentUid = remoteDatasource.currentUserId;
+          if (currentUid != null) {
+            final firebaseUser = remoteDatasource.auth.currentUser;
+            lastModel = UserModel(
+              id: currentUid,
+              fullName: firebaseUser?.displayName ?? 'User',
+              username: firebaseUser?.email?.split('@').first ?? 'user',
+              email: firebaseUser?.email ?? '',
+              streak: 0,
+              lastStreakDate: DateTime.now(),
+              streakHistory: [],
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            );
+            await emitLatest();
+          }
         }
       });
 
@@ -306,6 +331,29 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() async {
+    final uid = remoteDatasource.currentUserId;
+
+    // Clear local cache immediately to prevent profile mismatch for the next user
+    await _clearUserCache();
+    _cachedAvatarUrl = null;
+
+    if (uid != null) {
+      final isar = IsarService.isar;
+      try {
+        await isar.writeTxn(() async {
+          await isar.taskIsarModels.filter().userIdEqualTo(uid).syncStatusEqualTo('synced').deleteAll();
+          await isar.flashcardSetIsarModels.filter().userIdEqualTo(uid).syncStatusEqualTo('synced').deleteAll();
+          await isar.focusSessionIsarModels.filter().userIdEqualTo(uid).syncStatusEqualTo('synced').deleteAll();
+        });
+        debugPrint('Logged out: Synced local Isar records cleared for user $uid.');
+      } catch (e) {
+        debugPrint('Failed to clear synced local Isar records on logout: $e');
+      }
+    }
+
+    // Clear in-memory task repository cache
+    DependencyInjection.taskRepository.clearCache();
+
     // Log out the current user via the remote datasource.
     await remoteDatasource.logout();
   }

@@ -434,7 +434,7 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               await scanVm.batchDeleteSelected();
-              if (mounted) {
+              if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(AppLocalizations.of(context)!.scanDeleteSuccess)),
                 );

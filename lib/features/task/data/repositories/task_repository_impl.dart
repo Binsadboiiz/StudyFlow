@@ -37,8 +37,10 @@ class TaskRepositoryImpl implements TaskRepository {
   /// Khôi phục dữ liệu từ Isar local database (dữ liệu hiển thị offline tức thời)
   Future<List<Task>> _getLocalTasks() async {
     final isar = IsarService.isar;
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
     final localModels = await isar.taskIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .not()
         .syncStatusEqualTo('pending_delete')
         .findAll();
@@ -77,20 +79,25 @@ class TaskRepositoryImpl implements TaskRepository {
 
           final isar = IsarService.isar;
           await isar.writeTxn(() async {
+            final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
             // Lấy danh sách local UUIDs để tránh xóa nhầm các tasks đang chờ insert/update offline
             final pendingModels = await isar.taskIsarModels
                 .filter()
-                .syncStatusEqualTo('pending_insert')
-                .or()
-                .syncStatusEqualTo('pending_update')
-                .or()
-                .syncStatusEqualTo('pending_delete')
+                .userIdEqualTo(currentUid)
+                .and()
+                .group((q) => q
+                    .syncStatusEqualTo('pending_insert')
+                    .or()
+                    .syncStatusEqualTo('pending_update')
+                    .or()
+                    .syncStatusEqualTo('pending_delete'))
                 .findAll();
             final pendingUuids = pendingModels.map((m) => m.uuid).toSet();
 
             // Xóa các record đã synced cũ không còn trong danh sách pending
             await isar.taskIsarModels
                 .filter()
+                .userIdEqualTo(currentUid)
                 .syncStatusEqualTo('synced')
                 .deleteAll();
 
@@ -98,7 +105,7 @@ class TaskRepositoryImpl implements TaskRepository {
             for (final task in remoteTasks) {
               // Nếu task này không nằm trong danh sách đang chờ đồng bộ local
               if (!pendingUuids.contains(task.id)) {
-                final isarModel = TaskIsarModel.fromDomain(task, syncStatus: 'synced');
+                final isarModel = TaskIsarModel.fromDomain(task, userId: currentUid, syncStatus: 'synced');
                 await isar.taskIsarModels.put(isarModel);
               }
             }
@@ -140,13 +147,14 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<void> addTask(Task task) async {
     final isar = IsarService.isar;
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
     // Tạo ID cục bộ duy nhất nếu ID trống (khi tạo offline)
     final taskId = task.id.isEmpty
         ? DateTime.now().microsecondsSinceEpoch.toString()
         : task.id;
     final taskWithId = task.copyWith(id: taskId);
     
-    final localModel = TaskIsarModel.fromDomain(taskWithId, syncStatus: 'pending_insert');
+    final localModel = TaskIsarModel.fromDomain(taskWithId, userId: currentUid, syncStatus: 'pending_insert');
     
     // 1. Lưu local ngay lập tức
     await isar.writeTxn(() async {
@@ -188,6 +196,7 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<void> updateTask(Task task) async {
     final isar = IsarService.isar;
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
     
     // Tìm bản ghi local cũ để cập nhật
     final existingModel = await isar.taskIsarModels.filter().uuidEqualTo(task.id).findFirst();
@@ -196,7 +205,7 @@ class TaskRepositoryImpl implements TaskRepository {
     // Giữ nguyên trạng thái pending_insert nếu task chưa từng sync lên server
     final newSyncStatus = existingModel.syncStatus == 'pending_insert' ? 'pending_insert' : 'pending_update';
 
-    final updatedModel = TaskIsarModel.fromDomain(task, syncStatus: newSyncStatus);
+    final updatedModel = TaskIsarModel.fromDomain(task, userId: currentUid, syncStatus: newSyncStatus);
     updatedModel.id = existingModel.id; // Giữ nguyên ID local của Isar
 
     // 1. Cập nhật local
@@ -237,7 +246,8 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<void> deleteTask(String id) async {
     final isar = IsarService.isar;
-    final existingModel = await isar.taskIsarModels.filter().uuidEqualTo(id).findFirst();
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
+    final existingModel = await isar.taskIsarModels.filter().userIdEqualTo(currentUid).uuidEqualTo(id).findFirst();
     if (existingModel == null) return;
 
     // 1. Cập nhật local ngay lập tức
@@ -278,11 +288,15 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<void> syncAllPending() async {
     if (!connectionService.isOnline) return;
     
+    final currentUid = remoteDatasource.auth.currentUser?.uid ?? '';
+    if (currentUid.isEmpty) return;
+
     final isar = IsarService.isar;
 
     // 1. Đồng bộ lệnh XÓA
     final pendingDeletes = await isar.taskIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .syncStatusEqualTo('pending_delete')
         .findAll();
     
@@ -300,6 +314,7 @@ class TaskRepositoryImpl implements TaskRepository {
     // 2. Đồng bộ lệnh THÊM MỚI
     final pendingInserts = await isar.taskIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .syncStatusEqualTo('pending_insert')
         .findAll();
     
@@ -331,6 +346,7 @@ class TaskRepositoryImpl implements TaskRepository {
     // 3. Đồng bộ lệnh CẬP NHẬT
     final pendingUpdates = await isar.taskIsarModels
         .filter()
+        .userIdEqualTo(currentUid)
         .syncStatusEqualTo('pending_update')
         .findAll();
     
@@ -358,5 +374,11 @@ class TaskRepositoryImpl implements TaskRepository {
         debugPrint('Lỗi đồng bộ cập nhật task ${model.uuid}: $e');
       }
     }
+  }
+
+  @override
+  void clearCache() {
+    _tasksCache = null;
+    _tasksController.add([]);
   }
 }

@@ -468,4 +468,21 @@ class ScanViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     return 'en';
   }
+
+  /// Clears in-memory scanned document data upon logout
+  void clear() {
+    _allDocuments = [];
+    _documents = [];
+    _trashDocuments = [];
+    _storageUsage = null;
+    _isLoading = false;
+    _isProcessingOcr = false;
+    _isSaving = false;
+    _errorMessage = null;
+    _isSearching = false;
+    _isSelectionMode = false;
+    _selectedIds = {};
+    _currentFilterDays = null;
+    notifyListenersSafely();
+  }
 }

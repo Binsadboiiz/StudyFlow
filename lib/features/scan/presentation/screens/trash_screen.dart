@@ -152,7 +152,7 @@ class _TrashScreenState extends State<TrashScreen> {
               onTap: () async {
                 Navigator.pop(ctx);
                 final success = await scanVm.restoreDocument(id);
-                if (success && mounted) {
+                if (success && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(AppLocalizations.of(context)!.scanRestoreSuccess)),
                   );
@@ -189,7 +189,7 @@ class _TrashScreenState extends State<TrashScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await scanVm.hardDeleteDocument(id);
-              if (success && mounted) {
+              if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(AppLocalizations.of(context)!.scanHardDeleteSuccess)),
                 );

@@ -133,4 +133,19 @@ class GamificationViewModel extends ChangeNotifier {
       fetchLeaderboard(),
     ]);
   }
+
+  /// Clears in-memory gamification data upon logout
+  void clear() {
+    _summary = null;
+    _badges = [];
+    _leaderboardEntries = [];
+    _userRank = 0;
+    _currentSortBy = 'Level';
+    _activeSubTab = 0;
+    _isLoadingSummary = false;
+    _isLoadingBadges = false;
+    _isLoadingLeaderboard = false;
+    _isActionInProgress = false;
+    notifyListeners();
+  }
 }

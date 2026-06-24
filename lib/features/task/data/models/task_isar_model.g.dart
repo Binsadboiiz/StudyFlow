@@ -54,7 +54,8 @@ const TaskIsarModelSchema = CollectionSchema(
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
-    r'uuid': PropertySchema(id: 9, name: r'uuid', type: IsarType.string),
+    r'userId': PropertySchema(id: 9, name: r'userId', type: IsarType.string),
+    r'uuid': PropertySchema(id: 10, name: r'uuid', type: IsarType.string),
   },
 
   estimateSize: _taskIsarModelEstimateSize,
@@ -71,6 +72,19 @@ const TaskIsarModelSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'uuid',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+      ],
+    ),
+    r'userId': IndexSchema(
+      id: -2005826577402374815,
+      name: r'userId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'userId',
           type: IndexType.hash,
           caseSensitive: true,
         ),
@@ -95,6 +109,7 @@ int _taskIsarModelEstimateSize(
   bytesCount += 3 + object.description.length * 3;
   bytesCount += 3 + object.syncStatus.length * 3;
   bytesCount += 3 + object.title.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   bytesCount += 3 + object.uuid.length * 3;
   return bytesCount;
 }
@@ -114,7 +129,8 @@ void _taskIsarModelSerialize(
   writer.writeString(offsets[6], object.syncStatus);
   writer.writeString(offsets[7], object.title);
   writer.writeDateTime(offsets[8], object.updatedAt);
-  writer.writeString(offsets[9], object.uuid);
+  writer.writeString(offsets[9], object.userId);
+  writer.writeString(offsets[10], object.uuid);
 }
 
 TaskIsarModel _taskIsarModelDeserialize(
@@ -134,7 +150,8 @@ TaskIsarModel _taskIsarModelDeserialize(
   object.syncStatus = reader.readString(offsets[6]);
   object.title = reader.readString(offsets[7]);
   object.updatedAt = reader.readDateTime(offsets[8]);
-  object.uuid = reader.readString(offsets[9]);
+  object.userId = reader.readString(offsets[9]);
+  object.uuid = reader.readString(offsets[10]);
   return object;
 }
 
@@ -164,6 +181,8 @@ P _taskIsarModelDeserializeProp<P>(
     case 8:
       return (reader.readDateTime(offset)) as P;
     case 9:
+      return (reader.readString(offset)) as P;
+    case 10:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -373,6 +392,59 @@ extension TaskIsarModelQueryWhere
                 indexName: r'uuid',
                 lower: [],
                 upper: [uuid],
+                includeUpper: false,
+              ),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterWhereClause> userIdEqualTo(
+    String userId,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'userId', value: [userId]),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterWhereClause>
+  userIdNotEqualTo(String userId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [],
+                upper: [userId],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [userId],
+                includeLower: false,
+                upper: [],
+              ),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [userId],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [],
+                upper: [userId],
                 includeUpper: false,
               ),
             );
@@ -1201,6 +1273,147 @@ extension TaskIsarModelQueryFilter
     });
   }
 
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'userId',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'userId',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'userId', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition>
+  userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'userId', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterFilterCondition> uuidEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1469,6 +1682,18 @@ extension TaskIsarModelQuerySortBy
     });
   }
 
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
   QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> sortByUuid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuid', Sort.asc);
@@ -1611,6 +1836,18 @@ extension TaskIsarModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
   QueryBuilder<TaskIsarModel, TaskIsarModel, QAfterSortBy> thenByUuid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuid', Sort.asc);
@@ -1688,6 +1925,14 @@ extension TaskIsarModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<TaskIsarModel, TaskIsarModel, QDistinct> distinctByUserId({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<TaskIsarModel, TaskIsarModel, QDistinct> distinctByUuid({
     bool caseSensitive = true,
   }) {
@@ -1757,6 +2002,12 @@ extension TaskIsarModelQueryProperty
   QueryBuilder<TaskIsarModel, DateTime, QQueryOperations> updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<TaskIsarModel, String, QQueryOperations> userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 

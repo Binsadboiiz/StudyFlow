@@ -51,4 +51,11 @@ class NotificationViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint('Error clearing notifications: $e');
     }
   }
+
+  /// Resets notifications in memory upon logout
+  void clear() {
+    _notifications = [];
+    _isLoading = false;
+    notifyListenersSafely();
+  }
 }

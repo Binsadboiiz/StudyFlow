@@ -159,4 +159,14 @@ class ScheduleViewmodel extends ChangeNotifier with SafeChangeNotifier {
   String _dateKey(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
+
+  /// Clears in-memory schedule task lists upon logout
+  void clear() {
+    _allTasks = [];
+    _weeklyTasks = {};
+    _currentWeekStart = _getMonday(DateTime.now());
+    _selectedDay = DateTime.now();
+    _isLoading = false;
+    notifyListenersSafely();
+  }
 }

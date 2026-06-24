@@ -126,6 +126,10 @@ class AuthViewmodel extends ChangeNotifier with SafeChangeNotifier {
   /// Logs out the currently authenticated user.
   Future<void> logout() async {
     await logoutUsecase();
+    currentUser = null;
+    isAuthenticated = false;
+    isChecking = false;
+    notifyListenersSafely();
     NotificationService.instance.show(
       AppNotification(message: 'Logout success', type: NotificationType.success)
     );

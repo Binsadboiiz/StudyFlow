@@ -18,4 +18,7 @@ abstract class TaskRepository {
 
   /// Forces a refresh of tasks from remote datasource.
   Future<void> refresh();
+
+  /// Clears in-memory task caches.
+  void clearCache();
 }

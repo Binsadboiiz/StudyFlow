@@ -29,6 +29,7 @@ class _TaskFormModalState extends State<TaskFormModal> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   TimeOfDay? _reminderTime;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -321,7 +322,9 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                onPressed: () async {
+                onPressed: _isSaving
+                    ? null
+                    : () async {
                   if (_titleController.text.trim().isEmpty) return;
 
                   final localizations = AppLocalizations.of(context)!;
@@ -404,20 +407,25 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     }
                   }
 
-                  final vm = context.read<TaskViewmodel>();
-                  final scheduleVm = context.read<ScheduleViewmodel>();
-                  final homeVm = context.read<HomeViewModel>();
-                  final navigator = Navigator.of(context);
-                  DateTime? startDateTime;
-                  DateTime? endDateTime;
-                  DateTime? reminderDateTime;
-                  if (_startTime != null) {
-                    startDateTime = DateTime(
-                      _selectedDate.year,
-                      _selectedDate.month,
-                      _selectedDate.day,
-                      _startTime!.hour,
-                      _startTime!.minute,
+                  setState(() {
+                    _isSaving = true;
+                  });
+
+                  try {
+                    final vm = context.read<TaskViewmodel>();
+                    final scheduleVm = context.read<ScheduleViewmodel>();
+                    final homeVm = context.read<HomeViewModel>();
+                    final navigator = Navigator.of(context);
+                    DateTime? startDateTime;
+                    DateTime? endDateTime;
+                    DateTime? reminderDateTime;
+                    if (_startTime != null) {
+                      startDateTime = DateTime(
+                        _selectedDate.year,
+                        _selectedDate.month,
+                        _selectedDate.day,
+                        _startTime!.hour,
+                        _startTime!.minute,
                     );
                   }
                   if (_endTime != null) {
@@ -486,15 +494,37 @@ class _TaskFormModalState extends State<TaskFormModal> {
                       ),
                     );
                   }
-                },
-                child: Text(
-                  isEditMode ? AppLocalizations.of(context)!.saveChanges : AppLocalizations.of(context)!.addNow,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+                } catch (e) {
+                  if (!context.mounted) return;
+                  setState(() {
+                    _isSaving = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              },
+              child: _isSaving
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      isEditMode ? AppLocalizations.of(context)!.saveChanges : AppLocalizations.of(context)!.addNow,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
             ),
             const SizedBox(height: 24),
           ],

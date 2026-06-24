@@ -10,6 +10,9 @@ class TaskIsarModel {
   @Index(unique: true)
   late String uuid;
 
+  @Index()
+  late String userId;
+
   late String title;
   late String description;
   late DateTime date;
@@ -39,9 +42,10 @@ class TaskIsarModel {
   }
 
   /// Khởi tạo Isar model từ thực thể Domain Task
-  static TaskIsarModel fromDomain(Task task, {required String syncStatus, DateTime? updatedAt}) {
+  static TaskIsarModel fromDomain(Task task, {required String userId, required String syncStatus, DateTime? updatedAt}) {
     final model = TaskIsarModel();
     model.uuid = task.id;
+    model.userId = userId;
     model.title = task.title;
     model.description = task.description;
     model.date = task.date;

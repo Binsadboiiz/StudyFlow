@@ -121,12 +121,7 @@ class AuthRemoteDatasource {
 
         final googleUser = await googleSignIn.authenticate();
         final googleAuth = googleUser.authentication;
-        final List<String> scopes = ['email', 'profile'];
-        final clientAuth = await googleUser.authorizationClient.authorizeScopes(scopes);
-        final String accessToken = clientAuth.accessToken;
-
         final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: accessToken,
           idToken: googleAuth.idToken,
         );
 

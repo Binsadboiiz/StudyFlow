@@ -44,7 +44,8 @@ const FlashcardSetIsarModelSchema = CollectionSchema(
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
-    r'uuid': PropertySchema(id: 6, name: r'uuid', type: IsarType.string),
+    r'userId': PropertySchema(id: 6, name: r'userId', type: IsarType.string),
+    r'uuid': PropertySchema(id: 7, name: r'uuid', type: IsarType.string),
   },
 
   estimateSize: _flashcardSetIsarModelEstimateSize,
@@ -61,6 +62,19 @@ const FlashcardSetIsarModelSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'uuid',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+      ],
+    ),
+    r'userId': IndexSchema(
+      id: -2005826577402374815,
+      name: r'userId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'userId',
           type: IndexType.hash,
           caseSensitive: true,
         ),
@@ -91,6 +105,7 @@ int _flashcardSetIsarModelEstimateSize(
     }
   }
   bytesCount += 3 + object.title.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   bytesCount += 3 + object.uuid.length * 3;
   return bytesCount;
 }
@@ -107,7 +122,8 @@ void _flashcardSetIsarModelSerialize(
   writer.writeString(offsets[3], object.targetDocumentId);
   writer.writeString(offsets[4], object.title);
   writer.writeDateTime(offsets[5], object.updatedAt);
-  writer.writeString(offsets[6], object.uuid);
+  writer.writeString(offsets[6], object.userId);
+  writer.writeString(offsets[7], object.uuid);
 }
 
 FlashcardSetIsarModel _flashcardSetIsarModelDeserialize(
@@ -124,7 +140,8 @@ FlashcardSetIsarModel _flashcardSetIsarModelDeserialize(
   object.targetDocumentId = reader.readStringOrNull(offsets[3]);
   object.title = reader.readString(offsets[4]);
   object.updatedAt = reader.readDateTime(offsets[5]);
-  object.uuid = reader.readString(offsets[6]);
+  object.userId = reader.readString(offsets[6]);
+  object.uuid = reader.readString(offsets[7]);
   return object;
 }
 
@@ -148,6 +165,8 @@ P _flashcardSetIsarModelDeserializeProp<P>(
     case 5:
       return (reader.readDateTime(offset)) as P;
     case 6:
+      return (reader.readString(offset)) as P;
+    case 7:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -359,6 +378,58 @@ extension FlashcardSetIsarModelQueryWhere
                 indexName: r'uuid',
                 lower: [],
                 upper: [uuid],
+                includeUpper: false,
+              ),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterWhereClause>
+  userIdEqualTo(String userId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'userId', value: [userId]),
+      );
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterWhereClause>
+  userIdNotEqualTo(String userId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [],
+                upper: [userId],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [userId],
+                includeLower: false,
+                upper: [],
+              ),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [userId],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'userId',
+                lower: [],
+                upper: [userId],
                 includeUpper: false,
               ),
             );
@@ -1342,6 +1413,187 @@ extension FlashcardSetIsarModelQueryFilter
     FlashcardSetIsarModel,
     QAfterFilterCondition
   >
+  userIdEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'userId',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'userId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'userId',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'userId', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
+  userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'userId', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<
+    FlashcardSetIsarModel,
+    FlashcardSetIsarModel,
+    QAfterFilterCondition
+  >
   uuidEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1622,6 +1874,20 @@ extension FlashcardSetIsarModelQuerySortBy
   }
 
   QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
+  sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
+  sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
   sortByUuid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuid', Sort.asc);
@@ -1737,6 +2003,20 @@ extension FlashcardSetIsarModelQuerySortThenBy
   }
 
   QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
+  thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
+  thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QAfterSortBy>
   thenByUuid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuid', Sort.asc);
@@ -1802,6 +2082,13 @@ extension FlashcardSetIsarModelQueryWhereDistinct
   }
 
   QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QDistinct>
+  distinctByUserId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, FlashcardSetIsarModel, QDistinct>
   distinctByUuid({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'uuid', caseSensitive: caseSensitive);
@@ -1861,6 +2148,13 @@ extension FlashcardSetIsarModelQueryProperty
   updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<FlashcardSetIsarModel, String, QQueryOperations>
+  userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 

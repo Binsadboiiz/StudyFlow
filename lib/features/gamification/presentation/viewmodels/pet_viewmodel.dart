@@ -85,4 +85,13 @@ class PetViewModel extends ChangeNotifier {
       return false;
     }
   }
+
+  /// Clears pet data in memory upon logout
+  void clear() {
+    _pet = null;
+    _isLoadingPet = false;
+    _isActionInProgress = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
 }
