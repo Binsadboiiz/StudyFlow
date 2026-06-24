@@ -8,8 +8,6 @@ import 'package:studyflow/core/theme/app_colors.dart';
 import 'package:studyflow/core/theme/app_theme.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
-import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
-import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 
 /// A modal bottom sheet used to create a new task or edit an existing one.
@@ -63,8 +61,6 @@ class _TaskFormModalState extends State<TaskFormModal> {
 
   Future<void> _deleteTask(BuildContext context) async {
     final vm = context.read<TaskViewmodel>();
-    final scheduleVm = context.read<ScheduleViewmodel>();
-    final homeVm = context.read<HomeViewModel>();
     final navigator = Navigator.of(context);
     final localizations = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
@@ -104,8 +100,6 @@ class _TaskFormModalState extends State<TaskFormModal> {
     );
     if (confirm == true) {
       await vm.deleteTask(widget.task!.id, widget.task!.date);
-      scheduleVm.loadWeekTasks();
-      homeVm.refreshTasks();
       navigator.pop();
       NotificationService.instance.show(
         AppNotification(
@@ -413,8 +407,6 @@ class _TaskFormModalState extends State<TaskFormModal> {
 
                   try {
                     final vm = context.read<TaskViewmodel>();
-                    final scheduleVm = context.read<ScheduleViewmodel>();
-                    final homeVm = context.read<HomeViewModel>();
                     final navigator = Navigator.of(context);
                     DateTime? startDateTime;
                     DateTime? endDateTime;
@@ -476,8 +468,6 @@ class _TaskFormModalState extends State<TaskFormModal> {
                     );
                     await vm.addTask(newTask);
                   }
-                  scheduleVm.loadWeekTasks();
-                  homeVm.refreshTasks();
                   navigator.pop();
                   if (isEditMode) {
                     NotificationService.instance.show(

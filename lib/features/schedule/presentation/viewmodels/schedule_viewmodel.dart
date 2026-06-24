@@ -6,7 +6,6 @@ import 'package:studyflow/features/task/domain/usecase/add__task.dart';
 import 'package:studyflow/features/task/domain/usecase/delete_task.dart';
 import 'package:studyflow/features/task/domain/usecase/get_task.dart';
 import 'package:studyflow/features/task/domain/usecase/update_task.dart';
-import 'package:studyflow/core/network/network_checker.dart';
 
 /// View model for managing the state of the schedule screen.
 class ScheduleViewmodel extends ChangeNotifier with SafeChangeNotifier {
@@ -37,13 +36,6 @@ class ScheduleViewmodel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   Future<void> _init() async {
-    bool isConnected = await NetworkChecker.isServerReachable(timeoutSeconds: 30);
-    if (!isConnected) {
-      _isLoading = false;
-      notifyListenersSafely();
-      return;
-    }
-
     _taskSubscription = getTaskUseCase().listen((tasks) {
       _allTasks = tasks;
       _updateWeeklyTasks();

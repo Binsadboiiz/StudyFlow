@@ -5,8 +5,6 @@ import 'package:studyflow/features/ai_chat/presentation/providers/ai_chat_provid
 import 'package:studyflow/features/ai_chat/data/models/ai_chat_model.dart';
 import 'package:studyflow/features/task/presentation/viewmodels/task_viewmodel.dart';
 import 'package:studyflow/features/task/domain/entities/task.dart';
-import 'package:studyflow/features/schedule/presentation/viewmodels/schedule_viewmodel.dart';
-import 'package:studyflow/features/home/presentation/viewmodels/home_viewmodel.dart';
 import 'package:studyflow/l10n/app_localizations.dart';
 import 'package:studyflow/core/services/notification/app_notification.dart';
 import 'package:studyflow/core/services/notification/notification_type.dart';
@@ -731,10 +729,6 @@ class _AiChatScreenState extends State<AiChatScreen> {
         await taskVm.selectDate(taskDate);
         
         if (!mounted) return;
-
-        // Refresh schedule and home screens
-        context.read<ScheduleViewmodel>().loadWeekTasks();
-        context.read<HomeViewModel>().refreshTasks();
         
         NotificationService.instance.show(
           AppNotification(

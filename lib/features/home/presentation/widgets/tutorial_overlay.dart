@@ -189,12 +189,14 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                             children: [
                               const Icon(Icons.info_outline_rounded, color: Colors.white, size: 16),
                               const SizedBox(width: 8),
-                              Text(
-                                currentData.highlightMessage,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                              Flexible(
+                                child: Text(
+                                  currentData.highlightMessage,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ],
