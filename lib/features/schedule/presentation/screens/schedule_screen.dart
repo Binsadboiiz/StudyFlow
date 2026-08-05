@@ -27,75 +27,107 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<ScheduleViewmodel>();
     final theme = Theme.of(context);
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!widget.isNested) ...[
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Schedule', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+                GestureDetector(
+                  onTap: () => _showAddDialog(context, vm),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.add_rounded, color: AppColors.accent, size: 22),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        DayTabBar(
+          weekDays: vm.weekDays,
+          selectedDay: vm.selectedDay,
+          currentWeekStart: vm.currentWeekStart,
+          onDaySelected: (day) => vm.selectDay(day),
+          onPreviousWeek: () => vm.navigateWeek(-1),
+          onNextWeek: () => vm.navigateWeek(1),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: _buildDaySummary(vm),
+        ),
+        const SizedBox(height: 8),
+        if (isLandscape)
+          vm.isLoading
+              ? TaskSkeleton.buildList(count: 3)
+              : TimelineView(
+                  tasks: vm.selectedDayTasks,
+                  selectedDay: vm.selectedDay,
+                  onHourTapped: (hour) => _showAddDialog(context, vm, initialHour: hour),
+                  onTaskToggle: (task) async {
+                    await vm.toggleScheduleTask(task);
+                    if (!context.mounted) return;
+                    final taskVm = context.read<TaskViewmodel>();
+                    final homeVm = context.read<HomeViewModel>();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!context.mounted) return;
+                      taskVm.loadTask(taskVm.selectedDate);
+                      homeVm.refreshTasks();
+                    });
+                  },
+                  onTaskDelete: (task) => _confirmDelete(context, vm, task),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                )
+        else
+          Expanded(
+            child: vm.isLoading
+                ? TaskSkeleton.buildList(count: 3)
+                : TimelineView(
+                    tasks: vm.selectedDayTasks,
+                    selectedDay: vm.selectedDay,
+                    onHourTapped: (hour) => _showAddDialog(context, vm, initialHour: hour),
+                    onTaskToggle: (task) async {
+                      await vm.toggleScheduleTask(task);
+                      if (!context.mounted) return;
+                      final taskVm = context.read<TaskViewmodel>();
+                      final homeVm = context.read<HomeViewModel>();
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (!context.mounted) return;
+                        taskVm.loadTask(taskVm.selectedDate);
+                        homeVm.refreshTasks();
+                      });
+                    },
+                    onTaskDelete: (task) => _confirmDelete(context, vm, task),
+                  ),
+          ),
+      ],
+    );
+
+    if (isLandscape) {
+      content = SingleChildScrollView(
+        child: content,
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!widget.isNested) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Schedule', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
-                    GestureDetector(
-                      onTap: () => _showAddDialog(context, vm),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.add_rounded, color: AppColors.accent, size: 22),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            DayTabBar(
-              weekDays: vm.weekDays,
-              selectedDay: vm.selectedDay,
-              currentWeekStart: vm.currentWeekStart,
-              onDaySelected: (day) => vm.selectDay(day),
-              onPreviousWeek: () => vm.navigateWeek(-1),
-              onNextWeek: () => vm.navigateWeek(1),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildDaySummary(vm),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: vm.isLoading
-                  ? TaskSkeleton.buildList(count: 3)
-                  : TimelineView(
-                      tasks: vm.selectedDayTasks,
-                      selectedDay: vm.selectedDay,
-                      onHourTapped: (hour) => _showAddDialog(context, vm, initialHour: hour),
-                      onTaskToggle: (task) async {
-                        await vm.toggleScheduleTask(task);
-                        if (!context.mounted) return;
-                        final taskVm = context.read<TaskViewmodel>();
-                        final homeVm = context.read<HomeViewModel>();
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted) return;
-                          taskVm.loadTask(taskVm.selectedDate);
-                          homeVm.refreshTasks();
-                        });
-                      },
-                      onTaskDelete: (task) => _confirmDelete(context, vm, task),
-                    ),
-            ),
-          ],
-        ),
+        child: content,
       ),
       floatingActionButton: widget.isNested
           ? Padding(
-              padding: const EdgeInsets.only(bottom: 80.0),
+              padding: EdgeInsets.only(bottom: isLandscape ? 20.0 : 80.0),
               child: FloatingActionButton(
                 heroTag: 'schedule_add_fab',
                 onPressed: () => _showAddDialog(context, vm),

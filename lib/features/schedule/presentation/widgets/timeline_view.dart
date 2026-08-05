@@ -21,6 +21,12 @@ class TimelineView extends StatelessWidget {
   /// Callback triggered to delete a task.
   final Function(Task task) onTaskDelete;
 
+  /// Whether the timeline should shrink wrap its content.
+  final bool shrinkWrap;
+  
+  /// The scroll physics to use for the timeline.
+  final ScrollPhysics? physics;
+
   const TimelineView({
     super.key,
     required this.tasks,
@@ -28,11 +34,15 @@ class TimelineView extends StatelessWidget {
     required this.onHourTapped,
     required this.onTaskToggle,
     required this.onTaskDelete,
+    this.shrinkWrap = false,
+    this.physics,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      shrinkWrap: shrinkWrap,
+      physics: physics,
       padding: const EdgeInsets.only(left: 8, right: 16, top: 8, bottom: 100),
       itemCount: 24,
       itemBuilder: (context, index) {

@@ -282,274 +282,283 @@ class _FocusScreenState extends State<FocusScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    Widget content = Column(
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 48), // Balance for centering
+              Text(
+                AppLocalizations.of(context)!.focusMode,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.bar_chart_rounded,
+                  color: theme.colorScheme.onSurface,
+                ),
+                tooltip: AppLocalizations.of(context)!.focusAnalytics,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const FocusHeatmapScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Tabs
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: GlassCard(
+            padding: const EdgeInsets.all(4),
+            borderRadius: 30,
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: AppColors.accent,
+              ),
+              splashBorderRadius: BorderRadius.circular(30),
+              labelColor: Colors.white,
+              unselectedLabelColor: theme.brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.7)
+                  : Colors.black.withValues(alpha: 0.85),
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              dividerColor: Colors.transparent,
+              tabs: [
+                Tab(text: AppLocalizations.of(context)!.custom),
+                Tab(text: AppLocalizations.of(context)!.pomodoro),
+              ],
+            ),
+          ),
+        ),
+
+        if (isLandscape) const SizedBox(height: 30) else const Spacer(),
+
+        // Timer Display
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Outer animated glow ring
+            if (_isRunning)
+              Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
+                          blurRadius: 40,
+                          spreadRadius: 20,
+                        ),
+                      ],
+                    ),
+                  )
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .scale(
+                    begin: const Offset(0.9, 0.9),
+                    end: const Offset(1.1, 1.1),
+                    duration: 2.seconds,
+                  )
+                  .fade(begin: 0.5, end: 1.0, duration: 1.seconds)
+                  .then()
+                  .scale(
+                    begin: const Offset(1.1, 1.1),
+                    end: const Offset(0.9, 0.9),
+                    duration: 2.seconds,
+                  )
+                  .fade(begin: 1.0, end: 0.5, duration: 1.seconds),
+
+            // Circular Progress Indicator
+            SizedBox(
+              width: 250,
+              height: 250,
+              child: CircularProgressIndicator(
+                value: _progress,
+                strokeWidth: 12,
+                backgroundColor: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.15,
+                ),
+                color: _isResting ? Colors.blueAccent : AppColors.accent,
+                strokeCap: StrokeCap.round,
+              ),
+            ),
+
+            // Time Text
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _formattedTime,
+                  style: TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                if (_tabController.index == 1)
+                  Text(
+                    _isResting
+                        ? AppLocalizations.of(context)!.rest
+                        : AppLocalizations.of(context)!.focusLabel,
+                    style: TextStyle(
+                      fontSize: 16,
+                      letterSpacing: 2,
+                      color: _isResting
+                          ? Colors.blueAccent
+                          : theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+
+        if (isLandscape) const SizedBox(height: 30) else const Spacer(),
+
+        // Controls
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 1. Minus Button or Spacer
+            if (_tabController.index == 0)
+              (!_isRunning
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.remove_circle_outline,
+                        color: theme.colorScheme.onSurface,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        if (_customMinutes > 5) {
+                          setState(() {
+                            _customMinutes -= 5;
+                            _secondsRemaining = _customMinutes * 60;
+                          });
+                        }
+                      },
+                    )
+                  : const SizedBox(width: 48))
+            else
+              const SizedBox(width: 48),
+
+            const SizedBox(width: 16),
+
+            // 2. Reset Button or Spacer
+            // Show when timer is running or has been modified/paused
+            ((_isRunning ||
+                    _secondsRemaining !=
+                        (_tabController.index == 0
+                            ? _customMinutes * 60
+                            : (_isResting
+                                  ? _pomodoroRestMinutes * 60
+                                  : _pomodoroWorkMinutes * 60)))
+                ? IconButton(
+                    icon: Icon(
+                      Icons.replay_rounded,
+                      color: theme.colorScheme.onSurface,
+                      size: 32,
+                    ),
+                    tooltip: "Reset",
+                    onPressed: _resetTimer,
+                  )
+                : const SizedBox(width: 48)),
+
+            const SizedBox(width: 16),
+
+            // 3. Play/Stop Button
+            GestureDetector(
+              onTap: _toggleTimer,
+              child: GlassCard(
+                borderRadius: 40,
+                padding: const EdgeInsets.all(20),
+                color: _isRunning ? Colors.red.shade600 : AppColors.accent,
+                opacity:
+                    0.95, // High opacity to prevent it from looking washed out
+                child: Icon(
+                  _isRunning
+                      ? Icons.stop_rounded
+                      : Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            // 4. Spacer to balance the Reset button on the left (so Play remains centered)
+            const SizedBox(width: 48),
+
+            const SizedBox(width: 16),
+
+            // 5. Plus Button or Spacer
+            if (_tabController.index == 0)
+              (!_isRunning
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        color: theme.colorScheme.onSurface,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        if (_customMinutes < 120) {
+                          setState(() {
+                            _customMinutes += 5;
+                            _secondsRemaining = _customMinutes * 60;
+                          });
+                        }
+                      },
+                    )
+                  : const SizedBox(width: 48))
+            else
+              const SizedBox(width: 48),
+          ],
+        ),
+
+        SizedBox(height: isLandscape ? 20 : 100),
+      ],
+    );
+
+    if (isLandscape) {
+      content = SingleChildScrollView(
+        child: content,
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 48), // Balance for centering
-                  Text(
-                    AppLocalizations.of(context)!.focusMode,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.bar_chart_rounded,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    tooltip: AppLocalizations.of(context)!.focusAnalytics,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const FocusHeatmapScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: GlassCard(
-                padding: const EdgeInsets.all(4),
-                borderRadius: 30,
-                child: TabBar(
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: AppColors.accent,
-                  ),
-                  splashBorderRadius: BorderRadius.circular(30),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: theme.brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: 0.7)
-                      : Colors.black.withValues(alpha: 0.85),
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  dividerColor: Colors.transparent,
-                  tabs: [
-                    Tab(text: AppLocalizations.of(context)!.custom),
-                    Tab(text: AppLocalizations.of(context)!.pomodoro),
-                  ],
-                ),
-              ),
-            ),
-
-            const Spacer(),
-
-            // Timer Display
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                // Outer animated glow ring
-                if (_isRunning)
-                  Container(
-                        width: 280,
-                        height: 280,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(
-                                alpha: 0.3,
-                              ),
-                              blurRadius: 40,
-                              spreadRadius: 20,
-                            ),
-                          ],
-                        ),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .scale(
-                        begin: const Offset(0.9, 0.9),
-                        end: const Offset(1.1, 1.1),
-                        duration: 2.seconds,
-                      )
-                      .fade(begin: 0.5, end: 1.0, duration: 1.seconds)
-                      .then()
-                      .scale(
-                        begin: const Offset(1.1, 1.1),
-                        end: const Offset(0.9, 0.9),
-                        duration: 2.seconds,
-                      )
-                      .fade(begin: 1.0, end: 0.5, duration: 1.seconds),
-
-                // Circular Progress Indicator
-                SizedBox(
-                  width: 250,
-                  height: 250,
-                  child: CircularProgressIndicator(
-                    value: _progress,
-                    strokeWidth: 12,
-                    backgroundColor: theme.colorScheme.onSurface.withValues(
-                      alpha: 0.15,
-                    ),
-                    color: _isResting ? Colors.blueAccent : AppColors.accent,
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-
-                // Time Text
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _formattedTime,
-                      style: TextStyle(
-                        fontSize: 64,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    if (_tabController.index == 1)
-                      Text(
-                        _isResting
-                            ? AppLocalizations.of(context)!.rest
-                            : AppLocalizations.of(context)!.focusLabel,
-                        style: TextStyle(
-                          fontSize: 16,
-                          letterSpacing: 2,
-                          color: _isResting
-                              ? Colors.blueAccent
-                              : theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-
-            const Spacer(),
-
-            // Controls
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 1. Minus Button or Spacer
-                if (_tabController.index == 0)
-                  (!_isRunning
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.remove_circle_outline,
-                            color: theme.colorScheme.onSurface,
-                            size: 32,
-                          ),
-                          onPressed: () {
-                            if (_customMinutes > 5) {
-                              setState(() {
-                                _customMinutes -= 5;
-                                _secondsRemaining = _customMinutes * 60;
-                              });
-                            }
-                          },
-                        )
-                      : const SizedBox(width: 48))
-                else
-                  const SizedBox(width: 48),
-
-                const SizedBox(width: 16),
-
-                // 2. Reset Button or Spacer
-                // Show when timer is running or has been modified/paused
-                ((_isRunning ||
-                        _secondsRemaining !=
-                            (_tabController.index == 0
-                                ? _customMinutes * 60
-                                : (_isResting
-                                      ? _pomodoroRestMinutes * 60
-                                      : _pomodoroWorkMinutes * 60)))
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.replay_rounded,
-                          color: theme.colorScheme.onSurface,
-                          size: 32,
-                        ),
-                        tooltip: "Reset",
-                        onPressed: _resetTimer,
-                      )
-                    : const SizedBox(width: 48)),
-
-                const SizedBox(width: 16),
-
-                // 3. Play/Stop Button
-                GestureDetector(
-                  onTap: _toggleTimer,
-                  child: GlassCard(
-                    borderRadius: 40,
-                    padding: const EdgeInsets.all(20),
-                    color: _isRunning ? Colors.red.shade600 : AppColors.accent,
-                    opacity:
-                        0.95, // High opacity to prevent it from looking washed out
-                    child: Icon(
-                      _isRunning
-                          ? Icons.stop_rounded
-                          : Icons.play_arrow_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // 4. Spacer to balance the Reset button on the left (so Play remains centered)
-                const SizedBox(width: 48),
-
-                const SizedBox(width: 16),
-
-                // 5. Plus Button or Spacer
-                if (_tabController.index == 0)
-                  (!_isRunning
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.add_circle_outline,
-                            color: theme.colorScheme.onSurface,
-                            size: 32,
-                          ),
-                          onPressed: () {
-                            if (_customMinutes < 120) {
-                              setState(() {
-                                _customMinutes += 5;
-                                _secondsRemaining = _customMinutes * 60;
-                              });
-                            }
-                          },
-                        )
-                      : const SizedBox(width: 48))
-                else
-                  const SizedBox(width: 48),
-              ],
-            ),
-
-            const SizedBox(height: 100),
-          ],
-        ),
+        child: content,
       ),
     );
   }

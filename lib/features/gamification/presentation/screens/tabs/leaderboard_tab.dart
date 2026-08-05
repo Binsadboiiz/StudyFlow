@@ -68,18 +68,19 @@ class LeaderboardTab extends StatelessWidget {
             ),
           )
         else ...[
-          // Vẽ bục vinh quang cho Top 3 nếu có
-          if (top3.isNotEmpty)
-            _buildPodium(context, top3, currentUserId, gamificationVm.currentSortBy),
-          const SizedBox(height: 20),
-
-          // Danh sách xếp hạng còn lại (từ hạng 4 trở đi)
+          // Danh sách xếp hạng (bao gồm bục vinh quang ở đầu list và danh sách từ hạng 4 trở đi)
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 100),
-              itemCount: remainingEntries.length,
+              itemCount: remainingEntries.length + 1,
               itemBuilder: (context, index) {
-                final entry = remainingEntries[index];
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: _buildPodium(context, top3, currentUserId, gamificationVm.currentSortBy),
+                  );
+                }
+                final entry = remainingEntries[index - 1];
                 final isMe = entry.userId == currentUserId;
 
                 return Padding(

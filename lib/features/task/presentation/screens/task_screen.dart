@@ -40,65 +40,81 @@ class _TaskScreenState extends State<TaskScreen> {
     final today = DateTime.now();
     final theme = Theme.of(context);
     final ext = theme.extension<AppThemeExtension>()!;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!widget.isNested) const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!widget.isNested) ...[
+                    Text(
+                      AppLocalizations.of(context)!.tasks,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  Text(
+                    '${AppLocalizations.of(context)!.remainingWithCount(vm.tasks.where((t) => !t.isCompleted).length)} · ${AppLocalizations.of(context)!.completedWithCount(vm.tasks.where((t) => t.isCompleted).length)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ext.subtext,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              _buildDateChip(context, vm, today),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildDateSelector(vm, today),
+        const SizedBox(height: 16),
+        if (vm.tasks.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildProgressBar(vm),
+          ),
+        const SizedBox(height: 8),
+        if (isLandscape)
+          vm.isLoading
+              ? TaskSkeleton.buildList(count: 4)
+              : (vm.tasks.isEmpty
+                    ? _buildEmptyState()
+                    : _buildTaskList(vm, shrinkWrap: true, physics: const NeverScrollableScrollPhysics()))
+        else
+          Expanded(
+            child: vm.isLoading
+                ? TaskSkeleton.buildList(count: 4)
+                : (vm.tasks.isEmpty
+                      ? _buildEmptyState()
+                      : _buildTaskList(vm)),
+          ),
+      ],
+    );
+
+    if (isLandscape) {
+      content = SingleChildScrollView(
+        child: content,
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!widget.isNested) const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (!widget.isNested) ...[
-                        Text(
-                          AppLocalizations.of(context)!.tasks,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                      ],
-                      Text(
-                        '${AppLocalizations.of(context)!.remainingWithCount(vm.tasks.where((t) => !t.isCompleted).length)} · ${AppLocalizations.of(context)!.completedWithCount(vm.tasks.where((t) => t.isCompleted).length)}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: ext.subtext,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  _buildDateChip(context, vm, today),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildDateSelector(vm, today),
-            const SizedBox(height: 16),
-            if (vm.tasks.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildProgressBar(vm),
-              ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: vm.isLoading
-                  ? TaskSkeleton.buildList(count: 4)
-                  : (vm.tasks.isEmpty
-                        ? _buildEmptyState()
-                        : _buildTaskList(vm)),
-            ),
-          ],
-        ),
+        child: content,
       ),
     );
   }
@@ -303,11 +319,13 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  Widget _buildTaskList(TaskViewmodel vm) {
+  Widget _buildTaskList(TaskViewmodel vm, {bool shrinkWrap = false, ScrollPhysics? physics}) {
     final pendingTasks = vm.tasks.where((t) => !t.isCompleted).toList();
     final completedTasks = vm.tasks.where((t) => t.isCompleted).toList();
     final ext = Theme.of(context).extension<AppThemeExtension>()!;
     return ListView(
+      shrinkWrap: shrinkWrap,
+      physics: physics,
       padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 100),
       children: [
         ...pendingTasks.map((task) => _buildTaskCard(task, vm)),
